@@ -1,7 +1,8 @@
 import app from './app.js';
 import pool from './config/db.js';
+import config from './config/env.js';
 
-const port = 3000;
+const port = config.port;
 
 const startServer = async () => {
     try {
