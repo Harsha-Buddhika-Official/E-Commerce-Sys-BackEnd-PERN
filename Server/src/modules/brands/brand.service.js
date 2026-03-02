@@ -14,4 +14,18 @@ export const createBrand = async (brandData) => {
     return await brandRepository.createBrand(brandData);
 }
 
-export const deleteBrand = async ()
+export const deleteBrand = async (brandId) => {
+    const selectedBrand = await brandRepository.findById(brandId);
+    if(!selectedBrand){
+        throw new Error('Brand not found');
+    }
+    return await brandRepository.deleteBrand(brandId);
+}
+
+export const softDeleteBrand = async (brandId) => {
+    const selectedBrand = await brandRepository.findById(brandId);
+    if(!selectedBrand){
+        throw new Error('Brand not found');
+    }
+    return await brandRepository.softDelete(brandId);
+}

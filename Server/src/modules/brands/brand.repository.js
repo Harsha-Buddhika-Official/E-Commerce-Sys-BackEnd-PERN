@@ -29,7 +29,7 @@ export const findByName = async (name) => {
 
 //find brand by id
 export const findById = async (id) => {
-    const query = 'SELECT * FROM brands WHERE id = $1';
+    const query = 'SELECT * FROM brands WHERE brand_id = $1';
     const value = [id];
     const { rows } = await pool.query(query, value);
     return rows[0];
@@ -38,7 +38,7 @@ export const findById = async (id) => {
 //update brand
 export const updateBrand = async (id, brandData) => {
     const { name, slug, logo_url, is_active } = brandData;
-    const query = 'UPDATE brands SET name = $1 ,slug =$2, logo_url = $3, is_active = $4 WHERE id = $5 RETURNING *';
+    const query = 'UPDATE brands SET name = $1 ,slug =$2, logo_url = $3, is_active = $4 WHERE brand_id = $5 RETURNING *';
     const values = [
         name,
         slug,
@@ -52,7 +52,7 @@ export const updateBrand = async (id, brandData) => {
 
 //delete brand
 export const deleteBrand = async (id) => {
-    const query = 'DELETE FROM brands WHERE id =$1';
+    const query = 'DELETE FROM brands WHERE brand_id =$1';
     const values = [id];
     const { rows } = await pool.query(query, values);
     return rows[0];
@@ -63,7 +63,7 @@ export const softDelete = async (id) => {
     const query = `UPDATE brands
      SET is_active = false,
          updated_at = CURRENT_TIMESTAMP
-     WHERE id = $1
+     WHERE brand_id = $1
      RETURNING *`;
     const values = [id];
     const { rows } = await pool.query(query, values);
