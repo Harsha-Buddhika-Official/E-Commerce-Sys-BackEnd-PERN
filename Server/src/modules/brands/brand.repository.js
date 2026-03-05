@@ -2,6 +2,7 @@ import pool from "../../config/db.js";
 
 //create brand
 export const createBrand = async (brandData) => {
+    const { name, slug, logo_url, is_active } = brandData;
     const query = `
     INSERT INTO brands (name, slug, logo_url, is_active)
     VALUES ($1, $2, $3, $4)
@@ -9,14 +10,21 @@ export const createBrand = async (brandData) => {
   `;
 
     const values = [
-        brandData.name,
-        brandData.slug,
-        brandData.logo_url || null,
-        brandData.is_active ?? true
+        name,
+        slug,
+        logo_url || null,
+        is_active ?? true
     ];
 
     const { rows } = await pool.query(query, values);
     return rows[0];
+};
+
+//get all brands
+export const getAllBrands = async () => {
+    const query = 'SELECT * FROM brands';
+    const { rows } = await pool.query(query);
+    return rows;
 };
 
 //find brand by name
@@ -33,7 +41,7 @@ export const findById = async (id) => {
     const value = [id];
     const { rows } = await pool.query(query, value);
     return rows[0];
-}
+};
 
 //update brand
 export const updateBrand = async (id, brandData) => {
@@ -48,7 +56,7 @@ export const updateBrand = async (id, brandData) => {
     ];
     const { rows } = await pool.query(query, values);
     return rows[0];
-}
+};
 
 //delete brand
 export const deleteBrand = async (id) => {
@@ -56,7 +64,7 @@ export const deleteBrand = async (id) => {
     const values = [id];
     const { rows } = await pool.query(query, values);
     return rows[0];
-}
+};
 
 //soft delete brand
 export const softDelete = async (id) => {
@@ -69,10 +77,3 @@ export const softDelete = async (id) => {
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
-
-//get all brands
-export const getAllBrands = async () => {
-    const query = 'SELECT * FROM brands';
-    const { rows } = await pool.query(query);
-    return rows;
-}
