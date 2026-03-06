@@ -77,3 +77,15 @@ export const softDelete = async (id) => {
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
+
+//restore brand
+export const restoreBrand = async (id) => {
+    const query = `UPDATE brands
+        SET is_active = true,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE brand_id = $1
+        RETURNING *`;
+    const values = [id];
+    const { rows } = await pool.query(query, values);
+    return rows[0];
+}
