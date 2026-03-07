@@ -15,7 +15,7 @@ export const createCategory = async (categoryData) => {
 
 //get all categories
 export const getAllCategories = async () => {
-    const query = `SELECT * FROM categories`;
+    const query = `SELECT * FROM categories WHERE is_active = true ORDER BY name`;
     const { rows } = await pool.query(query);
     return rows;
 };
@@ -25,17 +25,11 @@ export const getCategoriesByType = async (type) => {
     const query = `
         SELECT * FROM categories
         WHERE category_type = $1
+        AND is_active = true
+        ORDER BY name
     `;
     const { rows } = await pool.query(query, [type]);
     return rows;
-};
-
-//find category by name
-export const findByName = async (name) => {
-    const query = `SELECT * FROM categories WHERE name = $1`;
-    const values = [name];
-    const { rows } = await pool.query(query, values);
-    return rows[0];
 };
 
 //find category by id
@@ -43,6 +37,14 @@ export const findById = async (id) => {
     const query = `SELECT * FROM categories WHERE category_id = $1`;
     const value = [id];
     const { rows } = await pool.query(query, value);
+    return rows[0];
+};
+
+//find category by name
+export const findByName = async (name) => {
+    const query = `SELECT * FROM categories WHERE name = $1`;
+    const values = [name];
+    const { rows } = await pool.query(query, values);
     return rows[0];
 };
 
