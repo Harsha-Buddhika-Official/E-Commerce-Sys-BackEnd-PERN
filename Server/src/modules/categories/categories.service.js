@@ -27,8 +27,11 @@ export const getCategories = async (type) => {
     if (type) {
         categories = await categoryRepository.getCategoriesByType(type);
     } else {
-        categories = await categoryRepository.getAllCategories();
+        throw new Error('Category type is required');
     }
+    // else {
+    //     categories = await categoryRepository.getAllCategories();
+    // }
     return categories;
 };
 
@@ -53,6 +56,7 @@ export const updateCategory = async (id, categoryData) => {
             throw new Error('Category with this name already exists');
         }
     }
+    categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });
     return await categoryRepository.updateCategory(id, categoryData);
 }
 
@@ -71,7 +75,7 @@ export const softDeleteCategory = async (id) => {
     if (!existing) {
         throw new Error('Category not found');
     }
-    return await categoryRepository.updateCategory(id, { is_active: false });
+    return await categoryRepository.softDelete(id, { is_active: false });
 }
 
 //restore category
@@ -80,5 +84,5 @@ export const restoreCategory = async (id) => {
     if (!existing) {
         throw new Error('Category not found');
     }
-    return await categoryRepository.updateCategory(id, { is_active: true });
+    return await categoryRepository.restoreCategory(id, { is_active: true });
 }
