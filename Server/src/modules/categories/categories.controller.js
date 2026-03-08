@@ -14,25 +14,30 @@ export const createCategory = async (req, res, next) => {
     }
 };
 
-//get all categories
-export const getAllCategories = async (req, res, next) => {
-    try {
-        const categories = await categoryService.getAllCategories();
-        res.status(200).json({
-            success: true,
-            data: categories,
-            message: 'Categories retrieved successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-}
+// //get all categories
+// export const getAllCategories = async (req, res, next) => {
+//     try {
+//         const categories = await categoryService.getAllCategories();
+//         res.status(200).json({
+//             success: true,
+//             data: categories,
+//             message: 'Categories retrieved successfully'
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }
 
-//get categories by category_type
+//get categories by category_type / get all categories if no type provided
 export const getCategories = async (req, res, next) => {
     try {
         const { type } = req.query;
-        const categories = await categoryService.getCategories(type);
+        let categories;
+        if(type) {
+            categories = await categoryService.getCategories(type);
+        } else {
+            categories = await categoryService.getCategories();
+        }
         res.status(200).json({
             success: true,
             data: categories

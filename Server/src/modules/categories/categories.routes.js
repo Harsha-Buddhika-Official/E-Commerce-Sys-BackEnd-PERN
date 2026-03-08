@@ -1,15 +1,15 @@
 import express from 'express';
-import { createCategory, getAllCategories, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory } from './categories.controller.js';
+import { createCategory, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory } from './categories.controller.js';
+import {validateCreateCategory} from './categories.validator.js';
 
 const router = express.Router();
 
-router.post('/', createCategory); //done testing
-router.get('/', getAllCategories); //done testing
-router.get('/type', getCategories); //done testing
+router.post('/', validateCreateCategory, createCategory); //done testing
+router.get('/', getCategories); //done testing with type and without type query param
 router.get('/:id', getCategoryById); //done testing
 router.put('/:id', updateCategory); //done testing
 router.delete('/:id', deleteCategory); //done testing
-router.put('/soft/:id', softDeleteCategory); //done testing
-router.put('/restore/:id', restoreCategory); //done testing
+router.put('/:id/deactivate', softDeleteCategory); //done testing
+router.put('/:id/restore', restoreCategory); //done testing
 
 export default router;

@@ -15,11 +15,11 @@ export const createCategory = async (categoryData) => {
     return await categoryRepository.createCategory(categoryData);
 }
 
-//get all categories
-export const getAllCategories = async () => {
-    const categories = await categoryRepository.getAllCategories();
-    return categories;
-};
+// //get all categories
+// export const getAllCategories = async () => {
+//     const categories = await categoryRepository.getAllCategories();
+//     return categories;
+// };
 
 //get categories by category_type
 export const getCategories = async (type) => {
@@ -27,11 +27,8 @@ export const getCategories = async (type) => {
     if (type) {
         categories = await categoryRepository.getCategoriesByType(type);
     } else {
-        throw new Error('Category type is required');
+       categories = await categoryRepository.getAllCategories();
     }
-    // else {
-    //     categories = await categoryRepository.getAllCategories();
-    // }
     return categories;
 };
 
