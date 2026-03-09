@@ -21,6 +21,39 @@ const createCategorySchema = joi.object({
             "any.only": "Invalid category type",
             "any.required": "Category type is required"
         })
+});
+
+// Validation schema for updating a category
+const updateCategorySchema = joi.object({
+    name: joi.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .required()
+        .messages({
+            "string.empty": "Category name is required",
+            "string.min": "Category name must be at least 2 characters",
+            "string.max": "Category name must not exceed 100 characters"
+        })
+});
+
+// Validation schema for getting categories with optional type query parameter
+const getCategorysSchema = joi.object({
+    type: joi.string()
+        .valid("product", "accessory")
+        .optional()
+})
+
+// Validation schema for validating category ID in params
+const idParamSchema = joi.object({
+    id: joi.number()
+        .positive()
+        .required()
+        .messages({
+            "number.base": "ID must be a number",
+            "number.integer": "ID must be an integer",
+            "number.positive": "ID must be positive"
+        })
 })
 
 //middleware to validate create category request
@@ -39,20 +72,6 @@ export const validateCreateCategory = (req, res, next) => {
     next();
 };
 
-// Validation schema for updating a category
-const updateCategorySchema = joi.object({
-    name: joi.string()
-        .trim()
-        .min(2)
-        .max(100)
-        .required()
-        .messages({
-            "string.empty": "Category name is required",
-            "string.min": "Category name must be at least 2 characters",
-            "string.max": "Category name must not exceed 100 characters"
-        })
-})
-
 //middleware to validate update category request
 export const validateUpdateCategory = (req, res, next) => {
     const { error, value } = updateCategorySchema.validate(req.body, { abortEarly: false });
@@ -69,13 +88,6 @@ export const validateUpdateCategory = (req, res, next) => {
     next();
 }
 
-// Validation schema for getting categories with optional type query parameter
-const getCategorysSchema = joi.object({
-    type: joi.string()
-        .valid("product", "accessory")
-        .optional()
-})
-
 //middleware to validate get categories request
 export const validateGetCategorySchema = (req, res, next) => {
     const { error, value } = getCategorysSchema.validate(req.query);
@@ -88,18 +100,6 @@ export const validateGetCategorySchema = (req, res, next) => {
     req.query = value;
     next();
 }
-
-// Validation schema for validating category ID in params
-const idParamSchema = joi.object({
-    id: joi.number()
-        .positive()
-        .required()
-        .messages({
-            "number.base": "ID must be a number",
-            "number.integer": "ID must be an integer",
-            "number.positive": "ID must be positive"
-        })
-})
 
 //middleware to validate category ID in params
 export const validateCategoryIdParam = (req, res, next) => {
