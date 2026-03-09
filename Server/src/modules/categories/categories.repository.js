@@ -8,7 +8,12 @@ export const createCategory = async (categoryData) => {
         VALUES ($1, $2, $3, $4)
         RETURNING *
     `;
-    const values = [name, slug, category_type, img_url];
+    const values = [
+        name,
+        slug,
+        category_type,
+        img_url || null
+    ];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };

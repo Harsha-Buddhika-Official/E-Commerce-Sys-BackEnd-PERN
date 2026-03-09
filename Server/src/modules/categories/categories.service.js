@@ -42,7 +42,7 @@ export const updateCategory = async (id, categoryData) => {
     if (!existing) {
         throw new Error('Category not found');
     }
-    if (categoryData.name !== existing.name) {
+    if (categoryData.name && categoryData.name !== existing.name) {
         const nameExists = await categoryRepository.findByName(categoryData.name);
         if (nameExists) {
             throw new Error('Category with this name already exists');

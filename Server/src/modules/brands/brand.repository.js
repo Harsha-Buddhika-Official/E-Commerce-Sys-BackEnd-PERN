@@ -2,10 +2,10 @@ import pool from "../../config/db.js";
 
 //create brand
 export const createBrand = async (brandData) => {
-    const { name, slug, logo_url, is_active } = brandData;
+    const { name, slug, logo_url } = brandData;
     const query = `
-    INSERT INTO brands (name, slug, logo_url, is_active)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO brands (name, slug, logo_url)
+    VALUES ($1, $2, $3)
     RETURNING *
   `;
 
@@ -13,7 +13,6 @@ export const createBrand = async (brandData) => {
         name,
         slug,
         logo_url || null,
-        is_active ?? true
     ];
 
     const { rows } = await pool.query(query, values);
@@ -28,7 +27,7 @@ export const getAllBrands = async () => {
 };
 
 //find brand by name
-export const findByName = async (name) => {
+export const findBrandByName = async (name) => {
     const query = 'SELECT * FROM brands WHERE name = $1';
     const values = [name];
     const { rows } = await pool.query(query, values);
@@ -36,7 +35,7 @@ export const findByName = async (name) => {
 };
 
 //find brand by id
-export const findById = async (id) => {
+export const getBrandById = async (id) => {
     const query = 'SELECT * FROM brands WHERE brand_id = $1';
     const value = [id];
     const { rows } = await pool.query(query, value);
@@ -45,13 +44,12 @@ export const findById = async (id) => {
 
 //update brand
 export const updateBrand = async (id, brandData) => {
-    const { name, slug, logo_url, is_active } = brandData;
-    const query = 'UPDATE brands SET name = $1 ,slug =$2, logo_url = $3, is_active = $4 WHERE brand_id = $5 RETURNING *';
+    const { name, slug, logo_url } = brandData;
+    const query = 'UPDATE brands SET name = $1 ,slug =$2, logo_url = $3 WHERE brand_id = $4 RETURNING *';
     const values = [
         name,
         slug,
         logo_url,
-        is_active,
         id
     ];
     const { rows } = await pool.query(query, values);

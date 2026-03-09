@@ -9,8 +9,8 @@ app.use(express.json());
 app.use(cors());
 
 // app.use('/api/products', productRoutes);
-// app.use('/api/brand', brandRoutes);
 // app.use('/api/admin',)
 app.use('/api/categories', categoryRoutes);
+app.use('/api/brands', brandRoutes)
 
 export default app;
