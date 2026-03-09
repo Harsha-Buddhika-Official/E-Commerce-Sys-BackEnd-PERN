@@ -4,6 +4,7 @@ import * as categoryRepository from "./categories.repository.js";
 //create category
 export const createCategory = async (categoryData) => {
     if (!categoryData.name) throw new Error('Category name is required');
+    if (!categoryData.category_type) throw new Error('Category type is required');
 
     const existing = await categoryRepository.findByName(categoryData.name);
     if (existing) {
@@ -14,12 +15,6 @@ export const createCategory = async (categoryData) => {
 
     return await categoryRepository.createCategory(categoryData);
 }
-
-// //get all categories
-// export const getAllCategories = async () => {
-//     const categories = await categoryRepository.getAllCategories();
-//     return categories;
-// };
 
 //get categories by category_type
 export const getCategories = async (type) => {

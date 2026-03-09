@@ -2,13 +2,13 @@ import pool from "../../config/db.js";
 
 //create category
 export const createCategory = async (categoryData) => {
-    const { name, slug, category_type } = categoryData;
+    const { name, slug, category_type, img_url } = categoryData;
     const query = `
-        INSERT INTO categories (name, slug, category_type)
-        VALUES ($1, $2, $3)
+        INSERT INTO categories (name, slug, category_type, img_url)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
     `;
-    const values = [name, slug, category_type];
+    const values = [name, slug, category_type, img_url];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
@@ -50,11 +50,12 @@ export const findByName = async (name) => {
 
 //update category
 export const updateCategory = async (id, categoryData) => {
-    const { name, slug } = categoryData;
-    const query = `UPDATE categories SET name = $1 ,slug =$2, updated_at = CURRENT_TIMESTAMP WHERE category_id = $3 RETURNING *`;
+    const { name, slug, img_url } = categoryData;
+    const query = `UPDATE categories SET name = $1 ,slug =$2, img_url = $3, updated_at = CURRENT_TIMESTAMP WHERE category_id = $4 RETURNING *`;
     const values = [
         name,
         slug,
+        img_url,
         id
     ];
     const { rows } = await pool.query(query, values);
