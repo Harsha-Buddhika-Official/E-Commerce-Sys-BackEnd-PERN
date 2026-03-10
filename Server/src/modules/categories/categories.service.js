@@ -6,7 +6,7 @@ export const createCategory = async (categoryData) => {
     if (!categoryData.name) throw new Error('Category name is required');
     if (!categoryData.category_type) throw new Error('Category type is required');
 
-    const existing = await categoryRepository.findByName(categoryData.name);
+    const existing = await categoryRepository.findCategoryByName(categoryData.name);
     if (existing) {
         throw new Error('Category with this name already exists');
     }
@@ -29,7 +29,7 @@ export const getCategories = async (type) => {
 
 //get category by id
 export const getCategoryById = async (id) => {
-    const category = await categoryRepository.findById(id);
+    const category = await categoryRepository.findCategoryById(id);
     if (!category) {
         throw new Error('Category not found');
     }
@@ -38,12 +38,12 @@ export const getCategoryById = async (id) => {
 
 //update category
 export const updateCategory = async (id, categoryData) => {
-    const existing = await categoryRepository.findById(id);
+    const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
         throw new Error('Category not found');
     }
     if (categoryData.name && categoryData.name !== existing.name) {
-        const nameExists = await categoryRepository.findByName(categoryData.name);
+        const nameExists = await categoryRepository.findCategoryByName(categoryData.name);
         if (nameExists) {
             throw new Error('Category with this name already exists');
         }
@@ -54,7 +54,7 @@ export const updateCategory = async (id, categoryData) => {
 
 //delete category
 export const deleteCategory = async (id) => {
-    const existing = await categoryRepository.findById(id);
+    const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
         throw new Error('Category not found');
     }
@@ -63,18 +63,18 @@ export const deleteCategory = async (id) => {
 
 //soft delete category
 export const softDeleteCategory = async (id) => {
-    const existing = await categoryRepository.findById(id);
+    const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
         throw new Error('Category not found');
     }
-    return await categoryRepository.softDelete(id, { is_active: false });
+    return await categoryRepository.softDeleteCategory(id);
 }
 
 //restore category
 export const restoreCategory = async (id) => {
-    const existing = await categoryRepository.findById(id);
+    const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
         throw new Error('Category not found');
     }
-    return await categoryRepository.restoreCategory(id, { is_active: true });
+    return await categoryRepository.restoreCategory(id);
 }

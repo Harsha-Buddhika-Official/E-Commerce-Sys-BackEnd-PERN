@@ -38,7 +38,7 @@ export const getCategoriesByType = async (type) => {
 };
 
 //find category by id
-export const findById = async (id) => {
+export const findCategoryById = async (id) => {
     const query = `SELECT * FROM categories WHERE category_id = $1`;
     const value = [id];
     const { rows } = await pool.query(query, value);
@@ -46,7 +46,7 @@ export const findById = async (id) => {
 };
 
 //find category by name
-export const findByName = async (name) => {
+export const findCategoryByName = async (name) => {
     const query = `SELECT * FROM categories WHERE name = $1`;
     const values = [name];
     const { rows } = await pool.query(query, values);
@@ -76,7 +76,7 @@ export const deleteCategory = async (id) => {
 }
 
 //soft delete category
-export const softDelete = async (id) => {
+export const softDeleteCategory = async (id) => {
     const query = `UPDATE categories
         SET is_active = false,
             updated_at = CURRENT_TIMESTAMP

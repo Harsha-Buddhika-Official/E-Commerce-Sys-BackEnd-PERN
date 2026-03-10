@@ -34,6 +34,12 @@ const updateCategorySchema = joi.object({
             "string.empty": "Category name is required",
             "string.min": "Category name must be at least 2 characters",
             "string.max": "Category name must not exceed 100 characters"
+        }),
+    img_url: joi.string()
+        .uri()
+        .optional()
+        .messages({
+            "string.uri": "Image URL must be a valid URI"
         })
 });
 
