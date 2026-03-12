@@ -73,7 +73,7 @@ export const deleteCategory = async (id) => {
     const values = [id];
     const { rows } = await pool.query(query, values);
     return rows[0];
-}
+};
 
 //soft delete category
 export const softDeleteCategory = async (id) => {

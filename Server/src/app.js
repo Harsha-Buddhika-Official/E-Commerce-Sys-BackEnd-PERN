@@ -8,9 +8,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// app.use('/api/products', productRoutes);
-// app.use('/api/admin',)
-app.use('/api/categories', categoryRoutes);
-app.use('/api/brands', brandRoutes)
+app.use('/api/categories', categoryRoutes); //done testing
+app.use('/api/brands', brandRoutes); //done testing
+app.use('/api/products', productRoutes);
 
 export default app;

@@ -21,18 +21,9 @@ export const getAllBrands = async() => {
     return brands;
 }
 
-// //get brand by name
-// export const getBrandByName = async (name) => {
-//     const brand = await brandRepository.findByName(name);
-//     if(!brand){
-//         throw new Error('Brand not found');
-//     }
-//     return brand;
-// }
-
 //get brand by id
 export const getBrandById = async (id) => {
-    const brand = await brandRepository.getBrandById(id);
+    const brand = await brandRepository.findBrandById(id);
     if(!brand){
         throw new Error('Brand not found');
     }
@@ -41,7 +32,7 @@ export const getBrandById = async (id) => {
 
 //update brand
 export const updateBrand = async(id, brandData) => {
-    const existing = await brandRepository.getBrandById(id);
+    const existing = await brandRepository.findBrandById(id);
     if(!existing){
         throw new Error('Brand not found');
     }
@@ -57,7 +48,7 @@ export const updateBrand = async(id, brandData) => {
 
 //delete brand
 export const deleteBrand = async (id) => {
-    const selectedBrand = await brandRepository.getBrandById(id);
+    const selectedBrand = await brandRepository.findBrandById(id);
     if(!selectedBrand){
         throw new Error('Brand not found');
     }
@@ -66,7 +57,7 @@ export const deleteBrand = async (id) => {
 
 //soft delete brand
 export const softDeleteBrand = async (id) => {
-    const selectedBrand = await brandRepository.getBrandById(id);
+    const selectedBrand = await brandRepository.findBrandById(id);
     if(!selectedBrand){
         throw new Error('Brand not found');
     }
@@ -75,7 +66,7 @@ export const softDeleteBrand = async (id) => {
 
 //restore brand
 export const restoreBrand = async (id) => {
-    const selectedBrand = await brandRepository.getBrandById(id);
+    const selectedBrand = await brandRepository.findBrandById(id);
     if(!selectedBrand){
         throw new Error('brand not found')
     }

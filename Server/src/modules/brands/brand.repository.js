@@ -35,7 +35,7 @@ export const findBrandByName = async (name) => {
 };
 
 //find brand by id
-export const getBrandById = async (id) => {
+export const findBrandById = async (id) => {
     const query = 'SELECT * FROM brands WHERE brand_id = $1';
     const value = [id];
     const { rows } = await pool.query(query, value);
