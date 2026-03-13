@@ -129,7 +129,7 @@ export const updateProduct = async (id, productData) => {
             }
         }
 
-        const { images, ...productFields } = productData;
+        const { images, category_name, brand_name, ...productFields } = productData;
         if (productFields.name) {
             productFields.slug = slugify(productFields.name, { lower: true, strict: true });
         }
