@@ -79,7 +79,19 @@ const productSchema = joi.object({
         .messages({
             'string.base': 'Product tag must be a string',
             'string.max': 'Product tag must be at most 255 characters'
+        }),
+    images: joi.array().items(
+        joi.object({
+            image_url: joi.string().uri().required().messages({
+                'string.base': 'Image URL must be a string',
+                'string.uri': 'Image URL must be a valid URI',
+                'any.required': 'Image URL is required'
+            }),
+            is_primary: joi.boolean().optional(),
+            alt_text: joi.string().max(255).allow("", null),
+            sort_order: joi.number().integer().min(0).optional()
         })
+    ).optional()
 });
 
 // Validation schema for validating product ID in params
@@ -97,8 +109,8 @@ const idParamSchema = joi.object({
 
 // Validation middleware for product creation and update
 export const validateProduct = (req, res, next) => {
-    const {error, value}= productSchema.validate(req.body, {abortEarly: false});
-    if(error){
+    const { error, value } = productSchema.validate(req.body, { abortEarly: false });
+    if (error) {
         return res.status(400).json({
             succes: false,
             error: error.details.map(err => ({

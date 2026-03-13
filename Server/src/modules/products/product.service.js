@@ -2,29 +2,58 @@ import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
 import { findCategoryById } from '../categories/categories.repository.js';
 import { findBrandById } from '../brands/brand.repository.js';
+import pool from "../../config/db.js";
 
 export const createProduct = async (productData) => {
-    if (!productData.name) throw new Error('Product name is required');
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        if (!productData.name) {
+            throw new Error("Product name is required");
+        }
 
-    const existing = await productRepository.findProductByName(productData.name);
-    if (existing) {
-        throw new Error('Product with this name already exists');
+        // Check if product with same name exists
+        const existing = await productRepository.findProductByName(productData.name, client);
+        if (existing) {
+            throw new Error("Product with this name already exists");
+        }
+
+        // Check if category exists
+        const categoryIdCheck = await findCategoryById(productData.category_id);
+        if (!categoryIdCheck) {
+            throw new Error("Category not found");
+        }
+
+        // Check if brand exists
+        const brandIdCheck = await findBrandById(productData.brand_id);
+        if (!brandIdCheck) {
+            throw new Error("Brand not found");
+        }
+
+        const { images, ...productFields } = productData;
+        productFields.slug = slugify(productFields.name, { lower: true, strict: true });
+
+        // Insert product
+        const product = await productRepository.createProduct(productFields, client);
+
+        // Insert images
+        if (images && images.length > 0) {
+            const primaryImages = images.filter(img => img.is_primary);
+            if (primaryImages.length > 1) {
+                throw new Error("Only one primary image allowed");
+            }
+            await productRepository.insertProductImages(product.product_id, images, client);
+        }
+
+        await client.query("COMMIT");
+        return product;
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
     }
-
-    // Check if category exists
-    const categoryIdCheck = await findCategoryById(productData.category_id);
-    if (!categoryIdCheck) {
-        throw new Error('Category not found');
-    }
-
-    // Check if brand exists
-    const brandIdCheck = await findBrandById(productData.brand_id);
-    if (!brandIdCheck) {
-        throw new Error('Brand not found');
-    }
-
-    productData.slug = slugify(productData.name, { lower: true, strict: true });
-    return await productRepository.createProduct(productData);
 };
 
 export const getAllProducts = async () => {
