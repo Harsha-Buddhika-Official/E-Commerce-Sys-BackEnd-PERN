@@ -4,6 +4,7 @@ import { findCategoryById } from '../categories/categories.repository.js';
 import { findBrandById } from '../brands/brand.repository.js';
 import pool from "../../config/db.js";
 
+// create product with transaction
 export const createProduct = async (productData) => {
     const client = await pool.connect();
     try {
@@ -56,6 +57,7 @@ export const createProduct = async (productData) => {
     }
 };
 
+// get all products
 export const getAllProducts = async () => {
     const products = await productRepository.getAllProducts();
     if (products.length === 0) {
@@ -64,6 +66,7 @@ export const getAllProducts = async () => {
     return products;
 }
 
+// get product by id
 export const getProductById = async (id) => {
     const product = await productRepository.findProductById(id);
     if (!product) {
@@ -72,21 +75,73 @@ export const getProductById = async (id) => {
     return product;
 }
 
+// update product with transaction
 export const updateProduct = async (id, productData) => {
-    const existing = await productRepository.findProductById(id);
-    if (!existing) {
-        throw new Error('product not found');
-    }
-    if (productData.name && productData.name !== existing.name) {
-        const nameExists = await productRepository.findProductByName(productData.name);
-        if (nameExists) {
-            throw new Error('Product with this name is already exists');
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        
+        const existing = await productRepository.findProductById(id);
+        if (!existing) {
+            throw new Error('product not found');
         }
+        if (productData.name && productData.name !== existing.name) {
+            const nameExists = await productRepository.findProductByName(productData.name, client);
+            if (nameExists) {
+                throw new Error('Product with this name is already exists');
+            }
+        }
+
+        // Check if category exists (if provided)
+        if (productData.category_id && productData.category_id !== existing.category_id) {
+            const categoryIdCheck = await findCategoryById(productData.category_id);
+            if (!categoryIdCheck) {
+                throw new Error("Category not found");
+            }
+        }
+
+        // Check if brand exists (if provided)
+        if (productData.brand_id && productData.brand_id !== existing.brand_id) {
+            const brandIdCheck = await findBrandById(productData.brand_id);
+            if (!brandIdCheck) {
+                throw new Error("Brand not found");
+            }
+        }
+
+        const { images, ...productFields } = productData;
+        if (productFields.name) {
+            productFields.slug = slugify(productFields.name, { lower: true, strict: true });
+        }
+        
+        // Update product
+        const updatedProduct = await productRepository.updateProduct(id, productFields, client);
+
+        // Handle images if provided
+        if (images && Array.isArray(images)) {
+            const primaryImages = images.filter(img => img.is_primary);
+            if (primaryImages.length > 1) {
+                throw new Error("Only one primary image allowed");
+            }
+            // Delete old images
+            await productRepository.deleteProductImages(id, client);
+            // Insert new images
+            if (images.length > 0) {
+                await productRepository.insertProductImages(id, images, client);
+            }
+        }
+
+        await client.query("COMMIT");
+        return updatedProduct;
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
     }
-    productData.slug = slugify(productData.name, { lower: true, strict: true });
-    return await productRepository.updateProduct(id, productData);
 }
 
+// delete product
 export const deleteProduct = async (id) => {
     const existing = await productRepository.findProductById(id);
     if (!existing) {
@@ -95,6 +150,7 @@ export const deleteProduct = async (id) => {
     return await productRepository.deleteProduct(id);
 }
 
+// soft delete product
 export const softDeleteProduct = async (id) => {
     const existing = await productRepository.findProductById(id);
     if (!existing) {
@@ -103,6 +159,7 @@ export const softDeleteProduct = async (id) => {
     return await productRepository.softDeleteProduct(id);
 }
 
+// restore product
 export const restoreProduct = async (id) => {
     const existing = await productRepository.findProductById(id);
     if (!existing) {
