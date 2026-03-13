@@ -13,25 +13,27 @@ const productSchema = joi.object({
             'string.max': 'Name must be at most 255 characters',
             'any.required': 'Name is required'
         }),
-    brand_id: joi.number()
-        .integer()
-        .positive()
+    brand_name: joi.string()
+        .min(2)
+        .max(100)
         .required()
         .messages({
-            'number.base': 'Brand ID must be a number',
-            'number.integer': 'Brand ID must be an integer',
-            'number.positive': 'Brand ID must be a positive number',
-            'any.required': 'Brand ID is required'
+            'string.base': 'Brand name must be a string',
+            'string.empty': 'Brand name is required',
+            'string.min': 'Brand name must be at least 2 characters',
+            'string.max': 'Brand name must be at most 100 characters',
+            'any.required': 'Brand name is required'
         }),
-    category_id: joi.number()
-        .integer()
-        .positive()
+    category_name: joi.string()
+        .min(2)
+        .max(100)
         .required()
         .messages({
-            'number.base': 'Category ID must be a number',
-            'number.integer': 'Category ID must be an integer',
-            'number.positive': 'Category ID must be a positive number',
-            'any.required': 'Category ID is required'
+            'string.base': 'Category name must be a string',
+            'string.empty': 'Category name is required',
+            'string.min': 'Category name must be at least 2 characters',
+            'string.max': 'Category name must be at most 100 characters',
+            'any.required': 'Category name is required'
         }),
     description: joi.string()
         .max(1000)

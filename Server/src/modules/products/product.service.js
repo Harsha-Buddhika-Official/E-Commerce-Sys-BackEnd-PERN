@@ -1,7 +1,7 @@
 import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
-import { findCategoryById } from '../categories/categories.repository.js';
-import { findBrandById } from '../brands/brand.repository.js';
+import { findCategoryById, findCategoryByName } from '../categories/categories.repository.js';
+import { findBrandByName, findBrandById } from '../brands/brand.repository.js';
 import pool from "../../config/db.js";
 
 // create product with transaction
@@ -20,16 +20,18 @@ export const createProduct = async (productData) => {
         }
 
         // Check if category exists
-        const categoryIdCheck = await findCategoryById(productData.category_id);
-        if (!categoryIdCheck) {
+        const categoryNameCheck = await findCategoryByName(productData.category_name);
+        if (!categoryNameCheck) {
             throw new Error("Category not found");
         }
+        productData.category_id = categoryNameCheck.category_id;
 
         // Check if brand exists
-        const brandIdCheck = await findBrandById(productData.brand_id);
-        if (!brandIdCheck) {
+        const brandNameCheck = await findBrandByName(productData.brand_name);
+        if (!brandNameCheck) {
             throw new Error("Brand not found");
         }
+        productData.brand_id = brandNameCheck.brand_id;
 
         const { images, ...productFields } = productData;
         productFields.slug = slugify(productFields.name, { lower: true, strict: true });
@@ -85,6 +87,25 @@ export const updateProduct = async (id, productData) => {
         if (!existing) {
             throw new Error('product not found');
         }
+        
+        // Convert category name to ID if provided
+        if (productData.category_name && !productData.category_id) {
+            const categoryNameCheck = await findCategoryByName(productData.category_name);
+            if (!categoryNameCheck) {
+                throw new Error("Category not found");
+            }
+            productData.category_id = categoryNameCheck.category_id;
+        }
+
+        // Convert brand name to ID if provided
+        if (productData.brand_name && !productData.brand_id) {
+            const brandNameCheck = await findBrandByName(productData.brand_name);
+            if (!brandNameCheck) {
+                throw new Error("Brand not found");
+            }
+            productData.brand_id = brandNameCheck.brand_id;
+        }
+        
         if (productData.name && productData.name !== existing.name) {
             const nameExists = await productRepository.findProductByName(productData.name, client);
             if (nameExists) {
