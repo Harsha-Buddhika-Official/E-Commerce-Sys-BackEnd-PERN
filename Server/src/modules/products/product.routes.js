@@ -4,11 +4,11 @@ import {validateProduct, validateCategoryIdParam } from './product.validator.js'
 
 const router = express.Router();
 
-router.post('/', validateProduct, createProduct); //done tesing
-router.get('/', getAllProducts);    //done testing
+router.post('/', validateProduct, createProduct); //done testing
+router.get('/', getAllProducts); //done testing
 router.get('/:id', validateCategoryIdParam, getProductByid); //done testing
-router.put('/:id', validateProduct, updateProduct); //done tesing
-router.delete('/:id', validateCategoryIdParam, deleteProduct); //done tesing
+router.put('/:id', validateProduct, updateProduct); //done testing
+router.delete('/:id', validateCategoryIdParam, deleteProduct); //done testing
 router.put('/:id/soft-delete', validateCategoryIdParam, softDeleteProduct); //done testing
 router.put('/:id/restore', validateCategoryIdParam, restoreProduct); //done testing
 

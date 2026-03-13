@@ -1,5 +1,6 @@
 import * as productService from './product.service.js';
 
+// Controller functions for product routes
 export const createProduct = async (req, res, next) => {
     try {
         const newProduct = await productService.createProduct(req.body);
@@ -13,6 +14,7 @@ export const createProduct = async (req, res, next) => {
     }
 };
 
+// Get all products
 export const getAllProducts = async (req, res, next) => {
     try {
         const products = await productService.getAllProducts();
@@ -26,6 +28,7 @@ export const getAllProducts = async (req, res, next) => {
     }
 }
 
+// Get product by ID
 export const getProductByid = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -40,6 +43,7 @@ export const getProductByid = async (req, res, next) => {
     }
 }
 
+// Update product by ID
 export const updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -54,6 +58,7 @@ export const updateProduct = async (req, res, next) => {
     }
 }
 
+// Delete product by ID
 export const deleteProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -67,6 +72,7 @@ export const deleteProduct = async (req, res, next) => {
     }
 }
 
+// Soft delete product by ID
 export const softDeleteProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -80,6 +86,7 @@ export const softDeleteProduct = async (req, res, next) => {
     }
 }
 
+// Restore soft-deleted product by ID
 export const restoreProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
