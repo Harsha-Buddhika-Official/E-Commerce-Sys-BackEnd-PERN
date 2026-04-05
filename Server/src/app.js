@@ -10,6 +10,6 @@ app.use(cors());
 
 app.use('/api/categories', categoryRoutes); //done testing
 app.use('/api/brands', brandRoutes); //done testing
-app.use('/api/products', productRoutes);
+app.use('/api/products', productRoutes); //done testing
 
 export default app;
