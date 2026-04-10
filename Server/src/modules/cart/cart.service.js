@@ -1,9 +1,52 @@
+import pool from '../../config/db.js';
+import * as productRepository from '../products/product.repository.js';
 import * as cartRepository from './cart.repository.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const addToCart = async (sessionId, productId, quantity) => {
-    let cart = await cartRepository.findCartBySessionId(sessionId);
-    if (!cart) {
-        cart = await cartRepository.addToCart(sessionId);
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        let cart = await cartRepository.findCartBySessionId(sessionId, client);
+        if (!cart) {
+            const newSessionId = uuidv4();
+            cart = await cartRepository.addToCart(newSessionId, client);
+        }
+        const product = await productRepository.findProductById(productId, client);
+        if (!product) {
+            throw new Error("Product not found");
+        }
+        if (product.stock_quantity < quantity) {
+            throw new Error("Not enough stock");
+        }
+        const item = await cartRepository.addItemToCart(
+            cart.cart_id,
+            productId,
+            quantity,
+            client
+        );
+        await client.query('COMMIT');
+        return item;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
     }
-    return await cartRepository.addItemToCart(cart.cart_id, productId, quantity);
+};
+
+export const getCartItems = async (sessionId) => {
+    const cart = await cartRepository.findCartBySessionId(sessionId);
+    if (!cart) {
+        return [];
+    }
+    return await cartRepository.getCartItems(cart.cart_id);
+}
+
+export const updateCartItem = async (cartItemId, quantity) => {
+    return await cartRepository.updateCartItem(cartItemId, quantity);
+}
+
+export const removeCartItem = async (cartItemId) => {
+    return await cartRepository.removeCartItem(cartItemId);
 }

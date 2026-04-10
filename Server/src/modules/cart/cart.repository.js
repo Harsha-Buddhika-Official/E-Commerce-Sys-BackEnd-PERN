@@ -1,26 +1,50 @@
-import pool from '../../config/database.js';
+import pool from '../../config/db.js';
 
 export const addToCart = async (sessionId, client = pool) => {
-    const query = `INSERT INTO carts (session_id) VALUES ($1) RETURNING *`;
-    const values = [sessionId];
-    const { rows } = await client.query(query, values);
+    const query = `
+        INSERT INTO carts (session_id, created_at, expires_at)
+        VALUES ($1, NOW(), NOW() + INTERVAL '30 days')
+        ON CONFLICT (session_id)
+        DO UPDATE SET expires_at = NOW() + INTERVAL '30 days'
+        RETURNING *
+    `;
+    const { rows } = await client.query(query, [sessionId]);
     return rows[0];
-}
+};
 
 export const findCartBySessionId = async (sessionId, client = pool) => {
-    const query = `SELECT * FROM carts WHERE session_id = $1`;
-    const values = [sessionId];
-    const { rows } = await client.query(query, values);
+    const query = `
+        SELECT * FROM carts 
+        WHERE session_id = $1
+        AND expires_at > NOW()
+    `;
+    const { rows } = await client.query(query, [sessionId]);
     return rows[0];
-}
+};
 
 export const addItemToCart = async (cartId, productId, quantity, client = pool) => {
-    const query = `INSERT INTO cart_items (cart_id, product_id, quantity) VALUES ($1, $2, $3) RETURNING *
-    ON CONFLICT (cart_id, product_id) DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity RETURNING *`;
+    const query = `
+        WITH inserted AS (
+            INSERT INTO cart_items (cart_id, product_id, quantity)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (cart_id, product_id)
+            DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
+            RETURNING *
+        )
+        SELECT 
+            i.cart_item_id, 
+            i.cart_id, 
+            i.product_id, 
+            i.quantity, 
+            p.name, 
+            p.selling_price
+        FROM inserted i
+        JOIN products p ON p.product_id = i.product_id
+    `;
     const values = [cartId, productId, quantity];
     const { rows } = await client.query(query, values);
     return rows[0];
-}
+};
 
 export const getCartItems = async (cartId, client = pool) => {
     const query = `
