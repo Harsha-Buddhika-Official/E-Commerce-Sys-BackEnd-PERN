@@ -8,11 +8,12 @@ export const addToCart = async (sessionId, productId, quantity) => {
     try {
         await client.query('BEGIN');
         let cart = await cartRepository.findCartBySessionId(sessionId, client);
+        let currentSessionId = sessionId;
         if (!cart) {
-            const newSessionId = uuidv4();
-            cart = await cartRepository.addToCart(newSessionId, client);
+            currentSessionId = uuidv4(); //making the new session id for the cart if the user doesn't have one already
+            cart = await cartRepository.addToCart(currentSessionId, client);
         }
-        const product = await productRepository.findProductById(productId, client);
+        const product = await productRepository.findProductById(productId);
         if (!product) {
             throw new Error("Product not found");
         }
@@ -26,7 +27,7 @@ export const addToCart = async (sessionId, productId, quantity) => {
             client
         );
         await client.query('COMMIT');
-        return item;
+        return { ...item, sessionId: currentSessionId };
     } catch (error) {
         await client.query('ROLLBACK');
         throw error;
@@ -38,7 +39,7 @@ export const addToCart = async (sessionId, productId, quantity) => {
 export const getCartItems = async (sessionId) => {
     const cart = await cartRepository.findCartBySessionId(sessionId);
     if (!cart) {
-        return [];
+        return ["Cart is empty"];
     }
     return await cartRepository.getCartItems(cart.cart_id);
 }
@@ -49,4 +50,8 @@ export const updateCartItem = async (cartItemId, quantity) => {
 
 export const removeCartItem = async (cartItemId) => {
     return await cartRepository.removeCartItem(cartItemId);
+}
+
+export const verifyCartItemOwnership = async (cartItemId, sessionId) => {
+    return await cartRepository.verifyCartItemOwnership(cartItemId, sessionId);
 }

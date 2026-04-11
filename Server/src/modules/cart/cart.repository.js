@@ -80,3 +80,13 @@ export const removeCartItem = async (cartItemId, client = pool) => {
     `;
     await client.query(query, [cartItemId]);
 };
+
+export const verifyCartItemOwnership = async (cartItemId, sessionId) => {
+    const query = `
+        SELECT ci.* FROM cart_items ci
+        JOIN carts c ON ci.cart_id = c.cart_id
+        WHERE ci.cart_item_id = $1 AND c.session_id = $2
+    `;
+    const result = await pool.query(query, [cartItemId, sessionId]);
+    return result.rows[0];
+};
