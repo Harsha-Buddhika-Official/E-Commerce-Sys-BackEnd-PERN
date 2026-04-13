@@ -37,7 +37,7 @@ export const addItemToCart = async (cartId, productId, quantity, client = pool) 
             i.product_id, 
             i.quantity, 
             p.name, 
-            p.selling_price
+            p.selling_price AS price_at_purchase
         FROM inserted i
         JOIN products p ON p.product_id = i.product_id
     `;
@@ -53,7 +53,7 @@ export const getCartItems = async (cartId, client = pool) => {
             ci.quantity,
             p.product_id,
             p.name,
-            p.selling_price
+            p.selling_price AS price_at_purchase
         FROM cart_items ci
         JOIN products p ON p.product_id = ci.product_id
         WHERE ci.cart_id = $1
