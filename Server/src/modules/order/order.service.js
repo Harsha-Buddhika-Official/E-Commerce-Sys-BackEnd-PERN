@@ -22,6 +22,13 @@ export const createCartOrder = async (orderData, client) => {
         throw new Error('Cannot create order from an empty cart');
     }
 
+    let total_amount = 0;
+    for (const item of cartItems) {
+        total_amount += item.quantity * item.price_at_purchase;
+    }
+
+    orderData.total_amount = total_amount;
+
     const items = cartItems.map((item, index) => ({
         product_id: item.product_id,
         quantity: item.quantity,
