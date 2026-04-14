@@ -31,6 +31,8 @@ export const createCartOrder = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getOrderById = async (req, res, next) => {
     try {
         const orderId = req.params.id;
         const order = await orderService.getOrderById(orderId);
