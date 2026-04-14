@@ -37,3 +37,23 @@ export const createCartOrder = async (orderData, client) => {
 
     return await orderRepository.createCartOrder({ ...orderData, items }, client);
 };
+
+export const getOrderById = async (orderId, client) => {
+    return await orderRepository.getOrderById(orderId, client);
+};
+
+export const getOrdersByEmail = async (email, client) => {
+    return await orderRepository.getOrdersByEmail(email, client);
+}
+
+export const getAllOrders = async (client) => {
+    return await orderRepository.getAllOrders(client);
+};
+
+export const updateOrderStatus = async (orderId, newStatus, client) => {
+    return await orderRepository.updateOrderStatus(orderId, newStatus, client);
+};
+
+export const deleteOrder = async (orderId, client) => {
+    return await orderRepository.deleteOrder(orderId, client);
+};
