@@ -4,8 +4,8 @@ import { validateAddToCart, validateUpdateCartItem, validateIdParam, validateSes
 
 const router = express.Router();
 
-router.post('/add', validateAddToCart, addToCart); //working
-router.get('/', validateSessionId, getCartItems);
+router.post('/add', validateAddToCart, validateSessionId, addToCart); //working
+router.get('/', getCartItems); //validateSessionId,
 router.put('/:cartItemId', validateIdParam, validateUpdateCartItem, validateSessionId, updateCartItem);
 router.delete('/:cartItemId', validateIdParam, validateSessionId, removeCartItem);
 

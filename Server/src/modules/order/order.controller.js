@@ -18,8 +18,11 @@ export const createDirectOrder = async (req, res, next) => {
 export const createCartOrder = async (req, res, next) => {
     try {
         const orderData = req.body;
-        const sessionId = req.sessionID; // Using sessionID from express-session
-        orderData.sessionId = sessionId; // Pass sessionId to service layer
+        //const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
+        //const sessionId = req.sessionID; // Using sessionID from express-session
+        const sessionId = req.cookies.sessionId; // Using sessionId from cookies
+        orderData.sessionId = sessionId; // Pass sessionId to service layer 
+        
         const order = await orderService.createCartOrder(orderData);
         res.status(201).json({
             success: true,
@@ -46,10 +49,10 @@ export const getOrderById = async (req, res, next) => {
     }
 };
 
-export const getOrdersByEmail = async (req, res, next) => {
+export const getOrdersByTrackingCode = async (req, res, next) => {
     try {
-        const email = req.query.email;
-        const orders = await orderService.getOrdersByEmail(email);
+        const { email, trackingCode } = req.body;
+        const orders = await orderService.getOrdersByTrackingCode(trackingCode, email);
         res.status(200).json({
             success: true,
             data: orders

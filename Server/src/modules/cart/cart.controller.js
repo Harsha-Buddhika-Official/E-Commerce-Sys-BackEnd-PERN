@@ -3,7 +3,7 @@ import * as cartService from './cart.service.js';
 export const addToCart = async (req, res, next) => {
     try{
         const { productId, quantity } = req.body;
-        const sessionId = req.sessionID;
+        const sessionId = req.sessionID || req.cookies.sessionId;
         const cartItem = await cartService.addToCart(sessionId, productId, quantity);
         
         // Set the sessionId as a cookie if it's a new session
@@ -16,7 +16,7 @@ export const addToCart = async (req, res, next) => {
             });
         }
         
-        res.status(200).json({
+        res.status(201).json({
             success: true,
             data: cartItem,
             message: 'Item added to cart successfully'
@@ -29,8 +29,14 @@ export const addToCart = async (req, res, next) => {
 
 export const getCartItems = async (req, res, next) => {
     try {
-        // const sessionId = req.sessionID; // Using sessionID from express-session
-        const sessionId = req.body.sessionId || req.sessionID; // Try to get sessionId from body first, then fallback to sessionID
+        // const sessionId = req.cookies.sessionId; 
+        const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
+       
+        /*
+        const cookies = req.cookies; // Get cookies from the request
+        console.log("Cookies:", cookies); // Debugging line to check cookies
+        */
+
         console.log("Session ID:", sessionId); // Debugging line to check session ID
         const cartItems = await cartService.getCartItems(sessionId);
         res.status(200).json({

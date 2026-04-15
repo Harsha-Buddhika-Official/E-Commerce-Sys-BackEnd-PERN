@@ -243,7 +243,7 @@ export const getOrderById = async (orderId, client = pool) => {
     }
 };
 
-export const getByEmail = async (email, client = pool) => {
+export const getOrdersByEmail = async (email, client = pool) => {
     const query = `SELECT o.order_id, o.tracking_code, o.customer_email, o.phone_number, o.total_amount, o.order_status, o.shipping_address, o.city, o.postal_code, oi.product_id, oi.quantity, oi.price_at_purchase FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.customer_email = $1`;
     const values = [email];
     try {

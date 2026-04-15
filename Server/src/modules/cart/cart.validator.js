@@ -72,7 +72,15 @@ export const validateIdParam = (req, res, next) => {
 };
 
 export const validateSessionId = (req, res, next) => {
-    const { error, value } = sessionIdSchema.validate(req.body.sessionId || req.sessionID, { abortEarly: false });
+    // Allow sessionId from body (for testing/explicit passing) or sessionID from express-session or cookies
+    const sessionId = req.body.sessionId || req.sessionID || req.cookies.sessionId;
+    
+    // If no sessionId yet, that's okay for new sessions - skip validation but log
+    if (!sessionId) {
+        return next(); // Allow new sessions to proceed
+    }
+    
+    const { error, value } = sessionIdSchema.validate(sessionId, { abortEarly: false });
     if (error) {
         return res.status(400).json({
             success: false,
@@ -80,6 +88,6 @@ export const validateSessionId = (req, res, next) => {
             errors: error.details.map((err) => err.message)
         });
     }
-    req.validatedData = value;
+    req.validatedSessionId = value;
     next();
 };

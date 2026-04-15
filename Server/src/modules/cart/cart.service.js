@@ -37,6 +37,9 @@ export const addToCart = async (sessionId, productId, quantity) => {
 };
 
 export const getCartItems = async (sessionId) => {
+    if (!sessionId) {
+        return ["Session ID is required to retrieve cart items"];
+    }
     const cart = await cartRepository.findCartBySessionId(sessionId);
     if (!cart) {
         return ["Cart is empty"];
