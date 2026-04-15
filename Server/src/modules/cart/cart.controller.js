@@ -29,8 +29,8 @@ export const addToCart = async (req, res, next) => {
 
 export const getCartItems = async (req, res, next) => {
     try {
-        // const sessionId = req.cookies.sessionId; 
-        const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
+        const sessionId = req.cookies.sessionId; 
+        //const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
        
         /*
         const cookies = req.cookies; // Get cookies from the request
