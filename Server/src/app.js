@@ -6,6 +6,7 @@ import brandRoutes from './modules/brands/brand.routes.js';
 import categoryRoutes from './modules/categories/categories.routes.js';
 import cartRoutes from './modules/cart/cart.routes.js';
 import orderRoutes from './modules/order/order.routes.js';
+import adminRoutes from './modules/admin/admin.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -17,5 +18,6 @@ app.use('/api/brands', brandRoutes); //done testing
 app.use('/api/products', productRoutes); //done testing
 app.use('/api/cart', cartRoutes); 
 app.use('/api/orders', orderRoutes);
+app.use('/api/admin', adminRoutes);
 
 export default app;
