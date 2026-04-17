@@ -2,6 +2,7 @@ import pool from '../../config/db.js';
 import * as productRepository from '../products/product.repository.js';
 import * as cartRepository from './cart.repository.js';
 import { v4 as uuidv4 } from 'uuid';
+import AppError from '../../utils/AppError.js';
 
 export const addToCart = async (sessionId, productId, quantity) => {
     const client = await pool.connect();
@@ -15,10 +16,10 @@ export const addToCart = async (sessionId, productId, quantity) => {
         }
         const product = await productRepository.findProductById(productId);
         if (!product) {
-            throw new Error("Product not found");
+            throw new AppError("Product not found", 404);
         }
         if (product.stock_quantity < quantity) {
-            throw new Error("Not enough stock");
+            throw new AppError("Not enough stock", 400);
         }
         const item = await cartRepository.addItemToCart(
             cart.cart_id,
@@ -38,11 +39,11 @@ export const addToCart = async (sessionId, productId, quantity) => {
 
 export const getCartItems = async (sessionId) => {
     if (!sessionId) {
-        return ["Session ID is required to retrieve cart items"];
+        throw new AppError("Session ID is required to retrieve cart items", 400);
     }
     const cart = await cartRepository.findCartBySessionId(sessionId);
     if (!cart) {
-        return ["Cart is empty"];
+        throw new AppError("Cart is empty", 404);
     }
     return await cartRepository.getCartItems(cart.cart_id);
 }

@@ -1,6 +1,7 @@
 import * as orderRepository from './order.repository.js';
 import * as cartRepository from '../cart/cart.repository.js';
 import { generateTrackingCode } from '../../utils/generateTrackingCode.js';
+import AppError from '../../utils/AppError.js';
 
 export const createDirectOrder = async (orderData, client) => {
 
@@ -21,17 +22,17 @@ export const createCartOrder = async (orderData, client) => {
     const { sessionId } = orderData;
 
     if (!sessionId) {
-        throw new Error('sessionId is required to create a cart order');
+        throw new AppError('sessionId is required to create a cart order', 400);
     }
 
     const cart = await cartRepository.findCartBySessionId(sessionId, client);
     if (!cart) {
-        throw new Error('Cart not found for this session');
+        throw new AppError('Cart not found for this session', 404);
     }
 
     const cartItems = await cartRepository.getCartItems(cart.cart_id, client);
     if (!cartItems || cartItems.length === 0) {
-        throw new Error('Cannot create order from an empty cart');
+        throw new AppError('Cannot create order from an empty cart', 400);
     }
 
     let total_amount = 0;
@@ -63,10 +64,10 @@ export const getOrderById = async (orderId, client) => {
 export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     const emailCheck = await orderRepository.getOrdersByEmail(email, client);
     if (!emailCheck || emailCheck.length === 0) {
-        throw new Error('No orders found for this email');
+        throw new AppError('No orders found for this email', 404);
     }
     if(!trackingCode) {
-        throw new Error('Tracking code is required');
+        throw new AppError('Tracking code is required', 400);
     }
     return await orderRepository.getOrderByTrackingCode(trackingCode, client);
 };

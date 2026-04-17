@@ -1,14 +1,15 @@
 import slugify from "slugify";
 import * as categoryRepository from "./categories.repository.js";
+import AppError from "../../utils/AppError.js";
 
 //create category
 export const createCategory = async (categoryData) => {
-    if (!categoryData.name) throw new Error('Category name is required');
-    if (!categoryData.category_type) throw new Error('Category type is required');
+    if (!categoryData.name) throw new AppError('Category name is required', 400);
+    if (!categoryData.category_type) throw new AppError('Category type is required', 400);
 
     const existing = await categoryRepository.findCategoryByName(categoryData.name);
     if (existing) {
-        throw new Error('Category with this name already exists');
+        throw new AppError('Category with this name already exists', 400);
     }
 
     categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });
@@ -31,7 +32,7 @@ export const getCategories = async (type) => {
 export const getCategoryById = async (id) => {
     const category = await categoryRepository.findCategoryById(id);
     if (!category) {
-        throw new Error('Category not found');
+        throw new AppError('Category not found', 404);
     }
     return category;
 }
@@ -40,12 +41,12 @@ export const getCategoryById = async (id) => {
 export const updateCategory = async (id, categoryData) => {
     const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
-        throw new Error('Category not found');
+        throw new AppError('Category not found', 404);
     }
     if (categoryData.name && categoryData.name !== existing.name) {
         const nameExists = await categoryRepository.findCategoryByName(categoryData.name);
         if (nameExists) {
-            throw new Error('Category with this name already exists');
+            throw new AppError('Category with this name already exists', 400);
         }
     }
     categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });
@@ -56,7 +57,7 @@ export const updateCategory = async (id, categoryData) => {
 export const deleteCategory = async (id) => {
     const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
-        throw new Error('Category not found');
+        throw new AppError('Category not found', 404);
     }
     return await categoryRepository.deleteCategory(id);
 }
@@ -65,7 +66,7 @@ export const deleteCategory = async (id) => {
 export const softDeleteCategory = async (id) => {
     const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
-        throw new Error('Category not found');
+        throw new AppError('Category not found', 404);
     }
     return await categoryRepository.softDeleteCategory(id);
 }
@@ -74,7 +75,7 @@ export const softDeleteCategory = async (id) => {
 export const restoreCategory = async (id) => {
     const existing = await categoryRepository.findCategoryById(id);
     if (!existing) {
-        throw new Error('Category not found');
+        throw new AppError('Category not found', 404);
     }
     return await categoryRepository.restoreCategory(id);
 }
