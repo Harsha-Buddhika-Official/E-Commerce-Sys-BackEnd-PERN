@@ -7,6 +7,7 @@ import categoryRoutes from './modules/categories/categories.routes.js';
 import cartRoutes from './modules/cart/cart.routes.js';
 import orderRoutes from './modules/order/order.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
+import attributeRoutes from './modules/attributes/attribute.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -16,8 +17,9 @@ app.use(cookieParser());
 app.use('/api/categories', categoryRoutes); //done testing
 app.use('/api/brands', brandRoutes); //done testing
 app.use('/api/products', productRoutes); //done testing
-app.use('/api/cart', cartRoutes); 
-app.use('/api/orders', orderRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/cart', cartRoutes);  //done testing
+app.use('/api/orders', orderRoutes); //done testing
+app.use('/api/admin', adminRoutes); //done testing
+app.use('/api/attributes', attributeRoutes);
 
 export default app;
