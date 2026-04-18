@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import errorHandler from './middlewares/errorHandler.js';
 import productRoutes from './modules/products/product.routes.js';
 import brandRoutes from './modules/brands/brand.routes.js';
 import categoryRoutes from './modules/categories/categories.routes.js';
@@ -21,5 +22,7 @@ app.use('/api/cart', cartRoutes);  //done testing
 app.use('/api/orders', orderRoutes); //done testing
 app.use('/api/admin', adminRoutes); //done testing
 app.use('/api/attributes', attributeRoutes);
+
+app.use(errorHandler);
 
 export default app;
