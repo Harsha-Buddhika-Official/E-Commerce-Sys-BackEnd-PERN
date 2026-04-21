@@ -79,26 +79,124 @@ export const insertProductImages = async (productId, images, client = pool) => {
 
 };
 
+// delete product attributes
+export const deleteProductAttributes = async (productId, client = pool) => {
+  const query = `DELETE FROM product_attributes WHERE product_id = $1`;
+  const values = [productId];
+  await client.query(query, values);
+};
+
+// insert product attributes
+export const insertProductAttributes = async (productId, attributes, client = pool) => {
+  if (!attributes || attributes.length === 0) return;
+
+  const values = [];
+  const placeholders = [];
+
+  attributes.forEach((attribute, index) => {
+    const baseIndex = index * 3;
+    placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3})`);
+
+    values.push(
+      productId,
+      attribute.attribute_id,
+      attribute.value
+    );
+  });
+
+  const query = `
+    INSERT INTO product_attributes
+      (product_id, attribute_id, value)
+    VALUES ${placeholders.join(",")}
+  `;
+
+  await client.query(query, values);
+};
+
+// create one product attribute mapping
+export const createProductAttribute = async (productId, attributeData, client = pool) => {
+  const query = `
+    INSERT INTO product_attributes
+      (product_id, attribute_id, value)
+    VALUES ($1, $2, $3)
+    RETURNING *
+  `;
+  const values = [productId, attributeData.attribute_id, attributeData.value];
+  const { rows } = await client.query(query, values);
+  return rows[0];
+};
+
+// remove one product attribute
+export const removeProductAttribute = async (productId, attributeId, client = pool) => {
+  const query = `
+    DELETE FROM product_attributes
+    WHERE product_id = $1 AND attribute_id = $2
+    RETURNING *
+  `;
+  const values = [productId, attributeId];
+  const { rows } = await client.query(query, values);
+  return rows[0];
+};
+
 // get all products
 export const getAllProducts = async () => {
-  const query = 'SELECT * FROM products WHERE is_active = true ORDER BY name';
+  const query = `
+    SELECT
+      p.*,
+      COALESCE(
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'product_attribute_id', pa.product_attribute_id,
+            'attribute_id', pa.attribute_id,
+            'attribute_name', a.name,
+            'value', pa.value
+          )
+        ) FILTER (WHERE pa.product_attribute_id IS NOT NULL),
+        '[]'::json
+      ) AS attributes
+    FROM products p
+    LEFT JOIN product_attributes pa ON pa.product_id = p.product_id
+    LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+    WHERE p.is_active = true
+    GROUP BY p.product_id
+    ORDER BY p.name
+  `;
   const { rows } = await pool.query(query);
   return rows;
 };
 
 // get product by id
-export const findProductById = async (id) => {
-  const query = 'SELECT * FROM products WHERE product_id = $1';
+export const findProductById = async (id, client = pool) => {
+  const query = `
+    SELECT
+      p.*,
+      COALESCE(
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'product_attribute_id', pa.product_attribute_id,
+            'attribute_id', pa.attribute_id,
+            'attribute_name', a.name,
+            'value', pa.value
+          )
+        ) FILTER (WHERE pa.product_attribute_id IS NOT NULL),
+        '[]'::json
+      ) AS attributes
+    FROM products p
+    LEFT JOIN product_attributes pa ON pa.product_id = p.product_id
+    LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+    WHERE p.product_id = $1
+    GROUP BY p.product_id
+  `;
   const values = [id];
-  const { rows } = await pool.query(query, values);
+  const { rows } = await client.query(query, values);
   return rows[0];
 };
 
 // get product by name
-export const findProductByName = async (name) => {
+export const findProductByName = async (name, client = pool) => {
   const query = 'SELECT * FROM products WHERE name = $1 LIMIT 1';
   const values = [name];
-  const { rows } = await pool.query(query, values);
+  const { rows } = await client.query(query, values);
   return rows[0];
 };
 

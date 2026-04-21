@@ -93,6 +93,21 @@ const productSchema = joi.object({
             alt_text: joi.string().max(255).allow("", null),
             sort_order: joi.number().integer().min(0).optional()
         })
+    ).optional(),
+    attributes: joi.array().items(
+        joi.object({
+            attribute_id: joi.number().integer().positive().required().messages({
+                'number.base': 'Attribute ID must be a number',
+                'number.integer': 'Attribute ID must be an integer',
+                'number.positive': 'Attribute ID must be a positive number',
+                'any.required': 'Attribute ID is required'
+            }),
+            value: joi.string().max(100).required().messages({
+                'string.base': 'Attribute value must be a string',
+                'string.max': 'Attribute value must be at most 100 characters',
+                'any.required': 'Attribute value is required'
+            })
+        })
     ).optional()
 });
 
@@ -108,6 +123,46 @@ const idParamSchema = joi.object({
             'any.required': 'ID is required'
         })
 })
+
+const productAttributeParamSchema = joi.object({
+    id: joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Product ID must be a number',
+            'number.positive': 'Product ID must be a positive number',
+            'any.required': 'Product ID is required'
+        }),
+    attributeId: joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Attribute ID must be a number',
+            'number.positive': 'Attribute ID must be a positive number',
+            'any.required': 'Attribute ID is required'
+        })
+});
+
+const createProductAttributeSchema = joi.object({
+    attribute_id: joi.number()
+        .integer()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Attribute ID must be a number',
+            'number.integer': 'Attribute ID must be an integer',
+            'number.positive': 'Attribute ID must be a positive number',
+            'any.required': 'Attribute ID is required'
+        }),
+    value: joi.number()
+        .max(100)
+        .required()
+        .messages({
+            'string.base': 'Attribute value must be a string',
+            'string.max': 'Attribute value must be at most 100 characters',
+            'any.required': 'Attribute value is required'
+        })
+});
 
 // Validation middleware for product creation and update
 export const validateProduct = (req, res, next) => {
@@ -135,5 +190,32 @@ export const validateCategoryIdParam = (req, res, next) => {
         })
     }
     req.params = value;
+    next();
+}
+
+export const validateProductAttributeParams = (req, res, next) => {
+    const { error, value } = productAttributeParamSchema.validate(req.params);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details[0].message
+        })
+    }
+    req.params = value;
+    next();
+}
+
+export const validateCreateProductAttribute = (req, res, next) => {
+    const { error, value } = createProductAttributeSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details.map(err => ({
+                field: err.path[0],
+                message: err.message
+            }))
+        })
+    }
+    req.body = value;
     next();
 }

@@ -34,7 +34,7 @@ export const createProduct = async (productData) => {
         }
         productData.brand_id = brandNameCheck.brand_id;
 
-        const { images, ...productFields } = productData;
+        const { images, attributes, ...productFields } = productData;
         productFields.slug = slugify(productFields.name, { lower: true, strict: true });
 
         // Insert product
@@ -47,6 +47,11 @@ export const createProduct = async (productData) => {
                 throw new AppError("Only one primary image allowed", 400);
             }
             await productRepository.insertProductImages(product.product_id, images, client);
+        }
+
+        // Insert product attributes mapping
+        if (attributes && attributes.length > 0) {
+            await productRepository.insertProductAttributes(product.product_id, attributes, client);
         }
 
         await client.query("COMMIT");
@@ -130,7 +135,7 @@ export const updateProduct = async (id, productData) => {
             }
         }
 
-        const { images, category_name, brand_name, ...productFields } = productData;
+        const { images, attributes, category_name, brand_name, ...productFields } = productData;
         if (productFields.name) {
             productFields.slug = slugify(productFields.name, { lower: true, strict: true });
         }
@@ -149,6 +154,14 @@ export const updateProduct = async (id, productData) => {
             // Insert new images
             if (images.length > 0) {
                 await productRepository.insertProductImages(id, images, client);
+            }
+        }
+
+        // Replace product attributes if payload is provided
+        if (attributes && Array.isArray(attributes)) {
+            await productRepository.deleteProductAttributes(id, client);
+            if (attributes.length > 0) {
+                await productRepository.insertProductAttributes(id, attributes, client);
             }
         }
 
@@ -188,4 +201,29 @@ export const restoreProduct = async (id) => {
         throw new AppError('Product not found', 404);
     }
     return await productRepository.restoreProduct(id);
+}
+
+// remove one mapped attribute from a product
+export const removeProductAttribute = async (productId, attributeId) => {
+    const existing = await productRepository.findProductById(productId);
+    if (!existing) {
+        throw new AppError('Product not found', 404);
+    }
+
+    const deleted = await productRepository.removeProductAttribute(productId, attributeId);
+    if (!deleted) {
+        throw new AppError('Product attribute not found', 404);
+    }
+
+    return deleted;
+}
+
+// create one mapped attribute for a product
+export const createProductAttribute = async (productId, attributeData) => {
+    const existing = await productRepository.findProductById(productId);
+    if (!existing) {
+        throw new AppError('Product not found', 404);
+    }
+
+    return await productRepository.createProductAttribute(productId, attributeData);
 }

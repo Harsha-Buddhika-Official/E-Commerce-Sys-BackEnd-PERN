@@ -99,3 +99,32 @@ export const restoreProduct = async (req, res, next) => {
         next(error);
     }
 }
+
+// Remove one attribute from a product
+export const removeProductAttribute = async (req, res, next) => {
+    try {
+        const { id, attributeId } = req.params;
+        await productService.removeProductAttribute(id, attributeId);
+        res.status(200).json({
+            success: true,
+            message: 'Product attribute removed successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Create one attribute mapping for a product
+export const createProductAttribute = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const mapped = await productService.createProductAttribute(id, req.body);
+        res.status(201).json({
+            success: true,
+            data: mapped,
+            message: 'Product attribute created successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+}
