@@ -1,7 +1,7 @@
 import { createAdmin, loginAdmin, getAllAdmins, updateAdminRole, deleteAdmin, updateAdminPassword } from './admin.controller.js';
 import express from 'express';
 import { validateRegister, validateLogin } from './admin.validator.js';
-import { authorize } from '../../middlewares/auth.middleware.js';
+import { authorize } from '../../middlewares/authorize.js';
 
 const router = express.Router();
 

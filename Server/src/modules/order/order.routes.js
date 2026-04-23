@@ -1,7 +1,7 @@
 import express from 'express';
 import { createCartOrder, createDirectOrder, getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder } from './order.controller.js';
 import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus } from './order.validator.js';
-import { authorize } from '../../middlewares/auth.middleware.js';
+import { authorize } from '../../middlewares/authorize.js';
 
 const router = express.Router();
 

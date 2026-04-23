@@ -1,4 +1,4 @@
-import AppError from "../utils/AppError";
+import AppError from "../utils/AppError.js";
 
 export const authorize = (...roles) => (req, res, next) => {
     if (!req.admin) {

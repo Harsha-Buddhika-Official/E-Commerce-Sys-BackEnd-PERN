@@ -1,7 +1,7 @@
 import express from 'express';
 import { createBrand, deleteBrand, getAllBrands, getBrandById, restoreBrand, softDeleteBrand, updateBrand } from './brand.controller.js';
 import { validateCreateBrand, validateIdParam, validateUpdateBrand } from './brand.validator.js';
-import { authorize } from '../../middlewares/auth.middleware.js';
+import { authorize } from '../../middlewares/authorize.js';
 
 const router = express.Router();
 

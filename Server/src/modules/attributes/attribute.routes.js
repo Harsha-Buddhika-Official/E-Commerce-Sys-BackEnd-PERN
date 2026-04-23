@@ -1,6 +1,6 @@
 import { createAttribute, getAttributesByCategoryId, getAttributeById, deleteAttribute, updateAttribute } from './attribute.controller.js';
 import express from 'express';
-import { authorize } from '../../middlewares/auth.middleware.js';
+import { authorize } from '../../middlewares/authorize.js';
 
 const router = express.Router();
 
