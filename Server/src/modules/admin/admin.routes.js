@@ -2,11 +2,18 @@ import { createAdmin, loginAdmin, getAllAdmins, updateAdminRole, deleteAdmin, up
 import express from 'express';
 import { validateRegister, validateLogin } from './admin.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
+import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
+// Public route for admin login
+router.post('/login', validateLogin, loginAdmin);
+
+// Protected routes for admin management
+router.use(authMiddleware);
+
+// protected routes for admin management
 router.post('/register', authorize('super_admin'), validateRegister, createAdmin);
-router.post('/login', authorize('super_admin', 'admin', 'manager'), validateLogin, loginAdmin);
 router.get('/', authorize('super_admin', 'admin'), getAllAdmins);
 router.put('/updateRole', authorize('super_admin'), updateAdminRole);
 router.delete('/delete', authorize('super_admin'), deleteAdmin);
