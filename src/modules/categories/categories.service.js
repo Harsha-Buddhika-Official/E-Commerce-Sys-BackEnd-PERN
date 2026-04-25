@@ -9,7 +9,7 @@ export const createCategory = async (categoryData) => {
 
     const existing = await categoryRepository.findCategoryByName(categoryData.name);
     if (existing) {
-        throw new AppError('Category with this name already exists', 400);
+        throw new AppError('Category with this name already exists', 409);
     }
 
     categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });
@@ -46,7 +46,7 @@ export const updateCategory = async (id, categoryData) => {
     if (categoryData.name && categoryData.name !== existing.name) {
         const nameExists = await categoryRepository.findCategoryByName(categoryData.name);
         if (nameExists) {
-            throw new AppError('Category with this name already exists', 400);
+            throw new AppError('Category with this name already exists', 409);
         }
     }
     categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });

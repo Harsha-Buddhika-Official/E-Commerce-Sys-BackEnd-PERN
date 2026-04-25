@@ -19,7 +19,7 @@ export const addToCart = async (sessionId, productId, quantity) => {
             throw new AppError("Product not found", 404);
         }
         if (product.stock_quantity < quantity) {
-            throw new AppError("Not enough stock", 400);
+            throw new AppError("Not enough stock", 409);
         }
         const item = await cartRepository.addItemToCart(
             cart.cart_id,
@@ -39,11 +39,11 @@ export const addToCart = async (sessionId, productId, quantity) => {
 
 export const getCartItems = async (sessionId) => {
     if (!sessionId) {
-        throw new AppError("Session ID is required to retrieve cart items", 400);
+        throw new AppError("Session ID is required to retrieve cart items", 401);
     }
     const cart = await cartRepository.findCartBySessionId(sessionId);
     if (!cart) {
-        throw new AppError("Cart is empty", 404);
+        throw new AppError("Cart is empty", 400);
     }
     return await cartRepository.getCartItems(cart.cart_id);
 }

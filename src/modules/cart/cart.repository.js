@@ -69,7 +69,8 @@ export const updateCartItem = async (cartItemId, quantity, client = pool) => {
         WHERE cart_item_id = $2
         RETURNING *
     `;
-    const { rows } = await client.query(query, [quantity, cartItemId]);
+    const values = [quantity, cartItemId];
+    const { rows } = await client.query(query, values);
     return rows[0];
 };
 
@@ -87,6 +88,7 @@ export const verifyCartItemOwnership = async (cartItemId, sessionId) => {
         JOIN carts c ON ci.cart_id = c.cart_id
         WHERE ci.cart_item_id = $1 AND c.session_id = $2
     `;
-    const result = await pool.query(query, [cartItemId, sessionId]);
+    const values = [cartItemId, sessionId];
+    const result = await pool.query(query, values);
     return result.rows[0];
 };

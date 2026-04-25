@@ -1,6 +1,5 @@
 import pool from "../../config/db.js";
 
-// create product with transaction
 export const createProduct = async (productData, client = pool) => {
 
   const {
@@ -40,14 +39,12 @@ export const createProduct = async (productData, client = pool) => {
   return rows[0];
 };
 
-// delete product images
 export const deleteProductImages = async (productId, client = pool) => {
   const query = `DELETE FROM product_images WHERE product_id = $1`;
   const values = [productId];
   await client.query(query, values);
 };
 
-// insert product images
 export const insertProductImages = async (productId, images, client = pool) => {
   if (!images || images.length === 0) return;
 
@@ -79,14 +76,12 @@ export const insertProductImages = async (productId, images, client = pool) => {
 
 };
 
-// delete product attributes
 export const deleteProductAttributes = async (productId, client = pool) => {
   const query = `DELETE FROM product_attributes WHERE product_id = $1`;
   const values = [productId];
   await client.query(query, values);
 };
 
-// insert product attributes
 export const insertProductAttributes = async (productId, attributes, client = pool) => {
   if (!attributes || attributes.length === 0) return;
 
@@ -113,7 +108,6 @@ export const insertProductAttributes = async (productId, attributes, client = po
   await client.query(query, values);
 };
 
-// create one product attribute mapping
 export const createProductAttribute = async (productId, attributeData, client = pool) => {
   const query = `
     INSERT INTO product_attributes
@@ -126,7 +120,6 @@ export const createProductAttribute = async (productId, attributeData, client = 
   return rows[0];
 };
 
-// remove one product attribute
 export const removeProductAttribute = async (productId, attributeId, client = pool) => {
   const query = `
     DELETE FROM product_attributes
@@ -138,7 +131,6 @@ export const removeProductAttribute = async (productId, attributeId, client = po
   return rows[0];
 };
 
-// get all products
 export const getAllProducts = async () => {
   const query = `
     SELECT
@@ -165,7 +157,6 @@ export const getAllProducts = async () => {
   return rows;
 };
 
-// get product by id
 export const findProductById = async (id, client = pool) => {
   const query = `
     SELECT
@@ -192,7 +183,6 @@ export const findProductById = async (id, client = pool) => {
   return rows[0];
 };
 
-// get product by name
 export const findProductByName = async (name, client = pool) => {
   const query = 'SELECT * FROM products WHERE name = $1 LIMIT 1';
   const values = [name];
@@ -200,7 +190,6 @@ export const findProductByName = async (name, client = pool) => {
   return rows[0];
 };
 
-// update product with transaction support
 export const updateProduct = async (id, productData, client = pool) => {
   const { name, brand_id, category_id, slug, description, base_price, selling_price, stock_quantity, warranty_months, product_tag } = productData;
   const query = `
@@ -226,7 +215,6 @@ export const updateProduct = async (id, productData, client = pool) => {
   return rows[0];
 };
 
-// delete product
 export const deleteProduct = async (id) => {
   const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
   const values = [id];
@@ -234,7 +222,6 @@ export const deleteProduct = async (id) => {
   return rows[0];
 };
 
-// soft delete product
 export const softDeleteProduct = async (id) => {
   const query = `UPDATE products SET is_active = false,
   updated_at = CURRENT_TIMESTAMP
@@ -245,7 +232,6 @@ export const softDeleteProduct = async (id) => {
   return rows[0];
 };
 
-// restore product
 export const restoreProduct = async (id) => {
   const query = `UPDATE products
   SET is_active = true,

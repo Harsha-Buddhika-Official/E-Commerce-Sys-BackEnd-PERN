@@ -22,7 +22,8 @@ export const getAllAdmins = async () => {
 export const updateAdminRole = async (AdminData) => {
     const { adminId, newRole } = AdminData;
     const query = 'UPDATE admins SET role = $1 WHERE admin_id = $2 RETURNING *';
-    const { rows } = await pool.query(query, [newRole, adminId]);
+    const values = [newRole, adminId];
+    const { rows } = await pool.query(query, values);
     return rows[0];
 }
 
@@ -41,7 +42,8 @@ export const getAdminById = async (adminId) => {
 export const updateAdminPassword = async (AdminData) => {
     const { adminId, newPassword } = AdminData;
     const query = 'UPDATE admins SET password_hash = $1 WHERE admin_id = $2 RETURNING *';
-    const { rows } = await pool.query(query, [newPassword, adminId]);
+    const values = [newPassword, adminId];
+    const { rows } = await pool.query(query, values);
     return rows[0];
 }
 

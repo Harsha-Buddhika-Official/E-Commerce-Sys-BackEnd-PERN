@@ -1,6 +1,7 @@
 import pool from '../../config/db.js';
 
 export const createDirectOrder = async (orderData, client = pool) => {
+
     const {
         tracking_code,
         customer_email,
@@ -15,9 +16,11 @@ export const createDirectOrder = async (orderData, client = pool) => {
         price_at_purchase
     } = orderData;
 
-    const orderQuery = `INSERT INTO orders
-    (tracking_code, customer_email, phone_number, total_amount, order_status, shipping_address, city, postal_code)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
+    const orderQuery = `
+        INSERT INTO orders (tracking_code, customer_email, phone_number, total_amount, order_status, shipping_address, city, postal_code)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *
+    `;
 
     const orderValues = [
         tracking_code,
@@ -36,17 +39,20 @@ export const createDirectOrder = async (orderData, client = pool) => {
         const order = orderResult.rows[0];
 
         // Insert the single direct-purchase item from the product page
-        const itemQuery = `INSERT INTO order_items
-        (order_id, product_id, quantity, price_at_purchase)
-        VALUES ($1, $2, $3, $4)`;
+        const itemQuery = `
+            INSERT INTO order_items
+            (order_id, product_id, quantity, price_at_purchase)
+            VALUES ($1, $2, $3, $4)
+        `;
 
-        await client.query(itemQuery, [
+        const itemValues = [
             order.order_id,
             product_id,
             quantity,
             price_at_purchase
-        ]);
+        ];
 
+        await client.query(itemQuery, itemValues);
         return order;
     } catch (error) {
         console.error('Error creating direct order:', error);
@@ -55,6 +61,7 @@ export const createDirectOrder = async (orderData, client = pool) => {
 };
 
 export const createCartOrder = async (orderData, client = pool) => {
+    
     const {
         tracking_code,
         customer_email,
@@ -135,7 +142,7 @@ export const updateOrder = async (orderId, orderData, client = pool) => {
     postal_code = $8,
     updated_at = NOW()
     WHERE order_id = $9 RETURNING *`;
-    
+
     const values = [
         tracking_code,
         customer_email,

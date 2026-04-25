@@ -17,7 +17,7 @@ export const createProduct = async (productData) => {
         // Check if product with same name exists
         const existing = await productRepository.findProductByName(productData.name, client);
         if (existing) {
-            throw new AppError("Product with this name already exists", 400);
+            throw new AppError("Product with this name already exists", 409);
         }
 
         // Check if category exists
@@ -115,7 +115,7 @@ export const updateProduct = async (id, productData) => {
         if (productData.name && productData.name !== existing.name) {
             const nameExists = await productRepository.findProductByName(productData.name, client);
             if (nameExists) {
-                throw new AppError('Product with this name is already exists', 400);
+                throw new AppError('Product with this name is already exists', 409);
             }
         }
 

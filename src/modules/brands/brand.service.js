@@ -8,7 +8,7 @@ export const createBrand = async (brandData) => {
 
     const existing = await brandRepository.findBrandByName(brandData.name);
     if(existing) {
-        throw new AppError('Brand with this name already exists', 400);
+        throw new AppError('Brand with this name already exists', 409);
     }
 
     brandData.slug = slugify(brandData.name, { lower: true, strict: true });
@@ -40,7 +40,7 @@ export const updateBrand = async(id, brandData) => {
     if(brandData.name && brandData.name !== existing.name){
         const nameExists = await brandRepository.findBrandByName(brandData.name);
         if(nameExists){
-            throw new AppError('Brand with this name already exists', 400);
+            throw new AppError('Brand with this name already exists', 409);
         }
     }
     brandData.slug = slugify(brandData.name, {lower: true, static:true});

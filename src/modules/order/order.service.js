@@ -22,7 +22,7 @@ export const createCartOrder = async (orderData, client) => {
     const { sessionId } = orderData;
 
     if (!sessionId) {
-        throw new AppError('sessionId is required to create a cart order', 400);
+        throw new AppError('sessionId is required to create a cart order', 401);
     }
 
     const cart = await cartRepository.findCartBySessionId(sessionId, client);

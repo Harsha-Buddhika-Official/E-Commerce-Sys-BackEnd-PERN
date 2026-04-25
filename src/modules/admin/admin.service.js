@@ -12,7 +12,7 @@ export const createAdmin = async (AdminData) => {
     }
     const exsitingAdmin = await adminRepository.getAdminByEmail(AdminData.email);
     if (exsitingAdmin) {
-        throw new AppError('Admin with this email already exists', 400);
+        throw new AppError('Admin with this email already exists', 409);
     }
     AdminData.password = await hashPassword(AdminData.password);
     return await adminRepository.createAdmin(AdminData);
@@ -75,16 +75,16 @@ export const updateAdminPassword = async (AdminData) => {
         throw new AppError('Admin ID and new password are required', 400);
     }
     if(AdminData.newPassword !== AdminData.confirmPassword){
-        throw new AppError('new password and confirm password do not match', 400);
+        throw new AppError('new password and confirm password do not match', 422);
     }
     const admin = await adminRepository.getAdminById(AdminData.adminId);
     const passwordMatch = await comparePasswords(AdminData.newPassword, admin.password_hash);
     const oldPasswordMatch = await comparePasswords(AdminData.oldPassword, admin.password_hash);
     if(!oldPasswordMatch){
-        throw new AppError('old password is incorrect', 400);
+        throw new AppError('old password is incorrect', 401);
     }
     if (passwordMatch) {
-        throw new AppError('New password cannot be the same as the old password', 400);
+        throw new AppError('New password cannot be the same as the old password', 409);
     }
     AdminData.newPassword = await hashPassword(AdminData.newPassword);
     return await adminRepository.updateAdminPassword(AdminData);
