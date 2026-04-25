@@ -2,12 +2,14 @@ import db from '../../config/db.js';
 
 export const createAttribute = async (attribute) => {
     const { name, categoryId } = attribute;
+
     const query = `
         INSERT INTO attributes (name, category_id)
         VALUES ($1, $2)
         RETURNING *
     `;
     const values = [name, categoryId];
+    
     const { rows } = await db.query(query, values);
     return rows[0];
 }
@@ -33,13 +35,13 @@ export const getAttributeByName = async (name) => {
 }
 
 export const getAttributeById = async (id) => {
-    const query = `SELECT * FROM attributes WHERE id = $1 RETURNING *`;
+    const query = `SELECT * FROM attributes WHERE id = $1`;
     const { rows } = await db.query(query, [id]);
     return rows[0];
 }
 
 export const deleteAttribute = async (id) => {
-    const query = `DELETE FROM attributes WHERE id = $1`;
+    const query = `DELETE FROM attributes WHERE id = $1 RETURNING *`;
     const { rows } = await db.query(query, [id]);
     return rows[0];
 }

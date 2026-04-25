@@ -64,22 +64,6 @@ const directOrderSchema = joi.object({
 			'number.integer': 'Quantity must be an integer',
 			'number.positive': 'Quantity must be positive',
 			'any.required': 'Quantity is required'
-		}),
-	price_at_purchase: joi.number()
-		.positive()
-		.required()
-		.messages({
-			'number.base': 'Price at purchase must be a number',
-			'number.positive': 'Price at purchase must be positive',
-			'any.required': 'Price at purchase is required'
-		}),
-	order_status: joi.string()
-		.trim()
-		.lowercase()
-		.valid(...orderStatusValues)
-		.optional()
-		.messages({
-			'any.only': `Order status must be one of: ${orderStatusValues.join(', ')}`
 		})
 });
 

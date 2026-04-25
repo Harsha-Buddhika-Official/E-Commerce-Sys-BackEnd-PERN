@@ -10,15 +10,15 @@ const router = express.Router();
 router.post('/direct', validateCreateDirectOrder, createDirectOrder);
 router.post('/cart', validateCreateCartOrder, createCartOrder);
 router.get('/tracking', validateTrackingLookup, getOrdersByTrackingCode);
-router.get('/:id', validateOrderIdParam, getOrderById);
 
 // Protected routes for order management
 router.use(authMiddleware);
 
 // Protected routes for order management
-router.get('/', authorize('super_admin','admin','manager'), getAllOrders);
-router.put('/:id', authorize('super_admin','admin','manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);
-router.delete('/:id', authorize('super_admin','admin','manager'), validateOrderIdParam, deleteOrder);
+router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
+router.get('/', authorize('super_admin', 'admin', 'manager'), getAllOrders);
+router.put('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);
+router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder);
 
 
 export default router;

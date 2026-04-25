@@ -78,6 +78,7 @@ export const removeCartItem = async (cartItemId, client = pool) => {
     const query = `
         DELETE FROM cart_items
         WHERE cart_item_id = $1
+        RETURNING *
     `;
     await client.query(query, [cartItemId]);
 };

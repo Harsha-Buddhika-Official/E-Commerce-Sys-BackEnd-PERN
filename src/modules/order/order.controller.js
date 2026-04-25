@@ -19,7 +19,6 @@ export const createCartOrder = async (req, res, next) => {
     try {
         const orderData = req.body;
         //const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
-        //const sessionId = req.sessionID; // Using sessionID from express-session
         const sessionId = req.cookies.sessionId; // Using sessionId from cookies
         orderData.sessionId = sessionId; // Pass sessionId to service layer 
         

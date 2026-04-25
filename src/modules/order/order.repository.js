@@ -240,9 +240,8 @@ export const updateOrder = async (orderId, orderData, client = pool) => {
 
 export const getOrderById = async (orderId, client = pool) => {
     const query = `SELECT o.order_id, o.tracking_code, o.customer_email, o.phone_number, o.total_amount, o.order_status, o.shipping_address, o.city, o.postal_code, o.created_at, o.updated_at, oi.product_id, oi.quantity, oi.price_at_purchase FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.order_id = $1`;
-    const values = [orderId];
     try {
-        const result = await client.query(query, values);
+        const result = await client.query(query, [orderId]);
         return result.rows[0];
     } catch (error) {
         console.error('Error fetching order by ID:', error);

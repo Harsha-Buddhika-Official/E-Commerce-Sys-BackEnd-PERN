@@ -46,7 +46,7 @@ export const updateBrand = async (id, brandData) => {
 };
 
 export const deleteBrand = async (id) => {
-    const query = `DELETE FROM brands WHERE brand_id =$1`;
+    const query = `DELETE FROM brands WHERE brand_id =$1 RETURNING *`;
     const values = [id];
     const { rows } = await pool.query(query, values);
     return rows[0];

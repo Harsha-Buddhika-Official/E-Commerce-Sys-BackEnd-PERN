@@ -1,19 +1,23 @@
 import * as orderRepository from './order.repository.js';
 import * as cartRepository from '../cart/cart.repository.js';
+import * as productRepository from '../products/product.repository.js';
 import { generateTrackingCode } from '../../utils/generateTrackingCode.js';
 import AppError from '../../utils/AppError.js';
 
 export const createDirectOrder = async (orderData, client) => {
-
+    const productData = await productRepository.findProductById(orderData.product_id);
+    if (!productData) {
+        throw new AppError('Product not found', 404);
+    }
     let total_amount = 0;
-    total_amount += orderData.quantity * orderData.price_at_purchase;
+    total_amount += orderData.quantity * productData.selling_price;
     orderData.total_amount = total_amount;
+
+    orderData.price_at_purchase = productData.selling_price;
 
     orderData.tracking_code = generateTrackingCode();
 
-    if (!orderData.order_status) {
-        orderData.order_status = 'pending';
-    }
+    orderData.order_status = 'pending';
 
     return await orderRepository.createDirectOrder(orderData, client);
 };
@@ -68,8 +72,15 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     }
     if(!trackingCode) {
         throw new AppError('Tracking code is required', 400);
+    }  
+    const TrackingCodeCheck = await orderRepository.getOrderByTrackingCode(trackingCode, client);
+    if (!TrackingCodeCheck) {
+        throw new AppError('No order found for this tracking code', 404);
     }
-    return await orderRepository.getOrderByTrackingCode(trackingCode, client);
+    if (TrackingCodeCheck.customer_email !== email) {
+        throw new AppError('Tracking code does not match the provided email', 400);
+    }
+    return TrackingCodeCheck;
 };
 
 export const getAllOrders = async (client) => {

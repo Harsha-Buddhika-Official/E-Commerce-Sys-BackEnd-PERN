@@ -151,7 +151,7 @@ export const getAllProducts = async () => {
     LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
     WHERE p.is_active = true
     GROUP BY p.product_id
-    ORDER BY p.name
+    ORDER BY p.product_id ASC
   `;
   const { rows } = await pool.query(query);
   return rows;
