@@ -13,8 +13,8 @@ router.get('/:id', getAttributeById);
 router.use(authMiddleware);
 
 // Protected routes for attribute management
-router.post('/', authorize('super_admin', 'admin', 'manager'), createAttribute);
-router.delete('/', authorize('super_admin', 'admin', 'manager'), deleteAttribute);
-router.put('/:id', authorize('super_admin', 'admin', 'manager'), updateAttribute);
+router.post('/', authorize('super_admin', 'admin'), createAttribute);
+router.delete('/', authorize('super_admin', 'admin'), deleteAttribute);
+router.put('/:id', authorize('super_admin', 'admin'), updateAttribute);
 
 export default router;
