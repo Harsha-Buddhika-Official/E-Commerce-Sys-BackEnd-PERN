@@ -128,3 +128,18 @@ export const createProductAttribute = async (req, res, next) => {
         next(error);
     }
 }
+
+// Get attributes by category ID
+export const getAttributesByCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const attributes = await productService.getAttributesByCategory(categoryId);
+        res.status(200).json({
+            success: true,
+            data: attributes,
+            message: 'Attributes retrieved successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+}

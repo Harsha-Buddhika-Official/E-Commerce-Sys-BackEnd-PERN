@@ -14,6 +14,30 @@ export const createCategory = async (req, res, next) => {
     }
 };
 
+export const getProductCategories = async (req, res, next) => {
+    try {
+        const categories = await categoryService.getCategories('product');
+        res.status(200).json({
+            success: true,
+            data: categories
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getAccessoryCategories = async (req, res, next) => {
+    try {
+        const categories = await categoryService.getCategories('accessory');
+        res.status(200).json({
+            success: true,
+            data: categories
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 //get categories by category_type / get all categories if no type provided
 export const getCategories = async (req, res, next) => {
     try {

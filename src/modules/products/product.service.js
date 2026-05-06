@@ -227,3 +227,12 @@ export const createProductAttribute = async (productId, attributeData) => {
 
     return await productRepository.createProductAttribute(productId, attributeData);
 }
+
+// get attributes by category
+export const getAttributesByCategory = async (categoryId) => {
+    const attributes = await productRepository.getAttributesByCategory(categoryId);
+    if (attributes.length === 0) {
+        throw new AppError('No attributes found for this category', 404);
+    }
+    return attributes;
+}

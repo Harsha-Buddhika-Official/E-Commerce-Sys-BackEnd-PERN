@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategory, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory } from './categories.controller.js';
+import { createCategory, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory, getProductCategories, getAccessoryCategories } from './categories.controller.js';
 import { validateCreateCategory, validateGetCategorySchema, validateUpdateCategory, validateCategoryIdParam } from './categories.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -9,6 +9,8 @@ const router = express.Router();
 
 // Public routes for fetching categories
 router.get('/',  validateGetCategorySchema, getCategories); 
+router.get('/products', validateGetCategorySchema, getProductCategories);
+router.get('/accessorys', validateGetCategorySchema, getAccessoryCategories);
 router.get('/:id', validateCategoryIdParam, getCategoryById);
 
 // Protected routes for category management

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct } from './product.controller.js';
+import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory } from './product.controller.js';
 import {validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Public routes for fetching products
 router.get('/',  getAllProducts); 
+router.get('/attributes/by-category/:categoryId', getAttributesByCategory); //new not tested yet
 router.get('/:id', validateCategoryIdParam, getProductByid); 
 
 // Protected routes for product management

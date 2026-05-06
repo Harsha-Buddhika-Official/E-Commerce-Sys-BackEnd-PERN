@@ -242,3 +242,15 @@ export const restoreProduct = async (id) => {
   const { rows } = await pool.query(query, values);
   return rows[0];
 };
+
+export const getAttributesByCategory = async (categoryId, client = pool) => {
+  const query = `
+    SELECT attribute_id, name
+    FROM attributes
+    WHERE category_id = $1 AND is_active = true
+    ORDER BY name ASC
+  `;
+  const values = [categoryId];
+  const { rows } = await client.query(query, values);
+  return rows;
+};

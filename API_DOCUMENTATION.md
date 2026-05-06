@@ -136,7 +136,9 @@ Base path: `/api/categories`
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
-| `GET` | `/` | Public | Get all categories or filter by type. |
+| `GET` | `/` | Public | Get all categories. |
+| `GET` | `/products` | Public | Get all product categories. |
+| `GET` | `/accessorys` | Public | Get all accessory categories. |
 | `GET` | `/:id` | Public | Get one category by id. |
 | `POST` | `/` | `super_admin`, `admin` | Create a category. |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update a category. |
@@ -163,11 +165,6 @@ Update:
   "img_url": "https://example.com/category.png"
 }
 ```
-
-Query parameters for listing:
-
-- `type=product`
-- `type=accessory`
 
 ## Product API
 
