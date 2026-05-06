@@ -10,7 +10,7 @@ const router = express.Router();
 // Public routes for fetching categories
 // router.get('/',  validateGetCategorySchema, getCategories); 
 router.get('/products', validateGetCategorySchema, getProductCategories);
-router.get('/accessorys', validateGetCategorySchema, getAccessoryCategories);
+router.get('/accessories', validateGetCategorySchema, getAccessoryCategories);
 router.get('/:id', validateCategoryIdParam, getCategoryById);
 
 // Protected routes for category management
