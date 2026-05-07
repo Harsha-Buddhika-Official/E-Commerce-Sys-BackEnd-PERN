@@ -74,6 +74,22 @@ export const getAllProducts = async () => {
     return products;
 }
 
+export const getBestSellingProducts = async () => {
+    const products = await productRepository.getBestSellingProducts();
+    if (products.length === 0) {
+        throw new AppError('No best selling products found', 404);
+    }
+    return products;
+}
+
+export const getLatestProducts = async () => {
+    const products = await productRepository.getLatestProducts();
+    if (products.length === 0) {
+        throw new AppError('No latest products found', 404);
+    }
+    return products;
+}
+
 // get product by id
 export const getProductById = async (id) => {
     const product = await productRepository.findProductById(id);

@@ -28,6 +28,33 @@ export const getAllProducts = async (req, res, next) => {
     }
 }
 
+export const getBestSellingProducts = async (req, res, next) => {
+    try {
+        const products = await productService.getBestSellingProducts();
+        res.status(201).json({
+            success: true,
+            data: products,
+            message: 'Get best selling products Successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getLatestProducts = async (req, res, next) => {
+    try {
+        const products = await productService.getLatestProducts();
+        res.status(201).json({
+            success: true,
+            data: products,
+            message: 'Get latest products Successfully'
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 // Get product by ID
 export const getProductByid = async (req, res, next) => {
     try {

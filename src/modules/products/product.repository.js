@@ -135,7 +135,12 @@ export const getAllProducts = async () => {
   const query = `
     SELECT
       p.*,
-      COALESCE(
+      COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+      COALESCE(img_agg.images, '[]'::json) AS images
+    FROM products p
+    LEFT JOIN (
+      SELECT
+        pa.product_id,
         JSON_AGG(
           JSON_BUILD_OBJECT(
             'product_attribute_id', pa.product_attribute_id,
@@ -143,15 +148,118 @@ export const getAllProducts = async () => {
             'attribute_name', a.name,
             'value', pa.value
           )
-        ) FILTER (WHERE pa.product_attribute_id IS NOT NULL),
-        '[]'::json
-      ) AS attributes
-    FROM products p
-    LEFT JOIN product_attributes pa ON pa.product_id = p.product_id
-    LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+        ) AS attributes
+      FROM product_attributes pa
+      LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+      GROUP BY pa.product_id
+    ) attr_agg ON attr_agg.product_id = p.product_id
+    LEFT JOIN (
+      SELECT
+        pi.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary,
+            'alt_text', pi.alt_text,
+            'sort_order', pi.sort_order
+          ) ORDER BY pi.sort_order
+        ) AS images
+      FROM product_images pi
+      GROUP BY pi.product_id
+    ) img_agg ON img_agg.product_id = p.product_id
     WHERE p.is_active = true
-    GROUP BY p.product_id
     ORDER BY p.product_id ASC
+  `;
+  const { rows } = await pool.query(query);
+  return rows;
+};
+
+export const getBestSellingProducts = async () => {
+  const query = `
+    SELECT
+      p.*,
+      COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+      COALESCE(img_agg.images, '[]'::json) AS images
+    FROM products p
+    LEFT JOIN (
+      SELECT
+        pa.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'product_attribute_id', pa.product_attribute_id,
+            'attribute_id', pa.attribute_id,
+            'attribute_name', a.name,
+            'value', pa.value
+          )
+        ) AS attributes
+      FROM product_attributes pa
+      LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+      GROUP BY pa.product_id
+    ) attr_agg ON attr_agg.product_id = p.product_id
+    LEFT JOIN (
+      SELECT
+        pi.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary,
+            'alt_text', pi.alt_text,
+            'sort_order', pi.sort_order
+          ) ORDER BY pi.sort_order
+        ) AS images
+      FROM product_images pi
+      GROUP BY pi.product_id
+    ) img_agg ON img_agg.product_id = p.product_id
+    WHERE p.is_active = true
+    AND p.product_tag = 'BEST_SELLER'
+    ORDER BY p.product_id ASC;
+  `;
+  const { rows } = await pool.query(query);
+  return rows;
+};
+
+export const getLatestProducts = async () => {
+  const query = `
+    SELECT
+      p.*,
+      COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+      COALESCE(img_agg.images, '[]'::json) AS images
+    FROM products p
+    LEFT JOIN (
+      SELECT
+        pa.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'product_attribute_id', pa.product_attribute_id,
+            'attribute_id', pa.attribute_id,
+            'attribute_name', a.name,
+            'value', pa.value
+          )
+        ) AS attributes
+      FROM product_attributes pa
+      LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+      GROUP BY pa.product_id
+    ) attr_agg ON attr_agg.product_id = p.product_id
+    LEFT JOIN (
+      SELECT
+        pi.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary,
+            'alt_text', pi.alt_text,
+            'sort_order', pi.sort_order
+          ) ORDER BY pi.sort_order
+        ) AS images
+      FROM product_images pi
+      GROUP BY pi.product_id
+    ) img_agg ON img_agg.product_id = p.product_id
+    WHERE p.is_active = true
+    ORDER BY p.created_at DESC
+    LIMIT 8;
   `;
   const { rows } = await pool.query(query);
   return rows;
@@ -161,7 +269,12 @@ export const findProductById = async (id, client = pool) => {
   const query = `
     SELECT
       p.*,
-      COALESCE(
+      COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+      COALESCE(img_agg.images, '[]'::json) AS images
+    FROM products p
+    LEFT JOIN (
+      SELECT
+        pa.product_id,
         JSON_AGG(
           JSON_BUILD_OBJECT(
             'product_attribute_id', pa.product_attribute_id,
@@ -169,14 +282,27 @@ export const findProductById = async (id, client = pool) => {
             'attribute_name', a.name,
             'value', pa.value
           )
-        ) FILTER (WHERE pa.product_attribute_id IS NOT NULL),
-        '[]'::json
-      ) AS attributes
-    FROM products p
-    LEFT JOIN product_attributes pa ON pa.product_id = p.product_id
-    LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+        ) AS attributes
+      FROM product_attributes pa
+      LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+      GROUP BY pa.product_id
+    ) attr_agg ON attr_agg.product_id = p.product_id
+    LEFT JOIN (
+      SELECT
+        pi.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary,
+            'alt_text', pi.alt_text,
+            'sort_order', pi.sort_order
+          ) ORDER BY pi.sort_order
+        ) AS images
+      FROM product_images pi
+      GROUP BY pi.product_id
+    ) img_agg ON img_agg.product_id = p.product_id
     WHERE p.product_id = $1
-    GROUP BY p.product_id
   `;
   const values = [id];
   const { rows } = await client.query(query, values);
