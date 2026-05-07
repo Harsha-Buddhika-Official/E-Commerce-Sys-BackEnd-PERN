@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts } from './product.controller.js';
+import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory } from './product.controller.js';
 import {validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -7,17 +7,18 @@ import { authMiddleware } from '../../middlewares/auth.js';
 const router = express.Router();
 
 // Public routes for fetching products
-router.get('/',  getAllProducts); 
+router.get('/',  getAllProducts);
+router.get('/products/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
 router.get('/best-selling', getBestSellingProducts);
 router.get('/latest', getLatestProducts);
 router.get('/attributes/by-category/:categoryId', getAttributesByCategory); //new not tested yet
 router.get('/:id', validateCategoryIdParam, getProductByid); 
+router.post('/',  validateProduct, createProduct);
 
 // Protected routes for product management
 router.use(authMiddleware);
 
 // Protected routes for product management
-router.post('/', authorize('super_admin','admin'), validateProduct, createProduct);
 router.put('/:id', authorize('super_admin','admin'), validateProduct, updateProduct); 
 router.delete('/:id', authorize('super_admin','admin'), validateCategoryIdParam, deleteProduct); 
 router.post('/:id/attributes', authorize('super_admin','admin'), validateCategoryIdParam, validateCreateProductAttribute, createProductAttribute); 

@@ -74,6 +74,14 @@ export const getAllProducts = async () => {
     return products;
 }
 
+export const getProductsByCategory = async (categoryId) => {
+    const products = await productRepository.getProductsByCategory(categoryId);
+    if (products.length === 0) {
+        throw new AppError('No products found for this category', 404);
+    }
+    return products;
+}
+
 export const getBestSellingProducts = async () => {
     const products = await productRepository.getBestSellingProducts();
     if (products.length === 0) {
