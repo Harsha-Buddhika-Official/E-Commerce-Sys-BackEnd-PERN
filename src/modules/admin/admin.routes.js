@@ -6,17 +6,23 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public route for admin login
+// ==================== PUBLIC ROUTES - POST ====================
 router.post('/login', validateLogin, loginAdmin);
 
-// Protected routes for admin management
+// ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
-// protected routes for admin management
-router.post('/register', authorize('super_admin'), validateRegister, createAdmin);
+// ==================== PROTECTED ROUTES - GET ====================
 router.get('/', authorize('super_admin', 'admin'), getAllAdmins);
+
+// ==================== PROTECTED ROUTES - POST ====================
+router.post('/register', authorize('super_admin'), validateRegister, createAdmin);
+
+// ==================== PROTECTED ROUTES - PUT ====================
 router.put('/updateRole', authorize('super_admin'), updateAdminRole);
-router.delete('/delete', authorize('super_admin'), deleteAdmin);
 router.put('/updatePassword', authorize('super_admin', 'admin', 'manager'), updateAdminPassword);
+
+// ==================== PROTECTED ROUTES - DELETE ====================
+router.delete('/delete', authorize('super_admin'), deleteAdmin);
 
 export default router;

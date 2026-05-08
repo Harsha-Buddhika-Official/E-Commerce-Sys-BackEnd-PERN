@@ -5,16 +5,20 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public routes for fetching attributes
+// ==================== PUBLIC ROUTES - GET ====================
 router.get('/category', getAttributesByCategoryId);
 router.get('/:id', getAttributeById);
 
-// Protected routes for attribute management
+// ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
-// Protected routes for attribute management
+// ==================== PROTECTED ROUTES - POST ====================
 router.post('/', authorize('super_admin', 'admin'), createAttribute);
-router.delete('/', authorize('super_admin', 'admin'), deleteAttribute);
+
+// ==================== PROTECTED ROUTES - PUT ====================
 router.put('/:id', authorize('super_admin', 'admin'), updateAttribute);
+
+// ==================== PROTECTED ROUTES - DELETE ====================
+router.delete('/', authorize('super_admin', 'admin'), deleteAttribute);
 
 export default router;

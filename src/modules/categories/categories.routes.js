@@ -7,20 +7,23 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public routes for fetching categories
-// router.get('/',  validateGetCategorySchema, getCategories); 
+// ==================== PUBLIC ROUTES - GET ====================
 router.get('/products', validateGetCategorySchema, getProductCategories);
 router.get('/accessories', validateGetCategorySchema, getAccessoryCategories);
 router.get('/:id', validateCategoryIdParam, getCategoryById);
 
-// Protected routes for category management
+// ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
-// Protected routes for category management 
-router.post('/', authorize('super_admin','admin'), validateCreateCategory, createCategory); 
-router.put('/:id', authorize('super_admin','admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory); 
-router.delete('/:id', authorize('super_admin','admin'), validateCategoryIdParam, deleteCategory); 
-router.put('/:id/deactivate', authorize('super_admin','admin'), validateCategoryIdParam, softDeleteCategory); 
-router.put('/:id/restore', authorize('super_admin','admin'), validateCategoryIdParam, restoreCategory); 
+// ==================== PROTECTED ROUTES - POST ====================
+router.post('/', authorize('super_admin', 'admin'), validateCreateCategory, createCategory);
+
+// ==================== PROTECTED ROUTES - PUT ====================
+router.put('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory);
+router.put('/:id/deactivate', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteCategory);
+router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreCategory);
+
+// ==================== PROTECTED ROUTES - DELETE ====================
+router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
 
 export default router;

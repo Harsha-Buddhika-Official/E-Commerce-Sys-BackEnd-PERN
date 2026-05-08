@@ -6,18 +6,24 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public routes for order creation and tracking
-router.post('/direct', validateCreateDirectOrder, createDirectOrder);
-router.post('/cart', validateCreateCartOrder, createCartOrder);
+// ==================== PUBLIC ROUTES - GET ====================
 router.get('/tracking', validateTrackingLookup, getOrdersByTrackingCode);
 
-// Protected routes for order management
+// ==================== PUBLIC ROUTES - POST ====================
+router.post('/direct', validateCreateDirectOrder, createDirectOrder);
+router.post('/cart', validateCreateCartOrder, createCartOrder);
+
+// ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
-// Protected routes for order management
-router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
+// ==================== PROTECTED ROUTES - GET ====================
 router.get('/', authorize('super_admin', 'admin', 'manager'), getAllOrders);
+router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
+
+// ==================== PROTECTED ROUTES - PUT ====================
 router.put('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);
+
+// ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder);
 
 

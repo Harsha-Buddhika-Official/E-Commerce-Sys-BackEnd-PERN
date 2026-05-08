@@ -6,18 +6,22 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public routes for fetching brands
+// ==================== PUBLIC ROUTES - GET ====================
 router.get('/', getAllBrands);
 router.get('/:id', validateIdParam, getBrandById);
 
-// Protected routes for brand management
+// ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
-// Protected routes for brand management
+// ==================== PROTECTED ROUTES - POST ====================
 router.post('/', authorize('super_admin', 'admin', 'manager'), validateCreateBrand, createBrand);
+
+// ==================== PROTECTED ROUTES - PUT ====================
 router.put('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, validateUpdateBrand, updateBrand);
-router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand);
 router.put('/:id/soft-delete', authorize('super_admin', 'admin', 'manager'), validateIdParam, softDeleteBrand);
 router.put('/:id/restore', authorize('super_admin', 'admin', 'manager'), validateIdParam, restoreBrand);
+
+// ==================== PROTECTED ROUTES - DELETE ====================
+router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand);
 
 export default router;

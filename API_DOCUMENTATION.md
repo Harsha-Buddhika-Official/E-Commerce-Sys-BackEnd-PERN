@@ -4,22 +4,20 @@ This project exposes a REST API for an e-commerce backend.
 
 ## Base URL
 
-All routes are mounted under the app root. In local development the server prints the full URL using the configured `PORT` value.
+All routes are mounted under the app root.
 
 - Server entrypoint: `src/server.js`
-- API mount points: `src/app.js`
+- Router mounts: `src/app.js`
 
 ## Common Conventions
 
 - Success responses usually include `success: true`.
-- Many write endpoints also include a `message` field.
-- Validation failures return HTTP `400` with field-level error details.
-- Protected routes require an `Authorization: Bearer <token>` header.
-- Cart and cart-order flows use a `sessionId` cookie.
+- Write endpoints often include a `message` field.
+- Validation failures return HTTP `400`.
+- Protected routes require `Authorization: Bearer <token>`.
+- Cart and cart-order flows use a `sessionId` cookie when available.
 
 ## Authentication And Roles
-
-The API uses JWT bearer authentication for protected routes.
 
 - `super_admin` can access all admin operations and most management routes.
 - `admin` can access most management routes.
@@ -27,7 +25,7 @@ The API uses JWT bearer authentication for protected routes.
 
 ## Standard Response Shape
 
-Examples used across the API:
+Typical success response:
 
 ```json
 {
@@ -37,7 +35,7 @@ Examples used across the API:
 }
 ```
 
-Validation error example:
+Typical validation error response:
 
 ```json
 {
@@ -58,11 +56,11 @@ Base path: `/api/admin`
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
 | `POST` | `/login` | Public | Log in an admin and receive a JWT token. |
-| `POST` | `/register` | `super_admin` | Create a new admin account. |
 | `GET` | `/` | `super_admin`, `admin` | List all admins. |
+| `POST` | `/register` | `super_admin` | Create a new admin account. |
 | `PUT` | `/updateRole` | `super_admin` | Update an admin role. |
-| `DELETE` | `/delete` | `super_admin` | Delete an admin by email. |
 | `PUT` | `/updatePassword` | `super_admin`, `admin`, `manager` | Update an admin password. |
+| `DELETE` | `/delete` | `super_admin` | Delete an admin by email. |
 
 ### Admin payloads
 
@@ -105,6 +103,14 @@ Update password:
 }
 ```
 
+Delete admin:
+
+```json
+{
+  "email": "admin@example.com"
+}
+```
+
 ## Brand API
 
 Base path: `/api/brands`
@@ -115,9 +121,9 @@ Base path: `/api/brands`
 | `GET` | `/:id` | Public | Get one brand by id. |
 | `POST` | `/` | `super_admin`, `admin`, `manager` | Create a brand. |
 | `PUT` | `/:id` | `super_admin`, `admin`, `manager` | Update a brand. |
-| `DELETE` | `/:id` | `super_admin`, `admin`, `manager` | Delete a brand. |
 | `PUT` | `/:id/soft-delete` | `super_admin`, `admin`, `manager` | Soft delete a brand. |
 | `PUT` | `/:id/restore` | `super_admin`, `admin`, `manager` | Restore a soft-deleted brand. |
+| `DELETE` | `/:id` | `super_admin`, `admin`, `manager` | Delete a brand. |
 
 ### Brand payloads
 
@@ -136,15 +142,14 @@ Base path: `/api/categories`
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
-| `GET` | `/` | Public | Get all categories. |
 | `GET` | `/products` | Public | Get all product categories. |
-| `GET` | `/accessorys` | Public | Get all accessory categories. |
+| `GET` | `/accessories` | Public | Get all accessory categories. |
 | `GET` | `/:id` | Public | Get one category by id. |
 | `POST` | `/` | `super_admin`, `admin` | Create a category. |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update a category. |
-| `DELETE` | `/:id` | `super_admin`, `admin` | Delete a category. |
 | `PUT` | `/:id/deactivate` | `super_admin`, `admin` | Soft delete a category. |
 | `PUT` | `/:id/restore` | `super_admin`, `admin` | Restore a category. |
+| `DELETE` | `/:id` | `super_admin`, `admin` | Delete a category. |
 
 ### Category payloads
 
@@ -172,20 +177,25 @@ Base path: `/api/products`
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
-| `GET` | `/` | Public | Get all products. |
-| `GET` | `/attributes/by-category/:categoryId` | Public | Get attributes available for a category. |
+| `GET` | `/` | Public | Get all active products. |
+| `GET` | `/best-selling` | Public | Get products tagged as best sellers. |
+| `GET` | `/latest` | Public | Get the latest 8 active products. |
+| `GET` | `/filter/bar/:categoryId` | Public | Get filter bar options for a category. |
+| `GET` | `/products/category/:categoryId` | Public | Get products by category. |
+| `GET` | `/attributes/by-category/:categoryId` | Public | Get active attributes available for a category. |
 | `GET` | `/:id` | Public | Get one product by id. |
-| `POST` | `/` | `super_admin`, `admin` | Create a product. |
+| `POST` | `/filter/products/:categoryId` | Public | Get products filtered by selected attribute values. |
+| `POST` | `/` | Public | Create a product. |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update a product. |
-| `DELETE` | `/:id` | `super_admin`, `admin` | Delete a product. |
-| `POST` | `/:id/attributes` | `super_admin`, `admin` | Add an attribute mapping to a product. |
-| `DELETE` | `/:id/attributes/:attributeId` | `super_admin`, `admin` | Remove one attribute mapping from a product. |
 | `PUT` | `/:id/soft-delete` | `super_admin`, `admin` | Soft delete a product. |
 | `PUT` | `/:id/restore` | `super_admin`, `admin` | Restore a soft-deleted product. |
+| `POST` | `/:id/attributes` | `super_admin`, `admin` | Add one attribute mapping to a product. |
+| `DELETE` | `/:id` | `super_admin`, `admin` | Delete a product. |
+| `DELETE` | `/:id/attributes/:attributeId` | `super_admin`, `admin` | Remove one attribute mapping from a product. |
 
 ### Product payloads
 
-Create or update:
+Create or update product:
 
 ```json
 {
@@ -197,7 +207,7 @@ Create or update:
   "selling_price": 999,
   "stock_quantity": 25,
   "warranty_months": 12,
-  "product_tag": "featured",
+  "product_tag": "BEST_SELLER",
   "images": [
     {
       "image_url": "https://example.com/product-1.png",
@@ -224,6 +234,29 @@ Create a product attribute mapping:
 }
 ```
 
+Filter products by category and selected attributes:
+
+```json
+{
+  "filters": [
+    {
+      "attribute_id": 1,
+      "value": "128GB"
+    },
+    {
+      "attribute_id": 2,
+      "value": "Black"
+    }
+  ]
+}
+```
+
+### Product response notes
+
+Single product and list responses include product details plus category, brand, attributes, and images. Attribute items are returned with `product_attribute_id`, `attribute_id`, `attribute_name`, and `value`.
+
+Filter bar responses are grouped by attribute and include value counts for each category.
+
 ## Cart API
 
 Base path: `/api/cart`
@@ -232,8 +265,8 @@ Cart routes use a `sessionId` cookie or session identifier to associate items wi
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
-| `POST` | `/add` | Public | Add an item to the cart. |
 | `GET` | `/` | Public | Get cart items for the current session. |
+| `POST` | `/add` | Public | Add an item to the cart. |
 | `PUT` | `/:cartItemId` | Public | Update a cart item quantity. |
 | `DELETE` | `/:cartItemId` | Public | Remove a cart item. |
 
@@ -262,11 +295,11 @@ Base path: `/api/orders`
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
+| `GET` | `/tracking` | Public | Look up orders by email and tracking code. |
 | `POST` | `/direct` | Public | Create a direct order for a single product. |
 | `POST` | `/cart` | Public | Create an order from the current cart session. |
-| `GET` | `/tracking` | Public | Look up orders by email and tracking code. |
-| `GET` | `/:id` | `super_admin`, `admin`, `manager` | Get an order by id. |
 | `GET` | `/` | `super_admin`, `admin`, `manager` | Get all orders. |
+| `GET` | `/:id` | `super_admin`, `admin`, `manager` | Get an order by id. |
 | `PUT` | `/:id` | `super_admin`, `admin`, `manager` | Update order status. |
 | `DELETE` | `/:id` | `super_admin`, `admin`, `manager` | Delete an order. |
 
@@ -333,8 +366,8 @@ Base path: `/api/attributes`
 | `GET` | `/category` | Public | Get attributes by category. |
 | `GET` | `/:id` | Public | Get attribute by id. |
 | `POST` | `/` | `super_admin`, `admin` | Create an attribute. |
-| `DELETE` | `/` | `super_admin`, `admin` | Delete an attribute. |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update an attribute. |
+| `DELETE` | `/` | `super_admin`, `admin` | Delete an attribute. |
 
 ### Attribute payloads
 
@@ -342,7 +375,8 @@ Create:
 
 ```json
 {
-  "name": "Storage"
+  "name": "Storage",
+  "categoryId": 1
 }
 ```
 
@@ -350,21 +384,20 @@ Update:
 
 ```json
 {
-  "name": "RAM"
+  "name": "RAM",
+  "categoryId": 1
 }
 ```
 
-Delete:
+Category lookup note:
 
-```json
-{
-  "id": 4
-}
-```
+- The controller currently reads category lookup input from the request body.
+- If you consume `GET /category` from the frontend, verify the expected transport shape in your client integration before relying on query parameters.
 
 ## Implementation Notes
 
-- The API uses `cors()` and `cookie-parser()` globally.
+- The app uses `cors()` and `cookie-parser()` globally.
 - Errors are handled by `src/middlewares/errorHandler.js`.
 - The server checks the database before starting.
-- Some routes use body-based identifiers in the current implementation, so clients should follow the payload examples above rather than assuming every lookup comes from query parameters.
+- Several list endpoints return raw arrays rather than a wrapped `{ success, data }` object in the current controllers.
+- Some older endpoints still use body-based identifiers; follow the payload examples above rather than assuming every lookup comes from params or query strings.

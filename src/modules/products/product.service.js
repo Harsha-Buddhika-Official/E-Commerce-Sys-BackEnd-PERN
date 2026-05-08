@@ -260,3 +260,45 @@ export const getAttributesByCategory = async (categoryId) => {
     }
     return attributes;
 }
+
+// get filter bar data - attributes and their values for a category
+export const getFilterBarData = async (categoryId) => {
+    const filterData = await productRepository.getAttributeValuesForFilterBar(categoryId);
+    if (filterData.length === 0) {
+        throw new AppError('No filter options available for this category', 404);
+    }
+    
+    // Group by attribute for better frontend consumption
+    const grouped = {};
+    filterData.forEach(item => {
+        if (!grouped[item.attribute_id]) {
+            grouped[item.attribute_id] = {
+                attribute_id: item.attribute_id,
+                attribute_name: item.attribute_name,
+                values: []
+            };
+        }
+        grouped[item.attribute_id].values.push({
+            value: item.value,
+            product_count: parseInt(item.product_count)
+        });
+    });
+    
+    return Object.values(grouped);
+}
+
+// get products filtered by category and attributes
+export const getFilteredProducts = async (categoryId, filters = []) => {
+    // Validate category exists
+    const categoryCheck = await findCategoryById(categoryId);
+    if (!categoryCheck) {
+        throw new AppError('Category not found', 404);
+    }
+    
+    const products = await productRepository.getProductsByAttributeFilter(categoryId, filters);
+    if (products.length === 0) {
+        throw new AppError('No products found matching the selected filters', 404);
+    }
+    
+    return products;
+}

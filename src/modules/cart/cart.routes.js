@@ -5,10 +5,16 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public routes for cart management
-router.post('/add', validateAddToCart, validateSessionId, addToCart); //working
+// ==================== PUBLIC ROUTES - GET ====================
 router.get('/', validateSessionId, getCartItems);
+
+// ==================== PUBLIC ROUTES - POST ====================
+router.post('/add', validateAddToCart, validateSessionId, addToCart);
+
+// ==================== PUBLIC ROUTES - PUT ====================
 router.put('/:cartItemId', validateIdParam, validateUpdateCartItem, validateSessionId, updateCartItem);
+
+// ==================== PUBLIC ROUTES - DELETE ====================
 router.delete('/:cartItemId', validateIdParam, validateSessionId, removeCartItem);
 
 export default router;

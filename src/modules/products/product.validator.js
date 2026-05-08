@@ -122,7 +122,21 @@ const idParamSchema = joi.object({
             'number.positive': 'ID must be a positive number',
             'any.required': 'ID is required'
         })
-})
+});
+
+// Validation schema for validating category ID in params
+const categoryIdParamSchema = joi.object({
+    categoryId: joi.number()
+        .integer()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Category ID must be a number',
+            'number.integer': 'Category ID must be an integer',
+            'number.positive': 'Category ID must be a positive number',
+            'any.required': 'Category ID is required'
+        })
+});
 
 const productAttributeParamSchema = joi.object({
     id: joi.number()
@@ -154,7 +168,7 @@ const createProductAttributeSchema = joi.object({
             'number.positive': 'Attribute ID must be a positive number',
             'any.required': 'Attribute ID is required'
         }),
-    value: joi.number()
+    value: joi.string()
         .max(100)
         .required()
         .messages({
@@ -164,12 +178,38 @@ const createProductAttributeSchema = joi.object({
         })
 });
 
+// Validation schema for filter products
+const filterProductsSchema = joi.object({
+    filters: joi.array().items(
+        joi.object({
+            attribute_id: joi.number()
+                .integer()
+                .positive()
+                .required()
+                .messages({
+                    'number.base': 'Attribute ID must be a number',
+                    'number.integer': 'Attribute ID must be an integer',
+                    'number.positive': 'Attribute ID must be a positive number',
+                    'any.required': 'Attribute ID is required'
+                }),
+            value: joi.string()
+                .max(100)
+                .required()
+                .messages({
+                    'string.base': 'Attribute value must be a string',
+                    'string.max': 'Attribute value must be at most 100 characters',
+                    'any.required': 'Attribute value is required'
+                })
+        })
+    ).optional()
+});
+
 // Validation middleware for product creation and update
 export const validateProduct = (req, res, next) => {
     const { error, value } = productSchema.validate(req.body, { abortEarly: false });
     if (error) {
         return res.status(400).json({
-            succes: false,
+            success: false,
             error: error.details.map(err => ({
                 field: err.path[0],
                 message: err.message
@@ -178,20 +218,20 @@ export const validateProduct = (req, res, next) => {
     }
     req.body = value;
     next();
-}
+};
 
-//middleware to validate category ID in params
+// middleware to validate category ID in params
 export const validateCategoryIdParam = (req, res, next) => {
-    const { error, value } = idParamSchema.validate(req.params);
+    const { error, value } = categoryIdParamSchema.validate(req.params);
     if (error) {
         return res.status(400).json({
             success: false,
             error: error.details[0].message
-        })
+        });
     }
     req.params = value;
     next();
-}
+};
 
 export const validateProductAttributeParams = (req, res, next) => {
     const { error, value } = productAttributeParamSchema.validate(req.params);
@@ -199,11 +239,11 @@ export const validateProductAttributeParams = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: error.details[0].message
-        })
+        });
     }
     req.params = value;
     next();
-}
+};
 
 export const validateCreateProductAttribute = (req, res, next) => {
     const { error, value } = createProductAttributeSchema.validate(req.body, { abortEarly: false });
@@ -214,8 +254,24 @@ export const validateCreateProductAttribute = (req, res, next) => {
                 field: err.path[0],
                 message: err.message
             }))
-        })
+        });
     }
     req.body = value;
     next();
-}
+};
+
+// Validation middleware for filter products
+export const validateFilterProducts = (req, res, next) => {
+    const { error, value } = filterProductsSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details.map(err => ({
+                field: err.path[0],
+                message: err.message
+            }))
+        });
+    }
+    req.body = value;
+    next();
+};

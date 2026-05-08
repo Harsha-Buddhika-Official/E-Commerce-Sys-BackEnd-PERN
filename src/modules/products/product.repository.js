@@ -454,3 +454,92 @@ export const getAttributesByCategory = async (categoryId, client = pool) => {
   const { rows } = await client.query(query, values);
   return rows;
 };
+
+// Get all available attribute values for a category with their counts
+export const getAttributeValuesForFilterBar = async (categoryId, client = pool) => {
+  const query = `
+    SELECT
+      a.attribute_id,
+      a.name AS attribute_name,
+      pa.value,
+      COUNT(DISTINCT p.product_id) AS product_count
+    FROM attributes a
+    LEFT JOIN product_attributes pa ON a.attribute_id = pa.attribute_id
+    LEFT JOIN products p ON pa.product_id = p.product_id 
+      AND p.category_id = $1 AND p.is_active = true
+    WHERE a.category_id = $1 AND a.is_active = true AND pa.value IS NOT NULL
+    GROUP BY a.attribute_id, a.name, pa.value
+    ORDER BY a.name, pa.value ASC
+  `;
+  const values = [categoryId];
+  const { rows } = await client.query(query, values);
+  return rows;
+};
+
+// Get products filtered by category and attributes
+export const getProductsByAttributeFilter = async (categoryId, attributeFilters = [], client = pool) => {
+  let query = `
+    SELECT
+      p.*,
+      c.name AS category_name,
+      c.category_id,
+      b.name AS brand_name,
+      COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+      COALESCE(img_agg.images, '[]'::json) AS images
+    FROM products p
+    LEFT JOIN categories c ON c.category_id = p.category_id
+    LEFT JOIN brands b ON b.brand_id = p.brand_id
+    LEFT JOIN (
+      SELECT
+        pa.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'product_attribute_id', pa.product_attribute_id,
+            'attribute_id', pa.attribute_id,
+            'attribute_name', a.name,
+            'value', pa.value
+          )
+        ) AS attributes
+      FROM product_attributes pa
+      LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
+      GROUP BY pa.product_id
+    ) attr_agg ON attr_agg.product_id = p.product_id
+    LEFT JOIN (
+      SELECT
+        pi.product_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary,
+            'alt_text', pi.alt_text,
+            'sort_order', pi.sort_order
+          ) ORDER BY pi.sort_order
+        ) AS images
+      FROM product_images pi
+      GROUP BY pi.product_id
+    ) img_agg ON img_agg.product_id = p.product_id
+    WHERE p.category_id = $1 AND p.is_active = true
+  `;
+  
+  const values = [categoryId];
+  
+  // Add attribute filters if provided
+  if (attributeFilters && attributeFilters.length > 0) {
+    // Using INTERSECT approach to require products to match ALL attribute filters
+    const attributeSubqueries = attributeFilters.map((filter, idx) => {
+      values.push(filter.attribute_id, filter.value);
+      const paramIdx = values.length;
+      return `(SELECT DISTINCT pa.product_id 
+              FROM product_attributes pa 
+              WHERE pa.attribute_id = $${paramIdx - 1} AND pa.value = $${paramIdx})`;
+    });
+    
+    query += ` AND p.product_id IN (SELECT product_id FROM (${attributeSubqueries.join(' INTERSECT ')}) matched_products)`;
+  }
+  
+  query += ` ORDER BY p.product_id ASC`;
+  
+  const { rows } = await client.query(query, values);
+  return rows;
+};
