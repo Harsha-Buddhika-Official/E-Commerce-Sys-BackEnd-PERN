@@ -1,6 +1,6 @@
 import express from 'express';
-import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterBarData, getFilteredProducts } from './product.controller.js';
-import {validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts } from './product.validator.js';
+import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts } from './product.controller.js';
+import { validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
@@ -10,13 +10,13 @@ const router = express.Router();
 router.get('/', getAllProducts);
 router.get('/best-selling', getBestSellingProducts);
 router.get('/latest', getLatestProducts);
-router.get('/filter/bar/:categoryId', validateCategoryIdParam, getFilterBarData);
 router.get('/products/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
 router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
 router.get('/:id', validateCategoryIdParam, getProductByid);
+router.get('/filter/options/:categoryId', getFilterOptions);
+router.post('/filter/:categoryId', getFilteredProducts); 
 
 // ==================== PUBLIC ROUTES - POST ====================
-router.post('/filter/products/:categoryId', validateCategoryIdParam, validateFilterProducts, getFilteredProducts);
 router.post('/', validateProduct, createProduct);
 
 // ==================== PROTECTED ROUTES ====================
@@ -32,6 +32,6 @@ router.post('/:id/attributes', authorize('super_admin', 'admin'), validateCatego
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteProduct);
-router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute); 
+router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
 
 export default router;

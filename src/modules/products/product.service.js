@@ -252,53 +252,49 @@ export const createProductAttribute = async (productId, attributeData) => {
     return await productRepository.createProductAttribute(productId, attributeData);
 }
 
-// get attributes by category
-export const getAttributesByCategory = async (categoryId) => {
-    const attributes = await productRepository.getAttributesByCategory(categoryId);
-    if (attributes.length === 0) {
-        throw new AppError('No attributes found for this category', 404);
-    }
-    return attributes;
-}
+export const getFilterOptions = async (categoryId) => {
+  const rows = await productRepository.getAttributesByCategory(categoryId);
 
-// get filter bar data - attributes and their values for a category
-export const getFilterBarData = async (categoryId) => {
-    const filterData = await productRepository.getAttributeValuesForFilterBar(categoryId);
-    if (filterData.length === 0) {
-        throw new AppError('No filter options available for this category', 404);
+  if (!rows.length) throw new AppError('No filter options found for this category', 404);
+
+  const map = new Map();
+  for (const row of rows) {
+    if (!map.has(row.attribute_id)) {
+      map.set(row.attribute_id, {
+        attributeId: row.attribute_id,
+        name: row.attribute_name,
+        values: [],
+      });
     }
-    
-    // Group by attribute for better frontend consumption
-    const grouped = {};
-    filterData.forEach(item => {
-        if (!grouped[item.attribute_id]) {
-            grouped[item.attribute_id] = {
-                attribute_id: item.attribute_id,
-                attribute_name: item.attribute_name,
-                values: []
-            };
-        }
-        grouped[item.attribute_id].values.push({
-            value: item.value,
-            product_count: parseInt(item.product_count)
-        });
+    map.get(row.attribute_id).values.push({
+      value: row.value,
+      count: parseInt(row.product_count, 10),
     });
-    
-    return Object.values(grouped);
-}
+  }
 
-// get products filtered by category and attributes
-export const getFilteredProducts = async (categoryId, filters = []) => {
-    // Validate category exists
-    const categoryCheck = await findCategoryById(categoryId);
-    if (!categoryCheck) {
-        throw new AppError('Category not found', 404);
-    }
-    
-    const products = await productRepository.getProductsByAttributeFilter(categoryId, filters);
-    if (products.length === 0) {
-        throw new AppError('No products found matching the selected filters', 404);
-    }
-    
-    return products;
-}
+  return Array.from(map.values());
+};
+
+export const filterProducts = async (categoryId, body) => {
+  // body comes parsed from req.body — no JSON.parse needed
+  const priceMin = body.priceMin !== undefined ? parseFloat(body.priceMin) : undefined;
+  const priceMax = body.priceMax !== undefined ? parseFloat(body.priceMax) : undefined;
+
+  const attributeFilters = Array.isArray(body.attributeFilters)
+    ? body.attributeFilters.map(f => ({
+        attributeId: Number(f.attributeId),
+        values: Array.isArray(f.values) ? f.values : [f.values],
+      }))
+    : [];
+
+  const products = await productRepository.getFilteredProducts({
+    categoryId: parseInt(categoryId, 10),
+    attributeFilters,
+    priceMin,
+    priceMax,
+  });
+
+  if (!products.length) throw new AppError('No products found matching the selected filters', 404);
+
+  return products;
+};

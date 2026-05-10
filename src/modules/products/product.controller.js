@@ -185,34 +185,22 @@ export const getAttributesByCategory = async (req, res, next) => {
     }
 }
 
-// Get filter bar data (attributes and values for a category)
-export const getFilterBarData = async (req, res, next) => {
-    try {
-        const { categoryId } = req.params;
-        const filterData = await productService.getFilterBarData(categoryId);
-        res.status(200).json({
-            success: true,
-            data: filterData,
-            message: 'Filter options retrieved successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-}
+export const getFilterOptions = async (req, res, next) => {
+  try {
+    const { categoryId } = req.params;
+    const data = await productService.getFilterOptions(categoryId);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};
 
-// Get products with attribute filters
 export const getFilteredProducts = async (req, res, next) => {
-    try {
-        const { categoryId } = req.params;
-        const { filters } = req.body; // filters: [{ attribute_id, value }, ...]
-        
-        const products = await productService.getFilteredProducts(categoryId, filters);
-        res.status(200).json({
-            success: true,
-            data: products,
-            message: 'Filtered products retrieved successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-}
+  try {
+    const { categoryId } = req.params;
+    const products = await productService.filterProducts(categoryId, req.body); // req.body not req.query
+    res.status(200).json({ success: true, products });
+  } catch (err) {
+    next(err);
+  }
+};
