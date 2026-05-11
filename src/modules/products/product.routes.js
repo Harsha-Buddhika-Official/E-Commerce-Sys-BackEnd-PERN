@@ -10,11 +10,11 @@ const router = express.Router();
 router.get('/', getAllProducts);
 router.get('/best-selling', getBestSellingProducts);
 router.get('/latest', getLatestProducts);
-router.get('/products/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
+router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
 router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
 router.get('/:id', validateCategoryIdParam, getProductByid);
-router.get('/filter/options/:categoryId', getFilterOptions);
-router.post('/filter/:categoryId', getFilteredProducts); 
+router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions);
+router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); 
 
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/', validateProduct, createProduct);
