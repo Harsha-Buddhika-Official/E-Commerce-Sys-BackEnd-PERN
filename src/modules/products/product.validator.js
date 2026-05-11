@@ -50,6 +50,14 @@ const productSchema = joi.object({
             'number.positive': 'Base price must be a positive number',
             'any.required': 'Base price is required'
         }),
+    discounted_price: joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Discounted price must be a number',
+            'number.positive': 'Discounted price must be a positive number',
+            'any.required': 'Base price is required'
+        }),
     selling_price: joi.number()
         .positive()
         .required()

@@ -112,12 +112,12 @@ export const updateProduct = async (id, productData) => {
     const client = await pool.connect();
     try {
         await client.query("BEGIN");
-        
+
         const existing = await productRepository.findProductById(id);
         if (!existing) {
             throw new AppError('Product not found', 404);
         }
-        
+
         // Convert category name to ID if provided
         if (productData.category_name && !productData.category_id) {
             const categoryNameCheck = await findCategoryByName(productData.category_name);
@@ -135,7 +135,7 @@ export const updateProduct = async (id, productData) => {
             }
             productData.brand_id = brandNameCheck.brand_id;
         }
-        
+
         if (productData.name && productData.name !== existing.name) {
             const nameExists = await productRepository.findProductByName(productData.name, client);
             if (nameExists) {
@@ -163,7 +163,7 @@ export const updateProduct = async (id, productData) => {
         if (productFields.name) {
             productFields.slug = slugify(productFields.name, { lower: true, strict: true });
         }
-        
+
         // Update product
         const updatedProduct = await productRepository.updateProduct(id, productFields, client);
 
@@ -253,48 +253,48 @@ export const createProductAttribute = async (productId, attributeData) => {
 }
 
 export const getFilterOptions = async (categoryId) => {
-  const rows = await productRepository.getAttributesByCategory(categoryId);
+    const rows = await productRepository.getAttributesByCategory(categoryId);
 
-  if (!rows.length) throw new AppError('No filter options found for this category', 404);
+    if (!rows.length) throw new AppError('No filter options found for this category', 404);
 
-  const map = new Map();
-  for (const row of rows) {
-    if (!map.has(row.attribute_id)) {
-      map.set(row.attribute_id, {
-        attributeId: row.attribute_id,
-        name: row.attribute_name,
-        values: [],
-      });
+    const map = new Map();
+    for (const row of rows) {
+        if (!map.has(row.attribute_id)) {
+            map.set(row.attribute_id, {
+                attributeId: row.attribute_id,
+                name: row.attribute_name,
+                values: [],
+            });
+        }
+        map.get(row.attribute_id).values.push({
+            value: row.value,
+            count: parseInt(row.product_count, 10),
+        });
     }
-    map.get(row.attribute_id).values.push({
-      value: row.value,
-      count: parseInt(row.product_count, 10),
-    });
-  }
 
-  return Array.from(map.values());
+    return Array.from(map.values());
 };
 
 export const filterProducts = async (categoryId, body) => {
-  // body comes parsed from req.body — no JSON.parse needed
-  const priceMin = body.priceMin !== undefined ? parseFloat(body.priceMin) : undefined;
-  const priceMax = body.priceMax !== undefined ? parseFloat(body.priceMax) : undefined;
+    // body comes parsed from req.body — no JSON.parse needed
+    const priceMin = body.priceMin !== undefined ? parseFloat(body.priceMin) : undefined;
+    const priceMax = body.priceMax !== undefined ? parseFloat(body.priceMax) : undefined;
 
-  const attributeFilters = Array.isArray(body.attributeFilters)
-    ? body.attributeFilters.map(f => ({
-        attributeId: Number(f.attributeId),
-        values: Array.isArray(f.values) ? f.values : [f.values],
-      }))
-    : [];
+    const attributeFilters = Array.isArray(body.attributeFilters)
+        ? body.attributeFilters.map(f => ({
+            attributeId: Number(f.attributeId),
+            values: Array.isArray(f.values) ? f.values : [f.values],
+        }))
+        : [];
 
-  const products = await productRepository.getFilteredProducts({
-    categoryId: parseInt(categoryId, 10),
-    attributeFilters,
-    priceMin,
-    priceMax,
-  });
+    const products = await productRepository.getFilteredProducts({
+        categoryId: parseInt(categoryId, 10),
+        attributeFilters,
+        priceMin,
+        priceMax,
+    });
 
-  if (!products.length) throw new AppError('No products found matching the selected filters', 404);
+    if (!products.length) throw new AppError('No products found matching the selected filters', 404);
 
-  return products;
+    return products;
 };

@@ -17,7 +17,7 @@ router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOpti
 
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/', validateProduct, createProduct);
-router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); 
+router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);

@@ -10,6 +10,7 @@ export const createProduct = async (productData, client = pool) => {
     description,
     base_price,
     selling_price,
+    discounted_price,
     stock_quantity,
     warranty_months,
     product_tag
@@ -17,8 +18,8 @@ export const createProduct = async (productData, client = pool) => {
 
   const query = `
     INSERT INTO products
-      (name, brand_id, category_id, slug, description, base_price, selling_price, stock_quantity, warranty_months, product_tag)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      (name, brand_id, category_id, slug, description, base_price, selling_price, discounted_price, stock_quantity, warranty_months, product_tag)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
     RETURNING *
   `;
 
@@ -30,6 +31,7 @@ export const createProduct = async (productData, client = pool) => {
     description || null,
     base_price,
     selling_price,
+    discounted_price,
     stock_quantity ?? 0,
     warranty_months ?? null,
     product_tag ?? null
@@ -391,11 +393,11 @@ export const findProductByName = async (name, client = pool) => {
 };
 
 export const updateProduct = async (id, productData, client = pool) => {
-  const { name, brand_id, category_id, slug, description, base_price, selling_price, stock_quantity, warranty_months, product_tag } = productData;
+  const { name, brand_id, category_id, slug, description, base_price, selling_price, discounted_price, stock_quantity, warranty_months, product_tag } = productData;
   const query = `
     UPDATE products
-    SET name = $1, brand_id = $2, category_id = $3, slug = $4, description = $5, base_price = $6, selling_price = $7, stock_quantity = $8, warranty_months = $9, product_tag = $10, updated_at = CURRENT_TIMESTAMP
-    WHERE product_id = $11
+    SET name = $1, brand_id = $2, category_id = $3, slug = $4, description = $5, base_price = $6, selling_price = $7, discounted_price = $8, stock_quantity = $9, warranty_months = $10, product_tag = $11, updated_at = CURRENT_TIMESTAMP
+    WHERE product_id = $12
     RETURNING *
   `;
   const values = [
@@ -406,6 +408,7 @@ export const updateProduct = async (id, productData, client = pool) => {
     description || null,
     base_price,
     selling_price,
+    discounted_price,
     stock_quantity || 0,
     warranty_months || null,
     product_tag || null,
@@ -444,7 +447,7 @@ export const restoreProduct = async (id) => {
 };
 
 export const getAttributesByCategory = async (categoryId) => {
-    const query = `
+  const query = `
             SELECT
         a.attribute_id,
         a.name        AS attribute_name,
@@ -458,9 +461,9 @@ export const getAttributesByCategory = async (categoryId) => {
         GROUP BY a.attribute_id, a.name, pa.value
         ORDER BY a.name, pa.value
     `;
-    const values = [categoryId];
-    const { rows } = await pool.query(query, values);
-    return rows;
+  const values = [categoryId];
+  const { rows } = await pool.query(query, values);
+  return rows;
 };
 
 
