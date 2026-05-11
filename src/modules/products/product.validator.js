@@ -204,6 +204,29 @@ const filterProductsSchema = joi.object({
     ).optional()
 });
 
+const productidSchema = joi.object({
+    id: joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Product ID must be a number',
+            'number.positive': 'Product ID must be a positive number',
+            'any.required': 'Product ID is required'
+        })
+});
+
+export const validateProductId = (req, res, next) => {
+    const { error, value } = productidSchema.validate(req.params);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details[0].message
+        });
+    }
+    req.params = value;
+    next();
+};
+
 // Validation middleware for product creation and update
 export const validateProduct = (req, res, next) => {
     const { error, value } = productSchema.validate(req.body, { abortEarly: false });

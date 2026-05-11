@@ -198,7 +198,7 @@ export const getFilterOptions = async (req, res, next) => {
 export const getFilteredProducts = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
-    const products = await productService.filterProducts(categoryId, req.body); // req.body not req.query
+    const products = await productService.filterProducts(categoryId, req.body);
     res.status(200).json({ success: true, products });
   } catch (err) {
     next(err);

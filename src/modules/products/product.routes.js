@@ -1,6 +1,6 @@
 import express from 'express';
 import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts } from './product.controller.js';
-import { validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts } from './product.validator.js';
+import { validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
@@ -12,12 +12,12 @@ router.get('/best-selling', getBestSellingProducts);
 router.get('/latest', getLatestProducts);
 router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
 router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
-router.get('/:id', validateCategoryIdParam, getProductByid);
+router.get('/:id', validateProductId, getProductByid);
 router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions);
-router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); 
 
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/', validateProduct, createProduct);
+router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); 
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
