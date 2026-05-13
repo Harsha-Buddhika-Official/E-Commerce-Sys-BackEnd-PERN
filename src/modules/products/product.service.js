@@ -107,6 +107,18 @@ export const getProductById = async (id) => {
     return product;
 }
 
+// get product by name (returns minimal fields)
+export const getProductByName = async (name) => {
+    if (!name) {
+        throw new AppError('Product name is required', 400);
+    }
+    const product = await productRepository.findProductByName(name);
+    if (!product) {
+        throw new AppError('Product not found', 404);
+    }
+    return { product_id: product.product_id, name: product.name, category_id: product.category_id };
+};
+
 // update product with transaction
 export const updateProduct = async (id, productData) => {
     const client = await pool.connect();

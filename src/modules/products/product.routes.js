@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts } from './product.controller.js';
+import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getProductByid, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts } from './product.controller.js';
 import { validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -10,6 +10,7 @@ const router = express.Router();
 router.get('/', getAllProducts);
 router.get('/best-selling', getBestSellingProducts);
 router.get('/latest', getLatestProducts);
+router.get('/search', getProductByName);
 router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
 router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
 router.get('/:id', validateProductId, getProductByid);
