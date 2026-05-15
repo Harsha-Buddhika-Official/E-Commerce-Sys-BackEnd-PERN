@@ -438,4 +438,19 @@ export const totalShippedOrders = async (client = pool) => {
     }
 };
 
-
+export const lowStockAlert = async (threshold = 5, client = pool) => {
+    const query = `
+        SELECT product_id, name, stock_quantity
+        FROM products
+        WHERE stock_quantity <= $1
+          AND is_active = true
+        ORDER BY stock_quantity ASC;
+    `;
+    try {
+        const result = await client.query(query, [threshold]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error fetching low stock products:', error);
+        throw error;
+    }
+};

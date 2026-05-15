@@ -123,3 +123,8 @@ export const getStatusData = async (client) => {
         shippedOrders
     };
 };
+
+export const lowStockAlert = async (client) => {
+    const lowStockProducts = await orderRepository.lowStockAlert(client);
+    return lowStockProducts;
+}

@@ -117,3 +117,16 @@ export const getStatusData = async (req, res, next) => {
         next(error);
     }
 };
+
+export const lowStockAlert = async (req, res, next) => {
+    try {
+        const lowStockProducts = await orderService.lowStockAlert();
+        res.status(200).json({
+            success: true,
+            data: lowStockProducts
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
