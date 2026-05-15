@@ -308,3 +308,134 @@ export const deleteOrder = async (orderId, client = pool) => {
         throw error;
     }
 };
+
+
+//status bar repository functions
+export const totalRevenueLastmonth = async (client = pool) => {
+    const query = `SELECT SUM(total_amount) AS last_30_days_revenue
+        FROM orders
+        WHERE order_status != 'cancelled'
+            AND created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW();`;
+    try {
+        const result = await client.query(query);
+        return result.rows[0].last_30_days_revenue;
+    } catch (error) {
+        console.error('Error fetching total revenue:', error);
+        throw error;
+    }
+};
+
+    //to comapare with last 30 days
+export const totalRevenuePrevious30Days = async (client = pool) => {
+    const query = `
+        SELECT COALESCE(SUM(total_amount), 0) AS previous_30_days_revenue
+        FROM orders
+        WHERE order_status != 'cancelled'
+          AND created_at >= NOW() - INTERVAL '60 days'
+          AND created_at < NOW() - INTERVAL '30 days';
+    `;
+
+    try {
+        const result = await client.query(query);
+        return Number(result.rows[0].previous_30_days_revenue);
+    } catch (error) {
+        console.error('Error fetching previous 30 days revenue:', error);
+        throw error;
+    }
+};
+
+export const totalOrdersLastMonth = async (client = pool) => {
+    const query = `SELECT COUNT(*) AS last_30_days_orders
+        FROM orders
+        WHERE order_status != 'cancelled'
+            AND created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW();`;
+    try {
+        const result = await client.query(query);
+        return result.rows[0].last_30_days_orders;
+    } catch (error) {
+        console.error('Error fetching total orders:', error);
+        throw error;
+    }
+};
+
+export const totalOrdersPrevious30Days = async (client = pool) => {
+    const query = `
+        SELECT COUNT(*) AS previous_30_days_orders
+        FROM orders
+        WHERE order_status != 'cancelled'
+          AND created_at >= NOW() - INTERVAL '60 days'
+          AND created_at < NOW() - INTERVAL '30 days';
+    `;
+    try {
+        const result = await client.query(query);
+        return Number(result.rows[0].previous_30_days_orders);
+    } catch (error) {
+        console.error('Error fetching previous 30 days orders:', error);
+        throw error;
+    }
+};
+
+export const totalActiveProducts = async (client = pool) => {
+    const query = `
+        SELECT COUNT(*) AS active_product_count
+        FROM products
+        WHERE is_active = true;
+    `;
+
+    try {
+        const result = await client.query(query);
+        return Number(result.rows[0].active_product_count);
+    } catch (error) {
+        console.error('Error fetching active product count:', error);
+        throw error;
+    }
+};
+
+export const totalLowStockProducts = async (client = pool) => {
+    const query = `
+        SELECT COUNT(*) AS out_of_stock_product_count
+        FROM products
+        WHERE stock_quantity = 0
+          AND is_active = true;
+    `;
+
+    try {
+        const result = await client.query(query);
+        return Number(result.rows[0].out_of_stock_product_count);
+    } catch (error) {
+        console.error('Error fetching out of stock product count:', error);
+        throw error;
+    }
+};
+
+export const totalPendingOrders = async (client = pool) => {
+    const query = `
+        SELECT COUNT(*) AS pending_order_count
+        FROM orders
+        WHERE order_status = 'pending';
+    `;
+    try {
+        const result = await client.query(query);
+        return Number(result.rows[0].pending_order_count);
+    } catch (error) {
+        console.error('Error fetching pending orders count:', error);
+        throw error;
+    }
+};
+
+export const totalShippedOrders = async (client = pool) => {
+    const query = `
+        SELECT COUNT(*) AS shipped_order_count
+        FROM orders
+        WHERE order_status = 'shipped';
+    `;
+    try {
+        const result = await client.query(query);
+        return Number(result.rows[0].shipped_order_count);
+    } catch (error) {        
+        console.error('Error fetching shipped orders count:', error);
+        throw error;
+    }
+};
+
+

@@ -94,3 +94,32 @@ export const updateOrderStatus = async (orderId, newStatus, client) => {
 export const deleteOrder = async (orderId, client) => {
     return await orderRepository.deleteOrder(orderId, client);
 };
+
+//status bar data for admin dashboard
+export const getStatusData = async (client) => {
+    const totalRevenueThisMonth = await orderRepository.totalRevenueLastmonth(client);
+    const totalRevenueLastMonth = await orderRepository.totalRevenuePrevious30Days(client);
+
+    const totalOrdersThisMonth = await orderRepository.totalOrdersLastMonth(client);
+    const totalOrdersLastMonth = await orderRepository.totalOrdersPrevious30Days(client);
+    
+    const activeProducts = await orderRepository.totalActiveProducts(client);
+    const lowStockProducts = await orderRepository.totalLowStockProducts(client);
+
+    const pendingOrders = await orderRepository.totalPendingOrders(client);
+    const shippedOrders = await orderRepository.totalShippedOrders(client);
+
+    const comparedRevenuePercentage = ((totalRevenueThisMonth - totalRevenueLastMonth) / totalRevenueLastMonth) * 100;
+    const comparedOrdersPercentage = ((totalOrdersThisMonth - totalOrdersLastMonth) / totalOrdersLastMonth) * 100;
+
+    return {
+        totalRevenueThisMonth,
+        comparedRevenuePercentage,
+        totalOrdersThisMonth,
+        comparedOrdersPercentage,
+        activeProducts,
+        lowStockProducts,
+        pendingOrders,
+        shippedOrders
+    };
+};

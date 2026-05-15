@@ -104,3 +104,16 @@ export const deleteOrder = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getStatusData = async (req, res, next) => {
+    try {
+        const statusData = await orderService.getStatusData();
+        res.status(200).json({
+            success: true,
+            data: statusData
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
