@@ -478,3 +478,24 @@ export const lowStockAlert = async (threshold = 5, client = pool) => {
         throw error;
     }
 };
+
+export const getOrderStatusCount = async (client = pool) => {
+    const query = `
+        SELECT
+            COUNT(*) FILTER (WHERE order_status = 'pending') AS pending_orders,
+            COUNT(*) FILTER (WHERE order_status = 'cancelled') AS cancelled_orders,
+            COUNT(*) FILTER (WHERE order_status = 'delivered') AS completed_orders
+        FROM orders;
+    `
+    try {
+        const result = await client.query(query);
+        return {
+            pendingOrders: Number(result.rows[0].pending_orders),
+            cancelledOrders: Number(result.rows[0].cancelled_orders),
+            completedOrders: Number(result.rows[0].completed_orders)
+        };
+    } catch (error) {
+        console.error('Error fetching order status count:', error);
+        throw error;
+    }
+}

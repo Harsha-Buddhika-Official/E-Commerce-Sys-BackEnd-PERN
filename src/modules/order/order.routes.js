@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCartOrder, createDirectOrder, getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert } from './order.controller.js';
+import { createCartOrder, createDirectOrder, getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount } from './order.controller.js';
 import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus } from './order.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -20,6 +20,7 @@ router.use(authMiddleware);
 // ==================== PROTECTED ROUTES - GET ====================
 router.get('/admin/statuses', authorize('super_admin', 'admin', 'manager'), getStatusData);
 router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'), lowStockAlert);
+router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount);
 
 router.get('/', authorize('super_admin', 'admin', 'manager'), getAllOrders);
 router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);

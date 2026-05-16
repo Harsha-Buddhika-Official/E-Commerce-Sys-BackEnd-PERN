@@ -126,3 +126,8 @@ export const lowStockAlert = async (client) => {
     const lowStockProducts = await orderRepository.lowStockAlert(client);
     return lowStockProducts;
 }
+
+export const getOrderStatusCount = async (client) =>{
+    const OrderStatus = await orderRepository.getOrderStatusCount(client);
+    return OrderStatus;
+}

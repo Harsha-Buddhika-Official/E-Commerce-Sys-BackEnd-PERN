@@ -132,3 +132,15 @@ export const lowStockAlert = async (req, res, next) => {
         next(error);
     }
 };
+
+export const OrderStatusCount = async (req, res, next) => {
+    try {
+        const OrderStatus = await orderService.getOrderStatusCount();
+        res.status(200).json({
+            success: true,
+            data: OrderStatus
+        });
+    } catch (error) {
+        next(error);
+    }
+};
