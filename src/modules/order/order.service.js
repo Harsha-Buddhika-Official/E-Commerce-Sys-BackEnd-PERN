@@ -22,9 +22,7 @@ export const createDirectOrder = async (orderData, client) => {
     return await orderRepository.createDirectOrder(orderData, client);
 };
 
-export const createCartOrder = async (orderData, client) => {
-    const { sessionId } = orderData;
-
+export const createCartOrder = async (orderData, sessionId, client) => {
     if (!sessionId) {
         throw new AppError('sessionId is required to create a cart order', 401);
     }

@@ -274,7 +274,31 @@ export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
 };
 
 export const getAllOrders = async (client = pool) => {
-    const query = `SELECT o.order_id, o.tracking_code, o.customer_email, o.phone_number, o.total_amount, o.order_status, o.shipping_address, o.city, o.postal_code, oi.product_id, oi.quantity, oi.price_at_purchase FROM orders o JOIN order_items oi ON o.order_id = oi.order_id ORDER BY o.created_at DESC`;
+    const query = `SELECT
+        o.order_id,
+        o.tracking_code,
+        o.customer_email,
+        o.phone_number,
+        o.total_amount,
+        o.order_status,
+        o.shipping_address,
+        o.city,
+        o.postal_code,
+
+        oi.product_id,
+        p.name AS product_name,
+        oi.quantity,
+        oi.price_at_purchase
+
+    FROM orders o
+
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+
+    JOIN products p
+        ON oi.product_id = p.product_id
+
+    ORDER BY o.created_at DESC;`;
     try {
         const result = await client.query(query);
         return result.rows;
