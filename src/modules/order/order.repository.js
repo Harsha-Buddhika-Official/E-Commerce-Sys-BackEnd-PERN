@@ -239,7 +239,60 @@ export const updateOrder = async (orderId, orderData, client = pool) => {
 };
 
 export const getOrderById = async (orderId, client = pool) => {
-    const query = `SELECT o.order_id, o.tracking_code, o.customer_email, o.phone_number, o.total_amount, o.order_status, o.shipping_address, o.city, o.postal_code, o.created_at, o.updated_at, oi.product_id, oi.quantity, oi.price_at_purchase FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.order_id = $1`;
+    const query = `SELECT 
+        o.order_id,
+        o.tracking_code,
+        o.customer_email,
+        o.phone_number,
+        o.total_amount,
+        o.order_status,
+        o.shipping_address,
+        o.city,
+        o.postal_code,
+        o.created_at,
+        o.updated_at,
+
+        COALESCE(
+            json_agg(
+                json_build_object(
+                    'order_item_id', oi.order_item_id,
+                    'product_id', oi.product_id,
+                    'quantity', oi.quantity,
+                    'price_at_purchase', oi.price_at_purchase,
+
+                    'product_name', p.name,
+                    'product_slug', p.slug,
+                    'selling_price', p.selling_price,
+                    'stock_quantity', p.stock_quantity,
+                    'warranty_months', p.warranty_months,
+
+                    'brand_id', b.brand_id,
+                    'brand_name', b.name,
+
+                    'category_id', c.category_id,
+                    'category_name', c.name
+                )
+            ) FILTER (WHERE oi.order_item_id IS NOT NULL),
+            '[]'
+        ) AS order_items
+
+    FROM orders o
+
+    LEFT JOIN order_items oi
+        ON o.order_id = oi.order_id
+
+    LEFT JOIN products p
+        ON oi.product_id = p.product_id
+
+    LEFT JOIN brands b
+        ON p.brand_id = b.brand_id
+
+    LEFT JOIN categories c
+        ON p.category_id = c.category_id
+
+    WHERE o.order_id = $1
+
+    GROUP BY o.order_id;`;
     try {
         const result = await client.query(query, [orderId]);
         return result.rows[0];
@@ -276,17 +329,13 @@ export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
 export const getAllOrders = async (client = pool) => {
     const query = `SELECT
         o.order_id,
-        o.tracking_code,
+        p.name AS product_name,
         o.customer_email,
-        o.phone_number,
+        o.updated_at,
         o.total_amount,
         o.order_status,
-        o.shipping_address,
-        o.city,
-        o.postal_code,
-
+        
         oi.product_id,
-        p.name AS product_name,
         oi.quantity,
         oi.price_at_purchase
 
@@ -309,7 +358,12 @@ export const getAllOrders = async (client = pool) => {
 };
 
 export const updateOrderStatus = async (orderId, newStatus, client = pool) => {
-    const query = `UPDATE orders SET order_status = $1 WHERE order_id = $2 RETURNING *`;
+    const query = `UPDATE orders
+    SET 
+        order_status = $1,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE order_id = $2
+    RETURNING *;`;
     const values = [newStatus, orderId];
     try {
         const result = await

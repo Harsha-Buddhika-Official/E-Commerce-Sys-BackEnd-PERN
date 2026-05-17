@@ -21,12 +21,11 @@ router.use(authMiddleware);
 router.get('/admin/statuses', authorize('super_admin', 'admin', 'manager'), getStatusData);
 router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'), lowStockAlert);
 router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount);
-
-router.get('/', authorize('super_admin', 'admin', 'manager'), getAllOrders);
-router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
+router.get('/admin/all', authorize('super_admin', 'admin', 'manager'), getAllOrders);
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);
+router.put('/admin/state/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder);
