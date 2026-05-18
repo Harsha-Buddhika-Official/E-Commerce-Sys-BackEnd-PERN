@@ -376,20 +376,25 @@ export const findProductById = async (id, client = pool) => {
 };
 
 export const findProductByName = async (name, client = pool) => {
-  const query = `
-    SELECT
+  const query = `SELECT
       p.*,
       c.name AS category_name,
       b.name AS brand_name
-    FROM products p
-    LEFT JOIN categories c ON c.category_id = p.category_id
-    LEFT JOIN brands b ON b.brand_id = p.brand_id
-    WHERE p.name = $1
-    LIMIT 1
-  `;
+
+  FROM products p
+
+  LEFT JOIN categories c
+      ON c.category_id = p.category_id
+
+  LEFT JOIN brands b
+      ON b.brand_id = p.brand_id
+
+  WHERE p.name ILIKE '%' || $1 || '%'
+
+  LIMIT 20;`;
   const values = [name];
   const { rows } = await client.query(query, values);
-  return rows[0];
+  return rows;
 };
 
 export const updateProduct = async (id, productData, client = pool) => {
