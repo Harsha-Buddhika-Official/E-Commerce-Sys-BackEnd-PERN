@@ -214,6 +214,112 @@ export const getAllProductLimitedDetilas = async () => {
   return rows;
 };
 
+  export const getAllDetialsProductById = async (id) => {
+    const query = `
+    SELECT
+      p.product_id,
+      p.name,
+      p.slug,
+      p.description,
+
+      p.base_price,
+      p.selling_price,
+      p.discounted_price,
+
+      p.stock_quantity,
+
+      CASE
+        WHEN p.stock_quantity <= 0 THEN 'OUT_OF_STOCK'
+        WHEN p.stock_quantity <= 3 THEN 'LOW_STOCK'
+        ELSE 'IN_STOCK'
+      END AS stock_status,
+
+      p.warranty_months,
+      p.product_tag,
+      p.is_active,
+
+      p.created_at,
+      p.updated_at,
+
+      c.category_id,
+      c.name AS category_name,
+      c.slug AS category_slug,
+      c.category_type,
+      c.img_url AS category_image,
+      c.is_active AS category_active,
+
+      b.brand_id,
+      b.name AS brand_name,
+      b.slug AS brand_slug,
+      b.logo_url,
+      b.is_active AS brand_active,
+
+      COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+
+      COALESCE(img_agg.images, '[]'::json) AS images
+
+    FROM products p
+
+    LEFT JOIN categories c
+      ON c.category_id = p.category_id
+
+    LEFT JOIN brands b
+      ON b.brand_id = p.brand_id
+
+    LEFT JOIN (
+      SELECT
+        pa.product_id,
+
+        JSON_AGG(
+          JSON_BUILD_object(
+            'product_attribute_id', pa.product_attribute_id,
+            'attribute_id', pa.attribute_id,
+            'attribute_name', a.name,
+            'attribute_value_id', pa.attribute_value_id,
+            'value', pa.value
+          )
+          ORDER BY pa.product_attribute_id
+        ) AS attributes
+
+      FROM product_attributes pa
+
+      LEFT JOIN attributes a
+        ON a.attribute_id = pa.attribute_id
+
+      GROUP BY pa.product_id
+
+    ) attr_agg
+      ON attr_agg.product_id = p.product_id
+
+    LEFT JOIN (
+      SELECT
+        pi.product_id,
+
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary,
+            'alt_text', pi.alt_text,
+            'sort_order', pi.sort_order
+          )
+          ORDER BY pi.sort_order
+        ) AS images
+
+      FROM product_images pi
+
+      GROUP BY pi.product_id
+
+    ) img_agg
+      ON img_agg.product_id = p.product_id
+
+    WHERE p.product_id = $1
+    `;
+
+    const { rows } = await pool.query(query, [id]);
+    return rows[0];
+  };
+
 export const getProductsByCategory = async (categoryId) => {
   const query = `
     SELECT

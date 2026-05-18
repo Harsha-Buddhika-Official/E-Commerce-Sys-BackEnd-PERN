@@ -41,6 +41,20 @@ export const getAllProductLimitedDetilas = async (req, res, next) => {
     }
 };
 
+export const getAllDetialsProductById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const product = await productService.getAllDetialsProductById(id);
+        res.status(200).json({
+            success: true,
+            data: product,
+            message: 'Product detailed info retrieved successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getProductsByCategory = async (req, res, next) => {
     try {
         const { categoryId } = req.params;
