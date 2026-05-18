@@ -181,6 +181,39 @@ export const getAllProducts = async () => {
   return rows;
 };
 
+export const getAllProductLimitedDetilas = async () => {
+  const query = `
+    SELECT
+      p.product_id,
+      p.name AS product_name,
+      b.name AS brand_name,
+      c.name AS category_name,
+      p.stock_quantity,
+      CASE
+        WHEN p.stock_quantity <= 0 THEN 'OUT_OF_STOCK'
+        WHEN p.stock_quantity <= 3 THEN 'LOW_STOCK'
+        ELSE 'IN_STOCK'
+      END AS stock_status,
+      p.base_price,
+      p.selling_price,
+      p.discounted_price,
+      pi.image_url AS primary_image
+    FROM products p
+    LEFT JOIN brands b
+      ON b.brand_id = p.brand_id
+    LEFT JOIN categories c
+      ON c.category_id = p.category_id
+    LEFT JOIN product_images pi
+      ON pi.product_id = p.product_id
+      AND pi.is_primary = true
+    WHERE p.is_active = true
+    ORDER BY p.created_at DESC
+  `;
+
+  const { rows } = await pool.query(query);
+  return rows;
+};
+
 export const getProductsByCategory = async (categoryId) => {
   const query = `
     SELECT
