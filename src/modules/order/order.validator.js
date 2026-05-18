@@ -1,6 +1,6 @@
 import joi from 'joi';
 
-const orderStatusValues = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+const orderStatusValues = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'];
 
 const directOrderSchema = joi.object({
 	customer_email: joi.string()
