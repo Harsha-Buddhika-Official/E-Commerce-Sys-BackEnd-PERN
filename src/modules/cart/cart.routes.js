@@ -1,20 +1,24 @@
-import express from 'express';
-import { addToCart, removeCartItem, getCartItems, updateCartItem } from './cart.controller.js';
-import { validateAddToCart, validateUpdateCartItem, validateIdParam, validateSessionId} from './cart.validator.js';
-import { authMiddleware } from '../../middlewares/auth.js';
+import { Router } from 'express';
+import { CartController } from './cart.controller.js';
+import { attachSession } from '../../middlewares/session.middleware.js';
+import { validateAddItem, validateUpdateItem, validateItemId } from './cart.validator.js';
 
-const router = express.Router();
+const router = Router();
+const ctrl = new CartController();
 
-// ==================== PUBLIC ROUTES - GET ====================
-router.get('/', validateSessionId, getCartItems);
+// Every cart route needs a session attached
+router.use(attachSession);
 
-// ==================== PUBLIC ROUTES - POST ====================
-router.post('/add', validateAddToCart, validateSessionId, addToCart);
+// GET    /api/cart              → get full cart
+// POST   /api/cart              → add item
+// PATCH  /api/cart/:itemId      → update quantity
+// DELETE /api/cart/:itemId      → remove single item
+// DELETE /api/cart              → clear entire cart
 
-// ==================== PUBLIC ROUTES - PUT ====================
-router.put('/:cartItemId', validateIdParam, validateUpdateCartItem, validateSessionId, updateCartItem);
-
-// ==================== PUBLIC ROUTES - DELETE ====================
-router.delete('/:cartItemId', validateIdParam, validateSessionId, removeCartItem);
+router.get('/', ctrl.getCart);
+router.post('/', validateAddItem, ctrl.addItem);
+router.patch('/:itemId', validateItemId, validateUpdateItem, ctrl.updateQuantity);
+router.delete('/:itemId', validateItemId, ctrl.removeItem);
+router.delete('/', ctrl.clearCart);
 
 export default router;

@@ -1,93 +1,91 @@
-import * as cartService from './cart.service.js';
+import { CartService } from './cart.service.js';
 
-export const addToCart = async (req, res, next) => {
-    try{
-        const { productId, quantity } = req.body;
-        const sessionId = req.sessionID || req.cookies.sessionId;
-        const cartItem = await cartService.addToCart(sessionId, productId, quantity);
-        
-        // Set the sessionId as a cookie if it's a new session
-        if (cartItem.sessionId && cartItem.sessionId !== sessionId) {
-            res.cookie('sessionId', cartItem.sessionId, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Use secure flag in production
-                sameSite: 'strict',
-                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-            });
-        }
-        
-        res.status(201).json({
-            success: true,
-            data: cartItem,
-            message: 'Item added to cart successfully'
-        });
-    } catch (error) {
-        next(error);
-
+export class CartController {
+    constructor() {
+        this.service = new CartService();
     }
+
+    getCart = async (req, res, next) => {
+        try {
+            const cart = await this.service.getCart(req.sessionId);
+            res.status(200).json({
+                success: true,
+                data: cart,
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    addItem = async (req, res, next) => {
+        try {
+            const { product_id, quantity } = req.body;
+            const cart = await this.service.addItem({
+                sessionId: req.sessionId,
+                isNewSession: req.isNewSession,
+                productId: product_id,
+                quantity,
+                res,
+            });
+
+            res.status(201).json({
+                success: true,
+                data: cart,
+                message: 'Item added to cart successfully',
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    updateQuantity = async (req, res, next) => {
+        try {
+            const { itemId } = req.params;
+            const { quantity } = req.body;
+
+            const cart = await this.service.updateQuantity({
+                sessionId: req.sessionId,
+                itemId,
+                quantity,
+            });
+
+            res.status(200).json({
+                success: true,
+                data: cart,
+                message: 'Cart item updated successfully',
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    removeItem = async (req, res, next) => {
+        try {
+            const { itemId } = req.params;
+            const cart = await this.service.removeItem({
+                sessionId: req.sessionId,
+                itemId,
+            });
+
+            res.status(200).json({
+                success: true,
+                data: cart,
+                message: 'Cart item removed successfully',
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    clearCart = async (req, res, next) => {
+        try {
+            await this.service.clearCart(req.sessionId);
+            res.status(200).json({
+                success: true,
+                message: 'Cart cleared successfully',
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }
-
-export const getCartItems = async (req, res, next) => {
-    try {
-        const sessionId = req.cookies.sessionId; 
-        //const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
-       
-        /*
-        const cookies = req.cookies; // Get cookies from the request
-        console.log("Cookies:", cookies); // Debugging line to check cookies
-        */
-
-        console.log("Session ID:", sessionId); // Debugging line to check session ID
-        const cartItems = await cartService.getCartItems(sessionId);
-        res.status(200).json({
-            success: true,
-            data: cartItems
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-export const updateCartItem = async (req, res, next) => {
-    try {
-        const { cartItemId } = req.params;
-        const { quantity } = req.body;
-
-        const cartItem = await cartService.verifyCartItemOwnership(cartItemId, req.sessionID);
-        if (!cartItem) {
-            return res.status(403).json({
-                success: false,
-                message: 'You do not have permission to modify this cart item'
-            });
-        }
-
-        const updatedItem = await cartService.updateCartItem(cartItemId, quantity);
-        res.status(200).json({
-            success: true,
-            data: updatedItem,
-            message: 'Cart item updated successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-export const removeCartItem = async (req, res, next) => {
-    try {
-        const { cartItemId } = req.params;
-        const cartItem = await cartService.verifyCartItemOwnership(cartItemId, req.sessionID);
-        if (!cartItem) {
-            return res.status(403).json({
-                success: false,
-                message: 'You do not have permission to modify this cart item'
-            });
-        }
-        await cartService.removeCartItem(cartItemId);
-        res.status(200).json({
-            success: true,
-            message: 'Cart item removed successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-};

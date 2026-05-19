@@ -114,7 +114,7 @@ export const getProductByid = async (req, res, next) => {
 // Get product by name (query param `name`)
 export const getProductByName = async (req, res, next) => {
     try {
-        const { name } = req.query;
+        const { name } = req.params;
         if (!name) {
             return res.status(400).json({ success: false, error: 'Name query parameter is required' });
         }

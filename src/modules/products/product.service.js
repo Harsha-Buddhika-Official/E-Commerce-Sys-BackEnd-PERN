@@ -132,7 +132,7 @@ export const getProductByName = async (name) => {
     if (!product) {
         throw new AppError('Product not found', 404);
     }
-    return { product_id: product.product_id, name: product.name, category_id: product.category_id };
+    return product;
 };
 
 // update product with transaction
