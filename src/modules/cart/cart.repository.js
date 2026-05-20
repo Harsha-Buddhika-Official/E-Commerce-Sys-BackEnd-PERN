@@ -82,7 +82,7 @@ export const findProduct = async (productId) => {
     const { rows } = await pool.query(
         `SELECT product_id,
                 name,
-                selling_price,
+                discounted_price,
                 stock_quantity,
                 is_active
          FROM   products
@@ -102,7 +102,7 @@ export const getCartWithItems = async (cartId) => {
              pi.image_url                              AS image_url,
              ci.quantity,
              ci.price_at_add::TEXT                     AS price_at_add,
-             p.selling_price::TEXT                     AS current_price,
+             p.discounted_price::TEXT                  AS current_price,
              p.stock_quantity,
              p.is_active,
              (ci.quantity * ci.price_at_add)::DECIMAL(10,2)::TEXT  AS line_total,

@@ -1,4 +1,5 @@
 import * as cartRepository from './cart.repository.js';
+import { findOfferByProductId, findOfferByIdWhenItsActive } from '../offers/offers.repository.js';
 import AppError from '../../utils/AppError.js';
 import { setSessionCookie } from '../../middlewares/session.middleware.js';
 
@@ -8,7 +9,20 @@ export const getCart = async (sessionId) => {
     if (!cart) {
         return { items: [], total: '0.00', item_count: 0 };
     }
-
+    // const items = await cartRepository.getCartWithItems(cart.cart_id);
+    // const offerProduct = await findOfferByProductId(items.productId);
+    // if (offerProduct) {
+    //     const offer = await findOfferByIdWhenItsActive(offerProduct.offer_id);
+    //     if (offer) {
+    //         const type = offer.discount_type;
+    //         const value = offer.discount_value;
+    //         if (type === 'percentage') {
+    //             product.discounted_price = (product.discounted_price * (100 - value)) / 100;
+    //         } else if (type === 'fixed') {
+    //             product.discounted_price = Math.max(0, product.discounted_price - value);
+    //         }
+    //     }
+    // }
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
@@ -18,6 +32,21 @@ export const addItem = async (params) => {
     const product = await cartRepository.findProduct(productId);
     if (!product || !product.is_active) {
         throw new AppError('Product not found or is no longer available', 404);
+    }
+
+    // Check whether the product has an active offer and apply its price before adding to cart.
+    const offerProduct = await findOfferByProductId(productId);
+    if (offerProduct) {
+        const offer = await findOfferByIdWhenItsActive(offerProduct.offer_id);
+        if (offer) {
+            const type = offer.discount_type;
+            const value = offer.discount_value;
+            if (type === 'percentage') {
+                product.discounted_price = (product.discounted_price * (100 - value)) / 100;
+            } else if (type === 'fixed') {
+                product.discounted_price = Math.max(0, product.discounted_price - value);
+            }
+        }
     }
 
     if (quantity > product.stock_quantity) {
@@ -51,7 +80,7 @@ export const addItem = async (params) => {
             cart_id: cart.cart_id,
             product_id: productId,
             quantity,
-            price_at_add: product.selling_price,
+            price_at_add: product.discounted_price,
         });
     }
 

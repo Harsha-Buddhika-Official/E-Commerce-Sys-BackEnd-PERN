@@ -9,6 +9,7 @@ import cartRoutes from './modules/cart/cart.routes.js';
 import orderRoutes from './modules/order/order.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
 import attributeRoutes from './modules/attributes/attribute.routes.js';
+import offerRoutes from './modules/offers/offers.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use('/api/cart', cartRoutes);  //done testing
 app.use('/api/orders', orderRoutes); //done testing
 app.use('/api/admin', adminRoutes); //done testing
 app.use('/api/attributes', attributeRoutes);
+app.use('/api/offers', offerRoutes);
 
 app.use(errorHandler);
 

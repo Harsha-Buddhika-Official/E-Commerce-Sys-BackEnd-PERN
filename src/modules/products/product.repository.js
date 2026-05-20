@@ -139,11 +139,26 @@ export const getAllProducts = async () => {
       p.*,
       c.name AS category_name,
       b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
       COALESCE(img_agg.images, '[]'::json) AS images
     FROM products p
     LEFT JOIN categories c ON c.category_id = p.category_id
     LEFT JOIN brands b ON b.brand_id = p.brand_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN (
       SELECT
         pa.product_id,
@@ -196,13 +211,27 @@ export const getAllProductLimitedDetilas = async () => {
       END AS stock_status,
       p.base_price,
       p.selling_price,
-      p.discounted_price,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       pi.image_url AS primary_image
     FROM products p
     LEFT JOIN brands b
       ON b.brand_id = p.brand_id
     LEFT JOIN categories c
       ON c.category_id = p.category_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN product_images pi
       ON pi.product_id = p.product_id
       AND pi.is_primary = true
@@ -224,7 +253,11 @@ export const getAllProductLimitedDetilas = async () => {
 
       p.base_price,
       p.selling_price,
-      p.discounted_price,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
 
       p.stock_quantity,
 
@@ -265,6 +298,17 @@ export const getAllProductLimitedDetilas = async () => {
 
     LEFT JOIN brands b
       ON b.brand_id = p.brand_id
+
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
 
     LEFT JOIN (
       SELECT
@@ -326,11 +370,26 @@ export const getProductsByCategory = async (categoryId) => {
       p.*,
       c.name AS category_name,
       b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
       COALESCE(img_agg.images, '[]'::json) AS images
     FROM products p
     LEFT JOIN categories c ON c.category_id = p.category_id
     LEFT JOIN brands b ON b.brand_id = p.brand_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN (
       SELECT
         pa.product_id,
@@ -374,11 +433,26 @@ export const getBestSellingProducts = async () => {
       p.*,
       c.name AS category_name,
       b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
       COALESCE(img_agg.images, '[]'::json) AS images
     FROM products p
     LEFT JOIN categories c ON c.category_id = p.category_id
     LEFT JOIN brands b ON b.brand_id = p.brand_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN (
       SELECT
         pa.product_id,
@@ -423,11 +497,26 @@ export const getLatestProducts = async () => {
       p.*,
       c.name AS category_name,
       b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
       COALESCE(img_agg.images, '[]'::json) AS images
     FROM products p
     LEFT JOIN categories c ON c.category_id = p.category_id
     LEFT JOIN brands b ON b.brand_id = p.brand_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN (
       SELECT
         pa.product_id,
@@ -472,11 +561,26 @@ export const findProductById = async (id, client = pool) => {
       p.*,
       c.name AS category_name,
       b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
       COALESCE(img_agg.images, '[]'::json) AS images
     FROM products p
     LEFT JOIN categories c ON c.category_id = p.category_id
     LEFT JOIN brands b ON b.brand_id = p.brand_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN (
       SELECT
         pa.product_id,
@@ -518,7 +622,12 @@ export const findProductByName = async (name, client = pool) => {
   const query = `SELECT
       p.*,
       c.name AS category_name,
-      b.name AS brand_name
+      b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price
 
   FROM products p
 
@@ -527,6 +636,17 @@ export const findProductByName = async (name, client = pool) => {
 
   LEFT JOIN brands b
       ON b.brand_id = p.brand_id
+
+  LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+  ) active_offer ON true
 
   WHERE p.name ILIKE '%' || $1 || '%'
 
@@ -643,11 +763,26 @@ export const getFilteredProducts = async ({ categoryId, attributeFilters = [], p
       p.*,
       c.name AS category_name,
       b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price,
       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
       COALESCE(img_agg.images,      '[]'::json) AS images
     FROM products p
     LEFT JOIN categories c ON c.category_id = p.category_id
     LEFT JOIN brands b     ON b.brand_id    = p.brand_id
+    LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+    ) active_offer ON true
     LEFT JOIN (
       SELECT
         pa.product_id,
