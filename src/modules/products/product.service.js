@@ -128,7 +128,7 @@ export const getProductByName = async (name) => {
     if (!name) {
         throw new AppError('Product name is required', 400);
     }
-    const product = await productRepository.findProductByName(name);
+    const product = await productRepository.findProductByNameAdvanced(name);
     if (!product) {
         throw new AppError('Product not found', 404);
     }

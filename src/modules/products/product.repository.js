@@ -619,6 +619,15 @@ export const findProductById = async (id, client = pool) => {
 };
 
 export const findProductByName = async (name, client = pool) => {
+  const query = `
+    SELECT * FROM products WHERE name = $1 AND is_active = true
+  `;
+  const values = [name];
+  const { rows } = await client.query(query, values);
+  return rows[0];
+}
+
+export const findProductByNameAdvanced = async (name, client = pool) => {
   const query = `SELECT
       p.*,
       c.name AS category_name,

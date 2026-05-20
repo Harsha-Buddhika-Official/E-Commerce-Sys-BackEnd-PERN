@@ -36,7 +36,7 @@ router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryId
 router.post('/:id/attributes', authorize('super_admin', 'admin'), validateCategoryIdParam, validateCreateProductAttribute, createProductAttribute);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteProduct);
+router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct);
 router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
 
 export default router;
