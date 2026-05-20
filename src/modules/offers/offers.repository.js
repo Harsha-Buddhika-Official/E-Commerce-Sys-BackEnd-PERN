@@ -45,6 +45,7 @@ export const getAllOffers = async () => {
                         'product_id', p.product_id,
                         'name', p.name,
                         'selling_price', p.selling_price,
+                        'discounted_price', p.discounted_price,
                         'stock_quantity', p.stock_quantity,
                         'is_active', p.is_active,
                         'images', COALESCE(img_agg.images, '[]'::json)
