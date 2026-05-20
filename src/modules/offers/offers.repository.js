@@ -228,3 +228,16 @@ export const findProductById = async (productId) => {
     const { rows } = await pool.query(query, [productId]);
     return rows[0];
 };
+
+export const findOfferByProductIdFullOfferData = async (productId) => {
+    const query = `
+        SELECT o.* 
+        FROM offers o
+        JOIN offer_products op ON op.offer_id = o.id
+        WHERE op.product_id = $1
+          AND o.is_active = true
+            AND NOW() BETWEEN o.start_date AND o.end_date
+    `;
+    const { rows } = await pool.query(query, [productId]);
+    return rows[0];
+}

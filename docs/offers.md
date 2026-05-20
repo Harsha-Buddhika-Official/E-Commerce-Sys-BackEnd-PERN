@@ -2,26 +2,40 @@
 
 Base path: `/api/offers`
 
-This module manages offers and their product mappings. It exposes public read endpoints
-and protected write endpoints (admin roles).
+This module manages offer campaigns and the many-to-many mapping between offers and products. Frontend clients can read offers publicly, while create/update/delete and product assignment actions are protected.
+
+## What the frontend can use this for
+
+- Show an offers landing page with all offers and their mapped products.
+- Show active banner-style promotions.
+- Show offer detail pages with attached products.
+- Let admins create, edit, delete, attach, and detach products from an offer.
+
+## Auth rules
+
+- Public routes do not require a token.
+- Protected routes require `Authorization: Bearer <token>`.
+- Protected offer management routes accept these roles: `super_admin`, `admin`, `manager`.
 
 ## Route summary
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
-| `GET` | `/` | Public | Get all offers. |
-| `GET` | `/active` | Public | Get active offers (date + active flag). |
-| `GET` | `/:id` | Public | Get a single offer by id. |
-| `GET` | `/:id/products` | Public | Get products mapped to an offer. |
-| `POST` | `/` | `super_admin`, `admin`, `manager` | Create an offer. |
-| `POST` | `/:id/products` | `super_admin`, `admin`, `manager` | Attach product to offer. |
-| `PUT` | `/:id` | `super_admin`, `admin`, `manager` | Update an offer. |
-| `DELETE` | `/:id` | `super_admin`, `admin`, `manager` | Delete an offer. |
-| `DELETE` | `/:id/products/:productId` | `super_admin`, `admin`, `manager` | Remove product from offer. |
+| `GET` | `/` | Public | Get all offers with mapped products and product images. |
+| `GET` | `/active` | Public | Get offers that are active right now. |
+| `GET` | `/:id` | Public | Get one offer by id. |
+| `GET` | `/:id/products` | Public | Get only the products attached to an offer. |
+| `POST` | `/admin/` | `super_admin`, `admin`, `manager` | Create a new offer. |
+| `POST` | `/admin/products/:id` | `super_admin`, `admin`, `manager` | Attach a product to an offer. `:id` is the offer id. |
+| `PUT` | `/admin/:id` | `super_admin`, `admin`, `manager` | Update an offer. |
+| `DELETE` | `/admin/:id` | `super_admin`, `admin`, `manager` | Delete an offer. |
+| `DELETE` | `/admin/:id/products/:productId` | `super_admin`, `admin`, `manager` | Detach a product from an offer. |
 
 ## Request payloads
 
-Create offer (`POST /api/offers`):
+Create offer
+
+`POST /api/offers/admin/`
 
 ```json
 {
@@ -36,7 +50,9 @@ Create offer (`POST /api/offers`):
 }
 ```
 
-Update offer (`PUT /api/offers/:id`):
+Update offer
+
+`PUT /api/offers/admin/:id`
 
 ```json
 {
@@ -46,7 +62,9 @@ Update offer (`PUT /api/offers/:id`):
 }
 ```
 
-Attach product to offer (`POST /api/offers/:id/products`):
+Attach a product to an offer
+
+`POST /api/offers/admin/products/:id`
 
 ```json
 {
@@ -54,9 +72,9 @@ Attach product to offer (`POST /api/offers/:id/products`):
 }
 ```
 
-## Response shape
+## Response shapes
 
-Offer response (create, update, get by id):
+Create, update, and single-offer responses return a single offer object.
 
 ```json
 {
@@ -78,7 +96,7 @@ Offer response (create, update, get by id):
 }
 ```
 
-Offers list response (`GET /api/offers`):
+List responses from `GET /api/offers` return each offer with a nested `products` array. Each product also includes an `images` array.
 
 ```json
 {
@@ -102,6 +120,7 @@ Offers list response (`GET /api/offers`):
           "product_id": 42,
           "name": "iPhone 15",
           "selling_price": "999.00",
+          "discounted_price": "899.00",
           "stock_quantity": 25,
           "is_active": true,
           "images": [
@@ -120,7 +139,7 @@ Offers list response (`GET /api/offers`):
 }
 ```
 
-Offer products response (`GET /api/offers/:id/products`):
+Offer-product list responses from `GET /api/offers/:id/products` return a flatter shape that is useful when the UI only needs the attached products.
 
 ```json
 {
@@ -140,36 +159,50 @@ Offer products response (`GET /api/offers/:id/products`):
 }
 ```
 
+Write responses for attach/remove/delete operations usually return only a message and, when relevant, the created or removed relation.
+
 ## Validation rules
 
-Offer payload:
-- `title`: required, string 2-255 chars.
-- `description`: optional string.
-- `discount_type`: required, `percentage` or `fixed`.
-- `discount_value`: required, positive number; max 100 when percentage.
-- `start_date`: required date.
-- `end_date`: required date.
+Offer fields
+
+- `title`: required string, 2 to 255 characters.
+- `description`: optional string, empty string and `null` allowed.
+- `discount_type`: required, must be `percentage` or `fixed`.
+- `discount_value`: required positive number; if `discount_type` is `percentage`, the value cannot exceed 100.
+- `start_date`: required valid date.
+- `end_date`: required valid date.
 - `is_active`: optional boolean.
-- `banner_image`: optional string.
+- `banner_image`: optional string, empty string and `null` allowed.
 
-Route params:
-- `id`: offer id, required positive number.
-- `productId`: product id, required positive number.
+Route params
 
-Attach product payload:
+- `id`: required positive number.
+- `productId`: required positive number.
+
+Attach-product body
+
 - `product_id`: required positive number.
 
 ## Business rules
 
 - `end_date` must be after `start_date`.
 - Percentage discounts cannot exceed 100.
-- Offer must exist before adding/removing products.
-- Product must exist before attaching to an offer.
-- Duplicate offer-product pairs are blocked.
-- Cart add-item logic checks the `offer_products` mapping first, then loads the active offer and applies the discount before storing `price_at_add`.
-- If the mapped offer is inactive or outside its date window, cart pricing falls back to the product's regular selling price.
+- An offer must exist before it can be updated, deleted, or used for product mapping.
+- A product must exist before it can be attached to an offer.
+- Duplicate offer-product pairs are rejected.
+- `GET /api/offers/active` only returns offers where `is_active = true` and the current time is between `start_date` and `end_date`.
+- The cart flow checks `offer_products` first, then loads the active offer and applies the discount before storing `price_at_add`.
+- If the mapped offer is inactive or outside its date window, cart pricing falls back to the regular product price.
 
-## Layered implementation (reference)
+## Frontend usage notes
+
+- Use `GET /api/offers` for an admin list view or a marketing page that needs all offer metadata.
+- Use `GET /api/offers/active` for homepage promotion banners and currently running deals.
+- Use `GET /api/offers/:id/products` when the UI only needs the products attached to one offer.
+- Use `POST /api/offers/admin/products/:id` to attach an existing product to an offer in an admin panel.
+- Use `DELETE /api/offers/admin/:id/products/:productId` to remove one mapping without deleting the offer itself.
+
+## Layered implementation reference
 
 - Route: `src/modules/offers/offers.routes.js`
 - Controller: `src/modules/offers/offers.controller.js`

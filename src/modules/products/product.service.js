@@ -2,6 +2,7 @@ import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
 import { findCategoryById, findCategoryByName } from '../categories/categories.repository.js';
 import { findBrandByName, findBrandById } from '../brands/brand.repository.js';
+import { findOfferByProductIdFullOfferData } from '../offers/offers.repository.js';
 import pool from "../../config/db.js";
 import AppError from '../../utils/AppError.js';
 
@@ -65,6 +66,14 @@ export const createProduct = async (productData) => {
     }
 };
 
+export const getAllProductsDetailsSimple = async () => {
+    const products = await productRepository.getAllProductsDetailsSimple();
+    if (products.length === 0) {
+        throw new AppError('No products found', 404);
+    }
+    return products;
+};
+
 // get all products
 export const getAllProducts = async () => {
     const products = await productRepository.getAllProducts();
@@ -82,11 +91,20 @@ export const getAllProductLimitedDetilas = async () => {
     return products;
 };
 
+// to fix the bug offer price didnt sync with the main price after update
 export const getAllDetialsProductById = async (id) => {
     const product = await productRepository.getAllDetialsProductById(id);
     if (!product) {
         throw new AppError('Product not found', 404);
     }
+    // const checkOffer = await productRepository.findOfferByIdWhenItsActive(product.product_id);
+    // if (checkOffer) {
+    //     if(checkOffer.discount_type === 'percentage') {
+    //         product.discounted_price = (product.price * (100 - checkOffer.discount_value)) / 100;
+    //     } else if(checkOffer.discount_type === 'fixed') {
+    //         product.discounted_price = product.price - checkOffer.discount_value;
+    //     }
+    // }
     return product;
 };
 
@@ -119,6 +137,15 @@ export const getProductById = async (id) => {
     const product = await productRepository.findProductById(id);
     if (!product) {
         throw new AppError('Product not found', 404);
+    }
+    const checkOffer = await findOfferByProductIdFullOfferData(id);
+    if (checkOffer) {
+        if(checkOffer.discount_type === 'percentage') {
+            const discountAmount = (product.discounted_price * checkOffer.discount_value) / 100;
+            product.discounted_price = product.discounted_price - discountAmount;
+        } else if(checkOffer.discount_type === 'fixed') {
+            product.discounted_price = product.discounted_price - checkOffer.discount_value;
+        }
     }
     return product;
 }

@@ -14,6 +14,19 @@ export const createProduct = async (req, res, next) => {
     }
 };
 
+export const getAllProductsDetailsSimple = async (req, res, next) => {
+    try {
+        const products = await productService.getAllProductsDetailsSimple();
+        res.status(200).json({
+            success: true,
+            data: products,
+            message: 'Get all product limited details successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // Get all products
 export const getAllProducts = async (req, res, next) => {
     try {
