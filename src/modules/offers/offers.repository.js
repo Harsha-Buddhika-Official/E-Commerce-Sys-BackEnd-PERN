@@ -81,12 +81,96 @@ export const getAllOffers = async () => {
 
 export const getActiveOffers = async () => {
     const query = `
-        SELECT *
-        FROM offers
-        WHERE is_active = true
-          AND NOW() BETWEEN start_date AND end_date
-        ORDER BY start_date ASC
+        SELECT
+            o.*,
+            COALESCE(
+                JSON_AGG(
+                    DISTINCT JSONB_BUILD_OBJECT(
+                        'offer_product_id', op.id,
+                        'product_id', p.product_id,
+                        'name', p.name,
+                        'selling_price', p.selling_price,
+                        'discounted_price', p.discounted_price,
+                        'stock_quantity', p.stock_quantity,
+                        'is_active', p.is_active,
+                        'images', COALESCE(img_agg.images, '[]'::json)
+                    )
+                ) FILTER (WHERE p.product_id IS NOT NULL),
+                '[]'::json
+            ) AS products
+        FROM offers o
+        LEFT JOIN offer_products op ON op.offer_id = o.id
+        LEFT JOIN products p ON p.product_id = op.product_id
+        LEFT JOIN LATERAL (
+            SELECT COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'image_id', pi.image_id,
+                        'image_url', pi.image_url,
+                        'is_primary', pi.is_primary,
+                        'alt_text', pi.alt_text,
+                        'sort_order', pi.sort_order
+                    ) ORDER BY pi.sort_order
+                ),
+                '[]'::json
+            ) AS images
+            FROM product_images pi
+            WHERE pi.product_id = p.product_id
+        ) img_agg ON TRUE
+        WHERE o.is_active = true
+          AND NOW() BETWEEN o.start_date AND o.end_date
+        GROUP BY o.id
+        ORDER BY o.start_date ASC
     `;
+
+    const { rows } = await pool.query(query);
+    return rows;
+};
+
+export const getUpcomingOffers = async () => {
+    const query = `
+        SELECT
+            o.*,
+            COALESCE(
+                JSON_AGG(
+                    DISTINCT JSONB_BUILD_OBJECT(
+                        'offer_product_id', op.id,
+                        'product_id', p.product_id,
+                        'name', p.name,
+                        'selling_price', p.selling_price,
+                        'discounted_price', p.discounted_price,
+                        'stock_quantity', p.stock_quantity,
+                        'is_active', p.is_active,
+                        'images', COALESCE(img_agg.images, '[]'::json)
+                    )
+                ) FILTER (WHERE p.product_id IS NOT NULL),
+                '[]'::json
+            ) AS products
+        FROM offers o
+        LEFT JOIN offer_products op ON op.offer_id = o.id
+        LEFT JOIN products p ON p.product_id = op.product_id
+        LEFT JOIN LATERAL (
+            SELECT COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'image_id', pi.image_id,
+                        'image_url', pi.image_url,
+                        'is_primary', pi.is_primary,
+                        'alt_text', pi.alt_text,
+                        'sort_order', pi.sort_order
+                    ) ORDER BY pi.sort_order
+                ),
+                '[]'::json
+            ) AS images
+            FROM product_images pi
+            WHERE pi.product_id = p.product_id
+        ) img_agg ON TRUE
+        WHERE o.is_active = true
+          AND o.start_date > NOW()
+        GROUP BY o.id
+        ORDER BY o.start_date ASC
+    `;
+
     const { rows } = await pool.query(query);
     return rows;
 };

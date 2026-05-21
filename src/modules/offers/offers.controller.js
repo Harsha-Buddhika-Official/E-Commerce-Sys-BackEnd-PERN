@@ -37,6 +37,18 @@ export const getActiveOffers = async (req, res, next) => {
     }
 };
 
+export const getUpcomingOffers = async (req, res, next) => {
+    try {
+        const offers = await offersService.getUpcomingOffers();
+        res.status(200).json({
+            success: true,
+            data: offers
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getOfferById = async (req, res, next) => {
     try {
         const { id } = req.params;

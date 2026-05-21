@@ -30,6 +30,10 @@ export const getActiveOffers = async () => {
     return offersRepository.getActiveOffers();
 };
 
+export const getUpcomingOffers = async () => {
+    return offersRepository.getUpcomingOffers();
+};
+
 export const getOfferById = async (id) => {
     const offer = await offersRepository.findOfferById(id);
     if (!offer) {

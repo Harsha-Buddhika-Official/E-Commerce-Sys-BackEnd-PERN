@@ -2,26 +2,9 @@ import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
 import { findCategoryById, findCategoryByName } from '../categories/categories.repository.js';
 import { findBrandByName, findBrandById } from '../brands/brand.repository.js';
-import { findOfferByProductIdFullOfferData } from '../offers/offers.repository.js';
+import { applyActiveOfferPricing } from '../../utils/offerPricing.js';
 import pool from "../../config/db.js";
 import AppError from '../../utils/AppError.js';
-
-const applyActiveOfferPricing = async (products) => {
-    const checkOffer = await findOfferByProductIdFullOfferData(products.product_id);
-
-    if (checkOffer) {
-        products.active_offer = checkOffer;
-
-        if (checkOffer.discount_type === 'percentage') {
-            const discountAmount = (products.discounted_price * checkOffer.discount_value) / 100;
-            products.discounted_price = products.discounted_price - discountAmount;
-        } else if (checkOffer.discount_type === 'fixed') {
-            products.discounted_price = products.discounted_price - checkOffer.discount_value;
-        }
-    }
-
-    return products;
-};
 
 // create product with transaction
 export const createProduct = async (productData) => {
@@ -155,7 +138,7 @@ export const getProductByName = async (name) => {
     if (!name) {
         throw new AppError('Product name is required', 400);
     }
-    const product = await productRepository.findProductByNameAdvanced(name);
+    const product = await productRepository.findProductByNameForSearch(name);
     if (!product) {
         throw new AppError('Product not found', 404);
     }

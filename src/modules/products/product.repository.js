@@ -592,6 +592,20 @@ export const findProductByName = async (name, client = pool) => {
   return rows[0];
 }
 
+export const findProductByNameForSearch = async (name, client = pool) => {
+  const query = `SELECT
+      p.*,
+      c.name AS category_name
+  FROM products p
+  LEFT JOIN categories c
+      ON c.category_id = p.category_id
+  WHERE p.name ILIKE '%' || $1 || '%'
+  LIMIT 20;`;
+  const values = [name];
+  const { rows } = await client.query(query, values);
+  return rows;
+};
+
 export const findProductByNameAdvanced = async (name, client = pool) => {
   const query = `SELECT
       p.*,
@@ -629,6 +643,49 @@ export const findProductByNameAdvanced = async (name, client = pool) => {
   const { rows } = await client.query(query, values);
   return rows;
 };
+
+// NOTE: The function `findProductByNameAdvanced` was not referenced anywhere in the
+// codebase when checked. It's left here commented-out to avoid accidental removal
+// while preserving the original query for future use. Uncomment if needed.
+/*
+export const findProductByNameAdvanced = async (name, client = pool) => {
+  const query = `SELECT
+      p.*,
+      c.name AS category_name,
+      b.name AS brand_name,
+      CASE
+        WHEN active_offer.id IS NULL THEN p.discounted_price
+        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+      END AS discounted_price
+
+  FROM products p
+
+  LEFT JOIN categories c
+      ON c.category_id = p.category_id
+
+  LEFT JOIN brands b
+      ON b.brand_id = p.brand_id
+
+  LEFT JOIN LATERAL (
+      SELECT o.id, o.discount_type, o.discount_value
+      FROM offer_products op
+      JOIN offers o ON o.id = op.offer_id
+      WHERE op.product_id = p.product_id
+        AND o.is_active = true
+        AND NOW() BETWEEN o.start_date AND o.end_date
+      ORDER BY o.start_date DESC
+      LIMIT 1
+  ) active_offer ON true
+
+  WHERE p.name ILIKE '%' || $1 || '%'
+
+  LIMIT 20;`;
+  const values = [name];
+  const { rows } = await client.query(query, values);
+  return rows;
+};
+*/
 
 export const updateProduct = async (id, productData, client = pool) => {
   const { name, brand_id, category_id, slug, description, base_price, selling_price, discounted_price, stock_quantity, warranty_months, product_tag } = productData;

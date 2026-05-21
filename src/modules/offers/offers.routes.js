@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferById, getOfferProducts, removeOfferProduct, updateOffer } from './offers.controller.js';
+import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferById, getOfferProducts, getUpcomingOffers, removeOfferProduct, updateOffer } from './offers.controller.js';
 import { validateCreateOffer, validateOfferIdParam, validateOfferProductBody, validateProductIdParam, validateUpdateOffer } from './offers.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -9,6 +9,7 @@ const router = express.Router();
 // ==================== PUBLIC ROUTES - GET ====================
 router.get('/', getAllOffers);
 router.get('/active', getActiveOffers);
+router.get('/upcoming', getUpcomingOffers);
 router.get('/:id', validateOfferIdParam, getOfferById);
 router.get('/:id/products', validateOfferIdParam, getOfferProducts);
 
