@@ -23,17 +23,17 @@ export const loginAdmin = async (AdminData) => {
     if (!email || !password) {
         throw new AppError('Email and password are required', 400);
     }
-    const emailCheck = await adminRepository.getAdminByEmail(email);
-    if (!emailCheck) {
+    const Admin = await adminRepository.getAdminByEmail(email);
+    if (!Admin) {
         throw new AppError('credentials are incorrect', 401);
     }
-    const passwordMatch = await comparePasswords(password, emailCheck.password_hash);
+    const passwordMatch = await comparePasswords(password, Admin.password_hash);
     if (!passwordMatch) {
         throw new AppError('credentials are incorrect', 401);
     }
-    await adminRepository.updateLastLogin(emailCheck.admin_id);
-    const token = generateToken({ adminId: emailCheck.admin_id, role: emailCheck.role });
-    return { token };
+    await adminRepository.updateLastLogin(Admin.admin_id);
+    const token = generateToken({ adminId: Admin.admin_id, role: Admin.role });
+    return { token, admin: Admin };
 }
 
 export const getAdminByEmail = async (email) => {

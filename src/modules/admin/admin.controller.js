@@ -15,7 +15,7 @@ export const loginAdmin = async (req, res,next) => {
     try {
         const adminData = req.body;
         const { token, admin } = await adminService.loginAdmin(adminData);
-        res.status(200).json({ token });
+        res.status(200).json({ token, admin: { ...admin, password_hash: undefined } });
     } catch (error) {
         next(error);
     }
