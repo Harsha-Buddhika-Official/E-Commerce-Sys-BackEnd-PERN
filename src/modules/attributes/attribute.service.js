@@ -8,6 +8,10 @@ export const getAttributesByCategoryId = async (categoryId) => {
     return await attributeRepository.getAttributesByCategoryId(categoryId);
 }
 
+export const getAttributeCatalog = async () => {
+    return await attributeRepository.getAttributeCatalog();
+}
+
 export const getAttributeById = async (id) => {
     return await attributeRepository.getAttributeById(id);
 }

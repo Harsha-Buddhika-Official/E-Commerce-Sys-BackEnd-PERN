@@ -2,8 +2,9 @@ import * as attributeService from './attribute.service.js';
 
 export const createAttribute = async (req, res, next) => {
     try {
-        const attributeId = await attributeService.createAttribute(req.body);
-        res.status(201).json({ id: attributeId });
+        const attributeData = await attributeService.createAttribute(req.body);
+        console.log('Attribute created:', attributeData);
+        res.status(201).json({ message: 'Attribute created successfully', attribute: attributeData });
     } catch (error) {
         next(error);
     }
@@ -14,6 +15,15 @@ export const getAttributesByCategoryId = async (req, res, next) => {
         const Data = req.body;
         const attributes = await attributeService.getAttributesByCategoryId(Data);
         res.status(200).json(attributes);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getAttributeCatalog = async (req, res, next) => {
+    try {
+        const catalog = await attributeService.getAttributeCatalog();
+        res.status(200).json(catalog);
     } catch (error) {
         next(error);
     }

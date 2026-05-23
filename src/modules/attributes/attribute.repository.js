@@ -1,14 +1,14 @@
 import db from '../../config/db.js';
 
 export const createAttribute = async (attribute) => {
-    const { name, categoryId } = attribute;
+    const { name, category_id } = attribute;
 
     const query = `
         INSERT INTO attributes (name, category_id)
         VALUES ($1, $2)
         RETURNING *
     `;
-    const values = [name, categoryId];
+    const values = [name, category_id];
     
     const { rows } = await db.query(query, values);
     return rows[0];
@@ -23,6 +23,45 @@ export const getAttributesByCategoryId = async (categoryId) => {
     `;
     const { rows } = await db.query(query, [categoryId]);
     return rows;
+}
+
+export const getAttributeCatalog = async () => {
+    const categoriesQuery = `
+        SELECT category_id, name
+        FROM categories
+        ORDER BY category_id ASC
+    `;
+
+    const attributesQuery = `
+        SELECT
+            a.attribute_id,
+            a.name,
+            a.category_id,
+            COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'attribute_value_id', av.attribute_value_id,
+                        'value', av.value
+                    )
+                    ORDER BY av.attribute_value_id
+                ) FILTER (WHERE av.attribute_value_id IS NOT NULL),
+                '[]'::json
+            ) AS values
+        FROM attributes a
+        LEFT JOIN attribute_values av ON av.attribute_id = a.attribute_id
+        GROUP BY a.attribute_id, a.name, a.category_id
+        ORDER BY a.category_id ASC, a.attribute_id ASC
+    `;
+
+    const [categoriesResult, attributesResult] = await Promise.all([
+        db.query(categoriesQuery),
+        db.query(attributesQuery),
+    ]);
+
+    return {
+        categories: categoriesResult.rows,
+        attributes: attributesResult.rows,
+    };
 }
 
 export const getAttributeByName = async (name) => {
@@ -53,8 +92,8 @@ export const updateAttribute = async (id, attribute) => {
         WHERE attribute_id = $3 
         RETURNING *
     `;
-    const { name, categoryId } = attribute;
-    const values = [name, categoryId, id];
+    const { name, category_id } = attribute;
+    const values = [name, category_id, id];
     const { rows } = await db.query(query, values);
     return rows[0];
 }
