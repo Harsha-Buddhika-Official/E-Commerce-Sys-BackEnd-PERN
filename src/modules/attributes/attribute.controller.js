@@ -3,7 +3,6 @@ import * as attributeService from './attribute.service.js';
 export const createAttribute = async (req, res, next) => {
     try {
         const attributeData = await attributeService.createAttribute(req.body);
-        console.log('Attribute created:', attributeData);
         res.status(201).json({ message: 'Attribute created successfully', attribute: attributeData });
     } catch (error) {
         next(error);
@@ -40,7 +39,7 @@ export const getAttributeById = async (req, res, next) => {
 
 export const deleteAttribute = async (req, res, next) => {
     try {
-        const { id } = req.body;
+        const { id } = req.params;
         await attributeService.deleteAttribute(id);
         res.status(204).send();
     } catch (error) {
