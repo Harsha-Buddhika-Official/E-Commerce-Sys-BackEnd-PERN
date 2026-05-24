@@ -39,6 +39,35 @@ export const getOfferById = async (id) => {
     if (!offer) {
         throw new AppError('Offer not found', 404);
     }
+
+    const calculateDiscountedPrice = (price) => {
+        const numericPrice = Number(price) || 0;
+
+        if (offer.discount_type === 'percentage') {
+            return Math.max(0, numericPrice - (numericPrice * Number(offer.discount_value)) / 100);
+        }
+
+        if (offer.discount_type === 'fixed') {
+            return Math.max(0, numericPrice - Number(offer.discount_value));
+        }
+        return numericPrice;
+    };
+
+    offer.products = Array.isArray(offer.products)
+        ? offer.products.map((item) => {
+            const product = item.product || {};
+            const basePrice = product.discounted_price ?? product.selling_price;
+            const numericPrice = calculateDiscountedPrice(basePrice)
+            return {
+                ...item,
+                product: {
+                    ...product,
+                    discounted_price: numericPrice,
+                },
+            };
+        })
+        : [];
+
     return offer;
 };
 
