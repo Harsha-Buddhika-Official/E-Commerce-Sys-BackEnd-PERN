@@ -56,3 +56,25 @@ export const updateAttribute = async (req, res, next) => {
         next(error);
     }
 };
+
+export const createAttributeValue = async (req, res, next) => {
+    try {
+        const attributeValueData = await attributeService.createAttributeValue({
+            ...req.body,
+            attribute_id: req.params.attributeId,
+        });
+        res.status(201).json({ message: 'Attribute value created successfully', attributeValue: attributeValueData });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteAttributeValue = async (req, res, next) => {
+    try {
+        const { attributeId, valueId } = req.params;
+        await attributeService.deleteAttributeValue(attributeId, valueId);
+        res.status(204).send();
+    } catch (error) {
+        next(error);
+    }
+};

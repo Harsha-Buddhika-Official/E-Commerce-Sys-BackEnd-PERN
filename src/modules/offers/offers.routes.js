@@ -1,6 +1,6 @@
 import express from 'express';
-import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferById, getOfferProducts, getUpcomingOffers, removeOfferProduct, updateOffer } from './offers.controller.js';
-import { validateCreateOffer, validateOfferIdParam, validateOfferProductBody, validateProductIdParam, validateUpdateOffer } from './offers.validator.js';
+import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferById, getOfferProducts, getUpcomingOffers, removeOfferProduct, updateOffer, updateOfferStatus } from './offers.controller.js';
+import { validateCreateOffer, validateOfferIdParam, validateOfferProductBody, validateOfferStatusBody, validateProductIdParam, validateUpdateOffer } from './offers.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
@@ -22,6 +22,7 @@ router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'),
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateUpdateOffer, updateOffer);
+router.put('/admin/activation/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer);

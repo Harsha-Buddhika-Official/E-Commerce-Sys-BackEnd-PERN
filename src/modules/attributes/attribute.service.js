@@ -23,3 +23,11 @@ export const deleteAttribute = async (id) => {
 export const updateAttribute = async (id, attribute) => {
     await attributeRepository.updateAttribute(id, attribute);
 }
+
+export const createAttributeValue = async (attributeValue) => {
+    return await attributeRepository.createAttributeValue(attributeValue);
+}
+
+export const deleteAttributeValue = async (attributeId, valueId) => {
+    return await attributeRepository.deleteAttributeValue(attributeId, valueId);
+}

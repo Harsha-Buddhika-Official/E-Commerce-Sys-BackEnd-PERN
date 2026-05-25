@@ -175,6 +175,15 @@ export const getUpcomingOffers = async () => {
     return rows;
 };
 
+export const findOfferByIdBasic = async (id) => {
+    const query = `
+        SELECT * FROM offers
+        WHERE id = $1
+    `;
+    const { rows } = await pool.query(query, [id]);
+    return rows[0];
+}
+
 export const findOfferById = async (id) => {
     const query = `SELECT
         o.*,
@@ -326,6 +335,19 @@ export const updateOffer = async (id, offerData) => {
     ];
 
     const { rows } = await pool.query(query, values);
+    return rows[0];
+};
+
+export const updateOfferStatus = async (id, isActive) => {
+    const query = `
+        UPDATE offers
+        SET is_active = $1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING *
+    `;
+
+    const { rows } = await pool.query(query, [isActive, id]);
     return rows[0];
 };
 

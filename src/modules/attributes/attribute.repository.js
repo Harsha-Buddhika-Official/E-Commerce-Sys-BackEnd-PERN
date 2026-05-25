@@ -97,3 +97,26 @@ export const updateAttribute = async (id, attribute) => {
     const { rows } = await db.query(query, values);
     return rows[0];
 }
+
+export const createAttributeValue = async (attributeValue) => {
+    const { attribute_id, value } = attributeValue;
+    const query = `
+        INSERT INTO attribute_values (attribute_id, value)
+        VALUES ($1, $2)
+        RETURNING *
+    `;
+    const values = [attribute_id, value];
+    const { rows } = await db.query(query, values);
+    return rows[0];
+}
+
+export const deleteAttributeValue = async (attributeId, valueId) => {
+    const query = `
+        DELETE FROM attribute_values
+        WHERE attribute_id = $1 AND attribute_value_id = $2
+        RETURNING *
+    `;
+    const values = [attributeId, valueId];
+    const { rows } = await db.query(query, values);
+    return rows[0];
+}

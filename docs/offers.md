@@ -28,6 +28,7 @@ This module manages offer campaigns and the many-to-many mapping between offers 
 | `POST` | `/admin/` | `super_admin`, `admin`, `manager` | Create a new offer. |
 | `POST` | `/admin/products/:id` | `super_admin`, `admin`, `manager` | Attach a product to an offer. `:id` is the offer id. |
 | `PUT` | `/admin/:id` | `super_admin`, `admin`, `manager` | Update an offer. |
+| `PUT` | `/admin/:id/activation` | `super_admin`, `admin`, `manager` | Set an offer's `is_active` status explicitly from the request body. |
 | `DELETE` | `/admin/:id` | `super_admin`, `admin`, `manager` | Delete an offer. |
 | `DELETE` | `/admin/:id/products/:productId` | `super_admin`, `admin`, `manager` | Detach a product from an offer. |
 
@@ -59,6 +60,34 @@ Update offer
   "title": "Updated Sale",
   "discount_value": 15,
   "is_active": false
+}
+```
+
+Update offer activation
+
+`PUT /api/offers/admin/:id/activation`
+
+Request body:
+
+```json
+{
+  "is_active": true
+}
+```
+
+Use `true` to activate the offer and `false` to deactivate it.
+
+Response example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "title": "Summer Sale",
+    "is_active": true
+  },
+  "message": "Offer activation updated successfully"
 }
 ```
 
@@ -200,6 +229,7 @@ Attach-product body
 - Use `GET /api/offers/active` for homepage promotion banners and currently running deals.
 - Use `GET /api/offers/:id/products` when the UI only needs the products attached to one offer.
 - Use `POST /api/offers/admin/products/:id` to attach an existing product to an offer in an admin panel.
+- Use `PUT /api/offers/admin/:id/activation` when the frontend needs to set the active state explicitly.
 - Use `DELETE /api/offers/admin/:id/products/:productId` to remove one mapping without deleting the offer itself.
 
 ## Layered implementation reference

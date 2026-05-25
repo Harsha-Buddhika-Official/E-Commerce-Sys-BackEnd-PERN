@@ -104,6 +104,15 @@ export const updateOffer = async (id, offerData) => {
     return offersRepository.updateOffer(id, updated);
 };
 
+export const updateOfferStatus = async (id, isActive) => {
+    const existing = await offersRepository.findOfferByIdBasic(id);
+    if (!existing) {
+        throw new AppError('Offer not found', 404);
+    }
+
+    return offersRepository.updateOfferStatus(id, isActive);
+};
+
 export const deleteOffer = async (id) => {
     const existing = await offersRepository.findOfferById(id);
     if (!existing) {

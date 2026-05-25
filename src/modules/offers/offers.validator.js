@@ -111,6 +111,15 @@ const offerProductBodySchema = joi.object({
         })
 });
 
+const offerStatusBodySchema = joi.object({
+    is_active: joi.boolean()
+        .required()
+        .messages({
+            "boolean.base": "is_active must be a boolean",
+            "any.required": "is_active is required"
+        })
+});
+
 export const validateCreateOffer = (req, res, next) => {
     const { error, value } = createOfferSchema.validate(req.body, { abortEarly: false, stripUnknown: true });
     if (error) {
@@ -173,6 +182,21 @@ export const validateProductIdParam = (req, res, next) => {
 
 export const validateOfferProductBody = (req, res, next) => {
     const { error, value } = offerProductBodySchema.validate(req.body, { abortEarly: false, stripUnknown: true });
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details.map(err => ({
+                field: err.path[0],
+                message: err.message
+            }))
+        });
+    }
+    req.body = value;
+    next();
+};
+
+export const validateOfferStatusBody = (req, res, next) => {
+    const { error, value } = offerStatusBodySchema.validate(req.body, { abortEarly: false, stripUnknown: true });
     if (error) {
         return res.status(400).json({
             success: false,

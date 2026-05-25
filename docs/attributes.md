@@ -9,6 +9,8 @@ This document describes the `attributes` API endpoints, request/response example
 - Protected (requires `Authorization: Bearer <JWT>` and role `admin` or `super_admin`):
   - `GET /api/attributes/` — full catalog (categories + attributes with values)
   - `POST /api/attributes/` — create attribute
+  - `POST /api/attributes/:attributeId/value` — create an attribute value for one attribute
+  - `DELETE /api/attributes/:attributeId/value/:valueId` — delete one attribute value
   - `PUT /api/attributes/:id` — update attribute
   - `DELETE /api/attributes/:id` — delete attribute (see note)
 
@@ -115,6 +117,41 @@ Response (201):
   }
 }
 
+### POST /api/attributes/:attributeId/value
+Protected. Create a new attribute value (e.g., brand or size options) for an existing attribute.
+
+Headers:
+  Content-Type: application/json
+  Authorization: Bearer <JWT>
+
+Body (example):
+{
+  "value": "ASUS"
+}
+
+Response (201):
+{
+  "message": "Attribute value created successfully",
+  "attributeValue": {
+    "attribute_value_id": 1,
+    "attribute_id": 1,
+    "value": "ASUS",
+    "slug": null,
+    "created_at": "2026-05-25T00:00:00.000Z"
+  }
+}
+
+### DELETE /api/attributes/:attributeId/value/:valueId
+Protected. Delete one attribute value using both the parent attribute id and the specific value id.
+
+Example:
+  DELETE /api/attributes/1/value/9
+
+Headers:
+  Authorization: Bearer <JWT>
+
+Response (204): No content on success.
+
 ### PUT /api/attributes/:id
 Protected. Update attribute with id in path. Body should include new `name` and `category_id`.
 
@@ -164,9 +201,17 @@ Response (204): No content on success.
   "id": 5
 }
 
+- Create attribute value (POST /api/attributes/1/value):
+
+{
+  "value": "ASUS"
+}
+
+- Delete attribute value (DELETE /api/attributes/1/value/9)
+
 ## Implementation notes for AI or future changes
 - Consider changing `GET /api/attributes/category` to accept `?categoryId=` query param or `GET /api/attributes/category/:categoryId` and update controller to use `req.params`/`req.query` to avoid relying on bodies for GET requests.
-- Align `DELETE /api/attributes/:id` to read `req.params.id` instead of `req.body.id` for consistency.
+- The attribute value create route now uses `POST /api/attributes/:attributeId/value`, which is clearer than sending `attribute_id` in the body.
 - The authoritative catalog endpoint currently is the protected `GET /api/attributes/` which returns both `categories` and `attributes` with embedded `values`.
 
 ---
