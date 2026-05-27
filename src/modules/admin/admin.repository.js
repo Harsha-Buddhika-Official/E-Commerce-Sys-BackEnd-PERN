@@ -39,8 +39,8 @@ export const getAdminById = async (adminId) => {
     return rows[0];
 }
 
-export const updateAdminPassword = async (AdminData) => {
-    const { adminId, newPassword } = AdminData;
+export const updateAdminPassword = async (AdminData, adminId) => {
+    const { newPassword } = AdminData;
     const query = 'UPDATE admins SET password_hash = $1 WHERE admin_id = $2 RETURNING *';
     const values = [newPassword, adminId];
     const { rows } = await pool.query(query, values);

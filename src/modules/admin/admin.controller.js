@@ -11,7 +11,7 @@ export const createAdmin = async (req, res,next) => {
     }
 };
 
-export const loginAdmin = async (req, res,next) => {
+export const loginAdmin = async (req, res, next) => {
     try {
         const adminData = req.body;
         const { token, admin } = await adminService.loginAdmin(adminData);
@@ -54,8 +54,9 @@ export const deleteAdmin = async (req, res,next) => {
 
 export const updateAdminPassword = async (req, res,next) => {
     try {
+        const adminId = req.params.id;
         const adminData = req.body;
-        const updatedAdmin = await adminService.updateAdminPassword(adminData);
+        const updatedAdmin = await adminService.updateAdminPassword(adminData, adminId);
         const { password_hash, ...safeAdmin } = updatedAdmin;
         res.status(200).json(safeAdmin);
     } catch (error) {

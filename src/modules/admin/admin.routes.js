@@ -20,7 +20,7 @@ router.post('/register', authorize('super_admin'), validateRegister, createAdmin
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/updateRole', authorize('super_admin'), updateAdminRole);
-router.put('/updatePassword', authorize('super_admin', 'admin', 'manager'), updateAdminPassword);
+router.put('/settings/updatePassword/:id', authorize('super_admin', 'admin', 'manager'), updateAdminPassword);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/delete', authorize('super_admin'), deleteAdmin);

@@ -2,6 +2,11 @@
 
 Base path: `/api/admin`
 
+Headers (for protected routes):
+
+- `Authorization: Bearer <token>` — include for any protected/admin route.
+- `Content-Type: application/json` — include for JSON request bodies.
+
 This module manages admin authentication and admin account administration. Public clients can only log in. All other routes require a valid JWT in `Authorization: Bearer <token>` and are then filtered by role.
 
 ## Route summary
@@ -12,7 +17,7 @@ This module manages admin authentication and admin account administration. Publi
 | `GET` | `/` | `super_admin`, `admin` | `200` | List all admin accounts without password hashes. |
 | `POST` | `/register` | `super_admin` | `201` | Create a new admin account. |
 | `PUT` | `/updateRole` | `super_admin` | `200` | Update an admin role. |
-| `PUT` | `/updatePassword` | `super_admin`, `admin`, `manager` | `200` | Update an admin password. |
+| `PUT` | `/updatePassword/:id` | `super_admin`, `admin`, `manager` | `200` | Update an admin password. |
 | `DELETE` | `/delete` | `super_admin` | `200` | Delete an admin by email. |
 
 ---
@@ -20,7 +25,7 @@ This module manages admin authentication and admin account administration. Publi
 ### POST /api/admin/login
 
 - Auth: Public
-- Success: `200` — body: `{ "token": "<jwt>" }`
+- Success: `200` — body: `{ "token": "<jwt>", "admin": { ...adminObjectWithoutPasswordHash } }`
 - Validation: `400` for malformed body
 - Failure: `401` for incorrect credentials
 
@@ -94,17 +99,21 @@ Request example:
 
 ---
 
-### PUT /api/admin/updatePassword
+### PUT /api/admin/updatePassword/:id
 
 - Auth: `Authorization: Bearer <token>` (roles: `super_admin`, `admin`, `manager`)
 - Success: `200` — returns updated admin object (password hash omitted)
 - Validation: `400` missing fields; `401` old password incorrect; `409` new password same as old; `422` confirm mismatch
 
+Request notes:
+
+- The admin to update is provided as the URL parameter `:id` (admin id).
+- The request body should NOT include `adminId` — send only the password fields.
+
 Request example:
 
 ```json
 {
-  "adminId": 12,
   "oldPassword": "secret123",
   "newPassword": "newSecret123",
   "confirmPassword": "newSecret123"
@@ -173,11 +182,10 @@ Update role
 
 Update password
 
-`PUT /api/admin/updatePassword`
+`PUT /api/admin/updatePassword/:id`
 
 ```json
 {
-  "adminId": 12,
   "oldPassword": "secret123",
   "newPassword": "newSecret123",
   "confirmPassword": "newSecret123"
@@ -196,11 +204,20 @@ Delete admin
 
 ## Response shapes
 
-Login returns only a token.
+Login returns a token and the authenticated admin object (password hash omitted).
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "admin": {
+    "admin_id": 12,
+    "full_name": "Jane Doe",
+    "email": "admin@example.com",
+    "role": "manager",
+    "created_at": "2026-05-19T10:00:00.000Z",
+    "updated_at": "2026-05-19T10:00:00.000Z",
+    "last_login": null
+  }
 }
 ```
 

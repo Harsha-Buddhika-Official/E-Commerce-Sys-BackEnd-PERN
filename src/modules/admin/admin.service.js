@@ -70,16 +70,25 @@ export const deleteAdmin = async (adminEmail) => {
     return await adminRepository.deleteAdmin(admin.admin_id);
 }
 
-export const updateAdminPassword = async (AdminData) => {
-    if (!AdminData.adminId || !AdminData.newPassword) {
-        throw new AppError('Admin ID and new password are required', 400);
+export const updateAdminPassword = async (AdminData, adminId) => {
+    if (!adminId) {
+        throw new AppError('Admin ID is required', 400);
+    }
+    if(!AdminData.newPassword){
+        throw new AppError('New password is required', 400);
+    }
+    if(!AdminData.confirmPassword){
+        throw new AppError('Confirm password is required', 400);
+    }
+    if(!AdminData.oldPassword){
+        throw new AppError('Old password is required', 400);
     }
     if(AdminData.newPassword !== AdminData.confirmPassword){
         throw new AppError('new password and confirm password do not match', 422);
     }
-    const admin = await adminRepository.getAdminById(AdminData.adminId);
-    const passwordMatch = await comparePasswords(AdminData.newPassword, admin.password_hash);
+    const admin = await adminRepository.getAdminById(adminId);
     const oldPasswordMatch = await comparePasswords(AdminData.oldPassword, admin.password_hash);
+    const passwordMatch = await comparePasswords(AdminData.newPassword, admin.password_hash);
     if(!oldPasswordMatch){
         throw new AppError('old password is incorrect', 401);
     }
@@ -87,5 +96,5 @@ export const updateAdminPassword = async (AdminData) => {
         throw new AppError('New password cannot be the same as the old password', 409);
     }
     AdminData.newPassword = await hashPassword(AdminData.newPassword);
-    return await adminRepository.updateAdminPassword(AdminData);
+    return await adminRepository.updateAdminPassword(AdminData, adminId);
 }
