@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategory, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory, getProductCategories, getAccessoryCategories } from './categories.controller.js';
+import { createCategory, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory, getProductCategories, getAccessoryCategories, getCategoryNames } from './categories.controller.js';
 import { validateCreateCategory, validateGetCategorySchema, validateUpdateCategory, validateCategoryIdParam } from './categories.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -14,6 +14,9 @@ router.get('/:id', validateCategoryIdParam, getCategoryById);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
+
+// ==================== PROTECTED ROUTES - GET ====================
+router.get('/names', authorize('super_admin', 'admin'), getCategoryNames);
 
 // ==================== PROTECTED ROUTES - POST ====================
 router.post('/', authorize('super_admin', 'admin'), validateCreateCategory, createCategory);

@@ -28,6 +28,15 @@ export const getCategories = async (type) => {
     return categories;
 };
 
+// get category names and ids only
+export const getCategoryNames = async () => {
+    const categories = await categoryRepository.getCategoryNames();
+    if (!categories.length) {
+        throw new AppError('No categories found', 404);
+    }
+    return categories;
+};
+
 //get category by id
 export const getCategoryById = async (id) => {
     const category = await categoryRepository.findCategoryById(id);

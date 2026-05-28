@@ -165,27 +165,6 @@ const productAttributeParamSchema = joi.object({
         })
 });
 
-const createProductAttributeSchema = joi.object({
-    attribute_id: joi.number()
-        .integer()
-        .positive()
-        .required()
-        .messages({
-            'number.base': 'Attribute ID must be a number',
-            'number.integer': 'Attribute ID must be an integer',
-            'number.positive': 'Attribute ID must be a positive number',
-            'any.required': 'Attribute ID is required'
-        }),
-    value: joi.string()
-        .max(100)
-        .required()
-        .messages({
-            'string.base': 'Attribute value must be a string',
-            'string.max': 'Attribute value must be at most 100 characters',
-            'any.required': 'Attribute value is required'
-        })
-});
-
 // Validation schema for filter products
 const filterProductsSchema = joi.object({
     filters: joi.array().items(
@@ -273,21 +252,6 @@ export const validateProductAttributeParams = (req, res, next) => {
         });
     }
     req.params = value;
-    next();
-};
-
-export const validateCreateProductAttribute = (req, res, next) => {
-    const { error, value } = createProductAttributeSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-        return res.status(400).json({
-            success: false,
-            error: error.details.map(err => ({
-                field: err.path[0],
-                message: err.message
-            }))
-        });
-    }
-    req.body = value;
     next();
 };
 

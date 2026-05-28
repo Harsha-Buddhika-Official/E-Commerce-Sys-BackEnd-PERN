@@ -66,6 +66,55 @@ export const createProduct = async (productData) => {
     }
 };
 
+export const createProductWithoutAttributes = async (productData) => {
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        if (!productData.name) {
+            throw new AppError("Product name is required", 400);
+        }
+
+        const existing = await productRepository.findProductByName(productData.name, client);
+        if (existing) {
+            throw new AppError("Product with this name already exists", 409);
+        }
+
+        const categoryNameCheck = await findCategoryByName(productData.category_name);
+        if (!categoryNameCheck) {
+            throw new AppError("Category not found", 404);
+        }
+        productData.category_id = categoryNameCheck.category_id;
+
+        const brandNameCheck = await findBrandByName(productData.brand_name);
+        if (!brandNameCheck) {
+            throw new AppError("Brand not found", 404);
+        }
+        productData.brand_id = brandNameCheck.brand_id;
+
+        const { images, ...productFields } = productData;
+        productFields.slug = slugify(productFields.name, { lower: true, strict: true });
+
+        const product = await productRepository.createProduct(productFields, client);
+
+        if (images && images.length > 0) {
+            const primaryImages = images.filter(img => img.is_primary);
+            if (primaryImages.length > 1) {
+                throw new AppError("Only one primary image allowed", 400);
+            }
+            await productRepository.insertProductImages(product.product_id, images, client);
+        }
+
+        await client.query("COMMIT");
+        return product;
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
+};
+
 export const getAllProductsDetailsSimple = async () => {
     const products = await productRepository.getAllProductsDetailsSimple();
     if (products.length === 0) {
@@ -280,16 +329,6 @@ export const removeProductAttribute = async (productId, attributeId) => {
     return deleted;
 }
 
-// create one mapped attribute for a product
-export const createProductAttribute = async (productId, attributeData) => {
-    const existing = await productRepository.findProductById(productId);
-    if (!existing) {
-        throw new AppError('Product not found', 404);
-    }
-
-    return await productRepository.createProductAttribute(productId, attributeData);
-}
-
 export const getFilterOptions = async (categoryId) => {
     const rows = await productRepository.getAttributesByCategory(categoryId);
 
@@ -311,6 +350,14 @@ export const getFilterOptions = async (categoryId) => {
     }
 
     return Array.from(map.values());
+};
+
+export const getAttributesByCategory = async (categoryId) => {
+    const rows = await productRepository.getAttributesByCategory(categoryId);
+    if (!rows || rows.length === 0) {
+        throw new AppError('No attributes found for this category', 404);
+    }
+    return rows;
 };
 
 export const filterProducts = async (categoryId, body) => {

@@ -8,6 +8,7 @@ This document describes the `attributes` API endpoints, request/response example
   - `GET /api/attributes/:id` — get one attribute by id
 - Protected (requires `Authorization: Bearer <JWT>` and role `admin` or `super_admin`):
   - `GET /api/attributes/` — full catalog (categories + attributes with values)
+  - `GET /api/attributes/grouped` — attributes grouped by category (category id + name + attributes + values)
   - `POST /api/attributes/` — create attribute
   - `POST /api/attributes/:attributeId/value` — create an attribute value for one attribute
   - `DELETE /api/attributes/:attributeId/value/:valueId` — delete one attribute value
@@ -57,6 +58,42 @@ Example Response (200):
 
 Notes:
 - This endpoint aggregates attributes and their `attribute_values` in `values`.
+
+### GET /api/attributes/grouped
+Protected. Returns attributes grouped by category. Each item in the returned array contains `category_id`, `category_name` and `attributes` (array). Each attribute contains `attribute_id`, `name` and `values` (array of attribute value objects).
+
+Auth: `Authorization: Bearer <JWT>` (roles: `admin`, `super_admin`)
+
+Example response (200):
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "category_id": 1,
+      "category_name": "Laptop",
+      "attributes": [
+        {
+          "attribute_id": 1,
+          "name": "Brand",
+          "values": [
+            { "attribute_value_id": 1, "value": "ASUS", "slug": null, "created_at": "2026-05-25T00:00:00.000Z" },
+            { "attribute_value_id": 2, "value": "MSI", "slug": null, "created_at": "2026-05-25T00:00:00.000Z" }
+          ]
+        },
+        {
+          "attribute_id": 2,
+          "name": "RAM",
+          "values": [
+            { "attribute_value_id": 10, "value": "16GB", "slug": null, "created_at": "2026-05-25T00:00:00.000Z" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
 
 ### GET /api/attributes/category
 Public. Current implementation reads the request body and forwards it to the service layer — this means you must send a JSON body containing the category identifier. (If you prefer a safer alternative, the product module exposes a GET-by-category route: `GET /api/products/attributes/by-category/:categoryId`.)

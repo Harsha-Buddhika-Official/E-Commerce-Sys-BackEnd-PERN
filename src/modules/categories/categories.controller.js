@@ -59,6 +59,19 @@ export const getCategories = async (req, res, next) => {
     }
 };
 
+//get category names and ids only
+export const getCategoryNames = async (req, res, next) => {
+    try {
+        const categories = await categoryService.getCategoryNames();
+        res.status(200).json({
+            success: true,
+            data: categories
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 //get category by id
 export const getCategoryById = async (req, res, next) => {
     try {

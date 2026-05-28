@@ -1,8 +1,9 @@
 import express from 'express';
-import { createProduct, createProductAttribute, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductByid, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple } from './product.controller.js';
-import { validateCreateProductAttribute, validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
+import { createProduct, createProductWithoutAttributes, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductByid, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple } from './product.controller.js';
+import { validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
+import upload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
@@ -17,7 +18,8 @@ router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOpti
 router.get('/:id', validateProductId, getProductByid);
 
 // ==================== PUBLIC ROUTES - POST ====================
-router.post('/', validateProduct, createProduct);
+router.post('/', upload.array('images', 3), validateProduct, createProduct);
+router.post('/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes);
 router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts);
 
 // ==================== PROTECTED ROUTES ====================
@@ -34,7 +36,6 @@ router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCatego
 router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/:id/attributes', authorize('super_admin', 'admin'), validateCategoryIdParam, validateCreateProductAttribute, createProductAttribute);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct);

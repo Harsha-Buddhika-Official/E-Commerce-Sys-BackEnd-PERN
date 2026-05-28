@@ -17,12 +17,12 @@ app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
-app.use('/api/categories', categoryRoutes); //done testing
-app.use('/api/brands', brandRoutes); //done testing
-app.use('/api/products', productRoutes); //done testing
-app.use('/api/cart', cartRoutes);  //done testing
-app.use('/api/orders', orderRoutes); //done testing
-app.use('/api/admin', adminRoutes); //done testing
+app.use('/api/categories', categoryRoutes); 
+app.use('/api/brands', brandRoutes); 
+app.use('/api/products', productRoutes); 
+app.use('/api/cart', cartRoutes);  
+app.use('/api/orders', orderRoutes); 
+app.use('/api/admin', adminRoutes); 
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/offers', offerRoutes);
 

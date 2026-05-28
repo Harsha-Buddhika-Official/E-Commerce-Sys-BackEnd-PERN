@@ -144,6 +144,7 @@ Base path: `/api/categories`
 | --- | --- | --- | --- |
 | `GET` | `/products` | Public | Get all product categories. |
 | `GET` | `/accessories` | Public | Get all accessory categories. |
+| `GET` | `/names` | `super_admin`, `admin` | Get active category ids and names only. |
 | `GET` | `/:id` | Public | Get one category by id. |
 | `POST` | `/` | `super_admin`, `admin` | Create a category. |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update a category. |
@@ -180,17 +181,18 @@ Base path: `/api/products`
 | `GET` | `/` | Public | Get all active products. |
 | `GET` | `/best-selling` | Public | Get products tagged as best sellers. |
 | `GET` | `/latest` | Public | Get the latest 8 active products. |
-| `GET` | `/filter/bar/:categoryId` | Public | Get filter bar options for a category. |
-| `GET` | `/products/category/:categoryId` | Public | Get products by category. |
+| `GET` | `/search/:name` | Public | Search products by name. |
+| `GET` | `/category/:categoryId` | Public | Get products by category. |
 | `GET` | `/attributes/by-category/:categoryId` | Public | Get active attributes available for a category. |
+| `GET` | `/filter/options/:categoryId` | Public | Get filter options for a category. |
 | `GET` | `/:id` | Public | Get one product by id. |
-| `POST` | `/filter/products/:categoryId` | Public | Get products filtered by selected attribute values. |
-| `POST` | `/` | Public | Create a product. |
+| `POST` | `/filter/:categoryId` | Public | Get products filtered by selected attribute values. |
+| `POST` | `/` | Public | Create a product (accepts up to 3 `images` files multipart/form-data). |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update a product. |
 | `PUT` | `/:id/soft-delete` | `super_admin`, `admin` | Soft delete a product. |
 | `PUT` | `/:id/restore` | `super_admin`, `admin` | Restore a soft-deleted product. |
 | `POST` | `/:id/attributes` | `super_admin`, `admin` | Add one attribute mapping to a product. |
-| `DELETE` | `/:id` | `super_admin`, `admin` | Delete a product. |
+| `DELETE` | `/admin/delete/:id` | `super_admin`, `admin` | Permanently delete a product. |
 | `DELETE` | `/:id/attributes/:attributeId` | `super_admin`, `admin` | Remove one attribute mapping from a product. |
 
 ### Product payloads
@@ -437,11 +439,15 @@ Base path: `/api/attributes`
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
-| `GET` | `/category` | Public | Get attributes by category. |
+| `GET` | `/category` | Public | Get attributes by category (expects category lookup in body/query as implemented). |
 | `GET` | `/:id` | Public | Get attribute by id. |
+| `GET` | `/` | `super_admin`, `admin` | Get attribute catalog (protected). |
+| `GET` | `/grouped` | `super_admin`, `admin` | Get attributes grouped by category (protected). |
 | `POST` | `/` | `super_admin`, `admin` | Create an attribute. |
+| `POST` | `/:attributeId/value` | `super_admin`, `admin` | Create a value for an attribute. |
 | `PUT` | `/:id` | `super_admin`, `admin` | Update an attribute. |
-| `DELETE` | `/` | `super_admin`, `admin` | Delete an attribute. |
+| `DELETE` | `/:id` | `super_admin`, `admin` | Delete an attribute. |
+| `DELETE` | `/:attributeId/value/:valueId` | `super_admin`, `admin` | Delete a specific attribute value. |
 
 ### Attribute payloads
 
@@ -450,7 +456,7 @@ Create:
 ```json
 {
   "name": "Storage",
-  "categoryId": 1
+  "category_id": 1
 }
 ```
 
@@ -459,7 +465,7 @@ Update:
 ```json
 {
   "name": "RAM",
-  "categoryId": 1
+  "category_id": 1
 }
 ```
 

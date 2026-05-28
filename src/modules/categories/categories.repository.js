@@ -34,6 +34,17 @@ export const getCategoriesByType = async (type) => {
     return rows;
 };
 
+export const getCategoryNames = async () => {
+    const query = `
+        SELECT category_id, name
+        FROM categories
+        WHERE is_active = true
+        ORDER BY name
+    `;
+    const { rows } = await pool.query(query);
+    return rows;
+};
+
 export const findCategoryById = async (id) => {
     const query = `SELECT * FROM categories WHERE category_id = $1`;
     const value = [id];

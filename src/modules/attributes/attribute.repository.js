@@ -14,6 +14,44 @@ export const createAttribute = async (attribute) => {
     return rows[0];
 }
 
+export const getAttributeValueById = async (attributeValueId) => {
+    const query = `
+        SELECT
+            av.attribute_value_id,
+            av.attribute_id,
+            av.value
+        FROM attribute_values av
+        WHERE av.attribute_value_id = $1
+        LIMIT 1
+    `;
+
+    const { rows } = await db.query(query, [attributeValueId]);
+    return rows[0];
+};
+
+export const createProductAttribute = async (productId, attributeData) => {
+    const query = `
+        INSERT INTO product_attributes (
+            product_id,
+            attribute_id,
+            attribute_value_id,
+            value
+        )
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+    `;
+
+    const values = [
+        productId,
+        attributeData.attribute_id,
+        attributeData.attribute_value_id,
+        attributeData.value,
+    ];
+
+    const { rows } = await db.query(query, values);
+    return rows[0];
+};
+
 export const getAttributesByCategoryId = async (categoryId) => {
     const query = `
         SELECT *
@@ -63,6 +101,34 @@ export const getAttributeCatalog = async () => {
         attributes: attributesResult.rows,
     };
 }
+
+export const getAttributesByCategory = async (categoryId) => {
+    const query = `
+        SELECT
+            a.attribute_id,
+            a.name,
+            COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'attribute_value_id', av.attribute_value_id,
+                        'value', av.value
+                    )
+                    ORDER BY av.attribute_value_id
+                ) FILTER (WHERE av.attribute_value_id IS NOT NULL),
+                '[]'::json
+            ) AS values
+        FROM attributes a
+        LEFT JOIN attribute_values av
+            ON av.attribute_id = a.attribute_id
+        WHERE a.category_id = $1
+        GROUP BY a.attribute_id, a.name
+        ORDER BY a.attribute_id;
+    `;
+
+    const { rows } = await db.query(query, [categoryId]);
+    return rows;
+};
+
 
 export const getAttributeByName = async (name) => {
     const query = `

@@ -41,6 +41,21 @@ export const createProduct = async (productData, client = pool) => {
   return rows[0];
 };
 
+export const getAttributeValueById = async (attributeValueId, client = pool) => {
+  const query = `
+    SELECT
+      av.attribute_value_id,
+      av.attribute_id,
+      av.value
+    FROM attribute_values av
+    WHERE av.attribute_value_id = $1
+    LIMIT 1
+  `;
+
+  const { rows } = await client.query(query, [attributeValueId]);
+  return rows[0];
+};
+
 export const deleteProductImages = async (productId, client = pool) => {
   const query = `DELETE FROM product_images WHERE product_id = $1`;
   const values = [productId];
@@ -91,35 +106,24 @@ export const insertProductAttributes = async (productId, attributes, client = po
   const placeholders = [];
 
   attributes.forEach((attribute, index) => {
-    const baseIndex = index * 3;
-    placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3})`);
+    const baseIndex = index * 4;
+    placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4})`);
 
     values.push(
       productId,
       attribute.attribute_id,
+      attribute.attribute_value_id,
       attribute.value
     );
   });
 
   const query = `
     INSERT INTO product_attributes
-      (product_id, attribute_id, value)
+      (product_id, attribute_id, attribute_value_id, value)
     VALUES ${placeholders.join(",")}
   `;
 
   await client.query(query, values);
-};
-
-export const createProductAttribute = async (productId, attributeData, client = pool) => {
-  const query = `
-    INSERT INTO product_attributes
-      (product_id, attribute_id, value)
-    VALUES ($1, $2, $3)
-    RETURNING *
-  `;
-  const values = [productId, attributeData.attribute_id, attributeData.value];
-  const { rows } = await client.query(query, values);
-  return rows[0];
 };
 
 export const removeProductAttribute = async (productId, attributeId, client = pool) => {

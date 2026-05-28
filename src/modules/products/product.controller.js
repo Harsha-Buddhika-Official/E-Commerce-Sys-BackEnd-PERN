@@ -1,15 +1,99 @@
 import * as productService from './product.service.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
 // Controller functions for product routes
 export const createProduct = async (req, res, next) => {
+    const uploadedCloudinaryIds = [];
+
     try {
-        const newProduct = await productService.createProduct(req.body);
+        const uploadedImages = [];
+
+        if (req.files && req.files.length > 0) {
+            for (const [index, file] of req.files.entries()) {
+                const uploadResult = await uploadToCloudinary(
+                    file.buffer,
+                    `product-${Date.now()}-${index + 1}`,
+                    'ecommerce/products'
+                );
+
+                uploadedImages.push({
+                    image_url: uploadResult.secure_url,
+                    is_primary: index === 0,
+                    alt_text: file.originalname,
+                    sort_order: index
+                });
+                uploadedCloudinaryIds.push(uploadResult.public_id);
+            }
+        }
+
+        const newProduct = await productService.createProduct({
+            ...req.body,
+            images: uploadedImages
+        });
+
         res.status(201).json({
             success: true,
             data: newProduct,
             message: 'Product created successfully'
         });
     } catch (error) {
+        if (uploadedCloudinaryIds.length > 0) {
+            for (const publicId of uploadedCloudinaryIds) {
+                try {
+                    await deleteFromCloudinary(publicId);
+                } catch (deleteError) {
+                    console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
+                }
+            }
+        }
+        next(error);
+    }
+};
+
+export const createProductWithoutAttributes = async (req, res, next) => {
+    const uploadedCloudinaryIds = [];
+
+    try {
+        const uploadedImages = [];
+
+        if (req.files && req.files.length > 0) {
+            for (const [index, file] of req.files.entries()) {
+                const uploadResult = await uploadToCloudinary(
+                    file.buffer,
+                    `product-${Date.now()}-${index + 1}`,
+                    'ecommerce/products'
+                );
+
+                uploadedImages.push({
+                    image_url: uploadResult.secure_url,
+                    is_primary: index === 0,
+                    alt_text: file.originalname,
+                    sort_order: index
+                });
+                uploadedCloudinaryIds.push(uploadResult.public_id);
+            }
+        }
+
+        const newProduct = await productService.createProductWithoutAttributes({
+            ...req.body,
+            images: uploadedImages
+        });
+
+        res.status(201).json({
+            success: true,
+            data: newProduct,
+            message: 'Product created successfully without attributes'
+        });
+    } catch (error) {
+        if (uploadedCloudinaryIds.length > 0) {
+            for (const publicId of uploadedCloudinaryIds) {
+                try {
+                    await deleteFromCloudinary(publicId);
+                } catch (deleteError) {
+                    console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
+                }
+            }
+        }
         next(error);
     }
 };
@@ -207,21 +291,6 @@ export const removeProductAttribute = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Product attribute removed successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-}
-
-// Create one attribute mapping for a product
-export const createProductAttribute = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const mapped = await productService.createProductAttribute(id, req.body);
-        res.status(201).json({
-            success: true,
-            data: mapped,
-            message: 'Product attribute created successfully'
         });
     } catch (error) {
         next(error);
