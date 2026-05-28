@@ -3,6 +3,8 @@ import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffer
 import { validateCreateOffer, validateOfferIdParam, validateOfferProductBody, validateOfferStatusBody, validateProductIdParam, validateUpdateOffer } from './offers.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
+import upload from '../../middlewares/multer.js';
+
 
 const router = express.Router();
 
@@ -17,11 +19,11 @@ router.get('/:id/products', validateOfferIdParam, getOfferProducts);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/admin/', authorize('super_admin', 'admin', 'manager'), validateCreateOffer, createOffer);
+router.post('/admin/', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateCreateOffer, createOffer);
 router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferProductBody, addOfferProduct);
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateUpdateOffer, updateOffer);
+router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer);
 router.put('/admin/activation/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus);
 
 // ==================== PROTECTED ROUTES - DELETE ====================

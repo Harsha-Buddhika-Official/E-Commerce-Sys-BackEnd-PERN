@@ -22,6 +22,12 @@ export const getAllBrands = async() => {
     return brands;
 }
 
+//get all brand names and ids
+export const getAllBrandNames = async() => {
+    const brandNames = await brandRepository.getAllBrandNames();
+    return brandNames;
+}
+
 //get brand by id
 export const getBrandById = async (id) => {
     const brand = await brandRepository.findBrandById(id);
@@ -42,8 +48,8 @@ export const updateBrand = async(id, brandData) => {
         if(nameExists){
             throw new AppError('Brand with this name already exists', 409);
         }
+        brandData.slug = slugify(brandData.name, {lower: true, strict: true});
     }
-    brandData.slug = slugify(brandData.name, {lower: true, static:true});
     return await brandRepository.updateBrand(id, brandData);
 }
 

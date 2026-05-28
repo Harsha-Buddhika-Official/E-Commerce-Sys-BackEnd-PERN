@@ -38,30 +38,66 @@ Create offer
 
 `POST /api/offers/admin/`
 
-```json
-{
-  "title": "Summer Sale",
-  "description": "Discount on selected products",
-  "discount_type": "percentage",
-  "discount_value": 10,
-  "start_date": "2026-06-01T00:00:00.000Z",
-  "end_date": "2026-06-30T23:59:59.000Z",
-  "is_active": true,
-  "banner_image": "https://example.com/banner.png"
-}
+This endpoint accepts `multipart/form-data` when uploading a banner image.
+
+Example fields (multipart/form-data):
+
+- `title` (string)
+- `description` (string)
+- `discount_type` (string)
+- `discount_value` (number)
+- `start_date` (ISO string)
+- `end_date` (ISO string)
+- `is_active` (boolean)
+- `banner_image` (file) — optional image file. Field name: `banner_image`.
+
+When not uploading a file you can send a JSON body with `banner_image` as a URL string.
+
+Storage
+
+- Uploaded banner files are stored in Cloudinary. The server saves the resulting URL to the `banner_image` column and the Cloudinary public id to `banner_image_id` in the `offers` table.
+
+curl examples
+
+Create offer with file upload:
+
+```bash
+curl -v -X POST http://localhost:4000/api/offers/admin/ \
+  -H "Authorization: Bearer <TOKEN>" \
+  -F "title=Test Offer" \
+  -F "discount_type=percentage" \
+  -F "discount_value=10" \
+  -F "start_date=2026-06-01T00:00:00.000Z" \
+  -F "end_date=2026-06-30T23:59:59.000Z" \
+  -F "banner_image=@/full/path/to/banner.jpg"
+```
+
+Create offer without file (JSON):
+
+```bash
+curl -v -X POST http://localhost:4000/api/offers/admin/ \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test","discount_type":"fixed","discount_value":5,"start_date":"2026-06-01T00:00:00.000Z","end_date":"2026-06-10T00:00:00.000Z","banner_image":"https://example.com/banner.jpg"}'
 ```
 
 Update offer
 
 `PUT /api/offers/admin/:id`
 
-```json
-{
-  "title": "Updated Sale",
-  "discount_value": 15,
-  "is_active": false
-}
-```
+This endpoint now accepts `multipart/form-data` to replace the banner image using the `banner_image` file field. If no file is provided, send a JSON body as before.
+
+Example fields (multipart/form-data):
+
+- `title` (string)
+- `discount_value` (number)
+- `is_active` (boolean)
+- `banner_image` (file) — optional image file to replace existing banner
+
+Notes:
+- Supported image formats: JPEG, PNG, WebP
+- Max file size: 5MB
+- Field name for file uploads: `banner_image`
 
 Update offer activation
 

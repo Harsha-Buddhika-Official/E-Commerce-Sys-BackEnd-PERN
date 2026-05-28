@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middlewares/errorHandler.js';
+import './config/cloudinary.js'; // Initialize Cloudinary
 import productRoutes from './modules/products/product.routes.js';
 import brandRoutes from './modules/brands/brand.routes.js';
 import categoryRoutes from './modules/categories/categories.routes.js';

@@ -9,13 +9,14 @@ export const createOffer = async (offerData) => {
         start_date,
         end_date,
         is_active,
-        banner_image,
+        banner_image_url,
+        banner_image_public_id
     } = offerData;
 
     const query = `
         INSERT INTO offers
-            (title, description, discount_type, discount_value, start_date, end_date, is_active, banner_image)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            (title, description, discount_type, discount_value, start_date, end_date, is_active, banner_image, banner_image_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *
     `;
 
@@ -27,7 +28,8 @@ export const createOffer = async (offerData) => {
         start_date,
         end_date,
         is_active ?? true,
-        banner_image || null,
+        banner_image_url || null,
+        banner_image_public_id || null
     ];
 
     const { rows } = await pool.query(query, values);
@@ -305,6 +307,7 @@ export const updateOffer = async (id, offerData) => {
         end_date,
         is_active,
         banner_image,
+        banner_image_id
     } = offerData;
 
     const query = `
@@ -317,8 +320,9 @@ export const updateOffer = async (id, offerData) => {
             end_date = $6,
             is_active = $7,
             banner_image = $8,
+            banner_image_id = $9,
             updated_at = CURRENT_TIMESTAMP
-        WHERE id = $9
+        WHERE id = $10
         RETURNING *
     `;
 
@@ -331,6 +335,7 @@ export const updateOffer = async (id, offerData) => {
         end_date,
         is_active,
         banner_image || null,
+        banner_image_id || null,
         id,
     ];
 

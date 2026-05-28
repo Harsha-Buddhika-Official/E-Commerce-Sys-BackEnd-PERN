@@ -1,31 +1,35 @@
 # Brands API
 
-This document describes the Brands API endpoints for managing product brands.
+This document describes the Brands API endpoints for managing product brands with Cloudinary image upload support.
 
-Base path: `/brands`
+Base path: `/api/brands`
 
 ## Endpoints
 
 - **GET /brands**
-  - Public
+  - Public (No authentication required)
   - Description: Retrieve a list of all brands.
   - Response 200: Array of brand objects.
   - Example response:
 
 ```json
-[{
-  "brand_id": 1,
-  "name": "Acme",
-  "slug": "acme",
-  "logo_url": "https://example.com/logo.png",
-  "is_active": true,
-  "created_at": "2024-01-01T00:00:00.000Z",
-  "updated_at": "2024-01-01T00:00:00.000Z"
-}]
+{
+  "success": true,
+  "data": [{
+    "brand_id": 1,
+    "name": "Acme",
+    "slug": "acme",
+    "logo_url": "https://res.cloudinary.com/...",
+    "logo_public_id": "ecommerce/brands/brand-1234567890",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000Z",
+    "updated_at": "2024-01-01T00:00:00.000Z"
+  }]
+}
 ```
 
 - **GET /brands/:id**
-  - Public
+  - Public (No authentication required)
   - Description: Retrieve a single brand by numeric `id`.
   - URL parameters:
     - `id` (number, positive, required)
@@ -34,53 +38,116 @@ Base path: `/brands`
     - 400: Invalid `id` parameter
     - 404: Brand not found
 
-- **POST /brands**
-  - Protected: requires authentication (`authMiddleware`) and authorization.
-  - Allowed roles: `super_admin`, `admin`, `manager` (via `authorize` middleware)
-  - Description: Create a new brand.
-  - Request body (application/json):
-    - `name` (string, required, 2-100 chars)
-    - `logo_url` (string, optional, must be a valid URI)
-  - Notes:
-    - The `slug` is generated server-side from `name` (lowercase, URL-safe).
-    - Duplicate names are rejected with 409 Conflict.
-  - Responses:
-    - 201: Brand created. Returns the created brand object.
-    - 400: Validation failed (returns details array).
-    - 409: Brand with this name already exists.
-
-  - Example request:
+- **GET /brands/names**
+  - Protected: requires authentication and authorization.
+  - Allowed roles: `super_admin`, `admin`, `manager`
+  - Description: Retrieve only active brand names and IDs (lightweight endpoint).
+  - Response 200: Array with `brand_id` and `name` only.
+  - Example response:
 
 ```json
 {
-  "name": "Acme",
-  "logo_url": "https://cdn.example.com/acme.png"
+  "success": true,
+  "data": [
+    { "brand_id": 1, "name": "Nike" },
+    { "brand_id": 2, "name": "Adidas" }
+  ]
+}
+```
+
+- **POST /brands**
+  - Protected: requires authentication and authorization.
+  - Allowed roles: `super_admin`, `admin`, `manager`
+  - Description: Create a new brand with optional logo image upload.
+  - Request format: `multipart/form-data`
+  - Request fields:
+    - `name` (string, required, 2-100 chars)
+    - `logo` (file, optional, image only - JPEG, PNG, WebP, max 5MB)
+  - Notes:
+    - The `slug` is generated server-side from `name` (lowercase, URL-safe).
+    - Duplicate names are rejected with 409 Conflict.
+    - Logo is uploaded to Cloudinary automatically if provided.
+  - Responses:
+    - 201: Brand created. Returns the created brand object with Cloudinary URLs.
+    - 400: Validation failed (returns details array).
+    - 409: Brand with this name already exists.
+
+  - Example request (using FormData):
+
+```javascript
+const formData = new FormData();
+formData.append('name', 'Nike');
+formData.append('logo', fileInput.files[0]);
+
+fetch('/api/brands', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer <your_token>'
+    },
+    body: formData  // DO NOT set Content-Type header
+});
+```
+
+  - Example response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "brand_id": 1,
+    "name": "Nike",
+    "slug": "nike",
+    "logo_url": "https://res.cloudinary.com/.../brand-1234567890.jpg",
+    "logo_public_id": "ecommerce/brands/brand-1234567890",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000Z",
+    "updated_at": "2024-01-01T00:00:00.000Z"
+  },
+  "message": "Brand created successfully"
 }
 ```
 
 - **PUT /brands/:id**
   - Protected: requires authentication and roles `super_admin`, `admin`, `manager`.
-  - Description: Update an existing brand.
+  - Description: Update an existing brand with optional new logo image.
+  - Request format: `multipart/form-data`
   - URL parameters:
     - `id` (number, positive, required)
-  - Request body (application/json):
+  - Request fields:
     - `name` (string, optional, 2-100 chars)
-    - `logo_url` (string, optional, valid URI)
+    - `logo` (file, optional, image only - JPEG, PNG, WebP, max 5MB)
   - Notes:
     - If `name` changes, the API checks for duplicate names and will return 409 on conflict.
     - A new `slug` will be generated from the provided `name`.
+    - If a new logo is provided, the old one is automatically deleted from Cloudinary.
   - Responses:
     - 200: Brand updated (returns updated object)
     - 400: Validation failed
     - 404: Brand not found
     - 409: Duplicate name conflict
 
+  - Example request:
+
+```javascript
+const formData = new FormData();
+formData.append('name', 'Nike Updated');
+formData.append('logo', newFileInput.files[0]);
+
+fetch('/api/brands/1', {
+    method: 'PUT',
+    headers: {
+        'Authorization': 'Bearer <your_token>'
+    },
+    body: formData
+});
+```
+
 - **PUT /brands/:id/soft-delete**
   - Protected: requires authentication and roles `super_admin`, `admin`, `manager`.
-  - Description: Soft-delete a brand (sets `is_active` to `false`).
+  - Description: Soft-delete a brand (sets `is_active` to `false`). Logo remains in Cloudinary.
   - URL parameters: `id` (number)
   - Responses:
-    - 200: Soft-delete successful (returns message)
+    - 200: Soft-delete successful
     - 404: Brand not found
 
 - **PUT /brands/:id/restore**
@@ -93,11 +160,38 @@ Base path: `/brands`
 
 - **DELETE /brands/:id**
   - Protected: requires authentication and roles `super_admin`, `admin`, `manager`.
-  - Description: Permanently delete a brand from the database.
+  - Description: Permanently delete a brand and its logo from the database and Cloudinary.
   - URL parameters: `id` (number)
   - Responses:
-    - 200: Brand deleted successfully
+    - 200: Brand and logo deleted successfully
     - 404: Brand not found
+
+## Error Responses
+
+All error responses follow this format:
+
+```json
+{
+  "success": false,
+  "message": "Error description"
+}
+```
+
+## Authentication Header
+
+Include this header in all protected requests:
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+## File Upload Requirements
+
+- **Supported formats**: JPEG, PNG, WebP
+- **Max file size**: 5MB
+- **Field name**: `logo`
+- **Request format**: `multipart/form-data`
+- **Content-Type header**: Do NOT set manually (browser will set it automatically)
 
 ## Validation rules
 

@@ -1,14 +1,39 @@
 import * as offersService from './offers.service.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
 export const createOffer = async (req, res, next) => {
     try {
-        const offer = await offersService.createOffer(req.body);
+        let bannerImageUrl = null;
+        let bannerImagePublicId = null;
+
+        if (req.file) {
+            const uploadResult = await uploadToCloudinary(
+                req.file.buffer,
+                `offer-banner-${Date.now()}`,
+                'ecommerce/offers'
+            );
+            bannerImageUrl = uploadResult.secure_url;
+            bannerImagePublicId = uploadResult.public_id;
+        }
+
+        const offer = await offersService.createOffer({
+            ...req.body,
+            banner_image_url: bannerImageUrl,
+            banner_image_public_id: bannerImagePublicId
+        });
         res.status(201).json({
             success: true,
             data: offer,
             message: 'Offer created successfully'
         });
     } catch (error) {
+        if (req.file && bannerImagePublicId) {
+            try {
+                await deleteFromCloudinary(bannerImagePublicId);
+            } catch (err) {
+                console.error('Failed to delete uploaded banner after error:', err);
+            }
+        }
         next(error);
     }
 };
@@ -64,8 +89,24 @@ export const getOfferById = async (req, res, next) => {
 
 export const updateOffer = async (req, res, next) => {
     try {
+        let bannerImageUrl = null;
+        let bannerImagePublicId = null;
+
+        if (req.file) {
+            const uploadResult = await uploadToCloudinary(
+                req.file.buffer,
+                `offer-banner-${Date.now()}`,
+                'ecommerce/offers'
+            );
+            bannerImageUrl = uploadResult.secure_url;
+            bannerImagePublicId = uploadResult.public_id;
+        }
+
+        const banner_image = bannerImageUrl;
+        const banner_image_id = bannerImagePublicId;
+
         const { id } = req.params;
-        const updated = await offersService.updateOffer(id, req.body);
+        const updated = await offersService.updateOffer(id, { ...req.body, banner_image, banner_image_id });
         res.status(200).json({
             success: true,
             data: updated,
