@@ -28,6 +28,11 @@ export const getCategories = async (type) => {
     return categories;
 };
 
+export const getAllCategories = async () => {
+    const categories = await categoryRepository.getAllCategories();
+    return categories;
+}
+
 // get category names and ids only
 export const getCategoryNames = async () => {
     const categories = await categoryRepository.getCategoryNames();

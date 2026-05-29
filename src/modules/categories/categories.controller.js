@@ -59,6 +59,18 @@ export const getCategories = async (req, res, next) => {
     }
 };
 
+export const getAllCategories = async (req, res, next) => {
+    try {
+        const categories = await categoryService.getAllCategories();
+        res.status(200).json({
+            success: true,
+            data: categories
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 //get category names and ids only
 export const getCategoryNames = async (req, res, next) => {
     try {

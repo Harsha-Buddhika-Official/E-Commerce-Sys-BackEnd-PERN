@@ -16,6 +16,7 @@ router.get('/:id', validateCategoryIdParam, getCategoryById);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
+router.get('/', authorize('super_admin', 'admin'), getCategories);
 router.get('/names', authorize('super_admin', 'admin'), getCategoryNames);
 
 // ==================== PROTECTED ROUTES - POST ====================
