@@ -692,11 +692,11 @@ export const findProductByNameAdvanced = async (name, client = pool) => {
 */
 
 export const updateProduct = async (id, productData, client = pool) => {
-  const { name, brand_id, category_id, slug, description, base_price, selling_price, discounted_price, stock_quantity, warranty_months, product_tag } = productData;
+  const { name, brand_id, category_id, slug, description, base_price, selling_price, discounted_price, stock_quantity, warranty_months, product_tag, is_active } = productData;
   const query = `
     UPDATE products
-    SET name = $1, brand_id = $2, category_id = $3, slug = $4, description = $5, base_price = $6, selling_price = $7, discounted_price = $8, stock_quantity = $9, warranty_months = $10, product_tag = $11, updated_at = CURRENT_TIMESTAMP
-    WHERE product_id = $12
+    SET name = $1, brand_id = $2, category_id = $3, slug = $4, description = $5, base_price = $6, selling_price = $7, discounted_price = $8, stock_quantity = $9, warranty_months = $10, product_tag = $11, is_active = $12, updated_at = CURRENT_TIMESTAMP
+    WHERE product_id = $13
     RETURNING *
   `;
   const values = [
@@ -711,6 +711,7 @@ export const updateProduct = async (id, productData, client = pool) => {
     stock_quantity || 0,
     warranty_months || null,
     product_tag || null,
+    is_active ?? true,
     id
   ];
   const { rows } = await client.query(query, values);

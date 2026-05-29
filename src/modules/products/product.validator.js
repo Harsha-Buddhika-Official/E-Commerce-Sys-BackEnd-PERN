@@ -110,11 +110,98 @@ const productSchema = joi.object({
                 'number.positive': 'Attribute ID must be a positive number',
                 'any.required': 'Attribute ID is required'
             }),
-            value: joi.string().max(100).required().messages({
-                'string.base': 'Attribute value must be a string',
-                'string.max': 'Attribute value must be at most 100 characters',
-                'any.required': 'Attribute value is required'
+            attribute_value_id: joi.number().integer().positive().required().messages({
+                'number.base': 'Attribute value ID must be a number',
+                'number.integer': 'Attribute value ID must be an integer',
+                'number.positive': 'Attribute value ID must be a positive number',
+                'any.required': 'Attribute value ID is required'
             })
+        })
+    ).optional()
+});
+
+const productUpdateSchema = joi.object({
+    product_id: joi.number()
+        .integer()
+        .positive()
+        .optional(),
+    name: joi.string()
+        .min(3)
+        .max(255)
+        .optional(),
+    slug: joi.string()
+        .max(255)
+        .optional(),
+    description: joi.string()
+        .max(1000)
+        .allow(null, '')
+        .optional(),
+    brand_name: joi.string()
+        .min(2)
+        .max(100)
+        .optional(),
+    brand_id: joi.number()
+        .integer()
+        .positive()
+        .optional(),
+    category_name: joi.string()
+        .min(2)
+        .max(100)
+        .optional(),
+    category_id: joi.number()
+        .integer()
+        .positive()
+        .optional(),
+    base_price: joi.number()
+        .positive()
+        .optional(),
+    selling_price: joi.number()
+        .positive()
+        .optional(),
+    discounted_price: joi.number()
+        .positive()
+        .optional(),
+    stock_quantity: joi.number()
+        .integer()
+        .min(0)
+        .optional(),
+    warranty_months: joi.number()
+        .integer()
+        .min(0)
+        .allow(null)
+        .optional(),
+    product_tag: joi.string()
+        .max(255)
+        .allow(null, '')
+        .optional(),
+    is_active: joi.boolean()
+        .optional(),
+    attributes: joi.array().items(
+        joi.object({
+            attribute_id: joi.number().integer().positive().required().messages({
+                'number.base': 'Attribute ID must be a number',
+                'number.integer': 'Attribute ID must be an integer',
+                'number.positive': 'Attribute ID must be a positive number',
+                'any.required': 'Attribute ID is required'
+            }),
+            attribute_value_id: joi.number().integer().positive().required().messages({
+                'number.base': 'Attribute value ID must be a number',
+                'number.integer': 'Attribute value ID must be an integer',
+                'number.positive': 'Attribute value ID must be a positive number',
+                'any.required': 'Attribute value ID is required'
+            })
+        })
+    ).optional(),
+    images: joi.array().items(
+        joi.object({
+            image_url: joi.string().uri().required().messages({
+                'string.base': 'Image URL must be a string',
+                'string.uri': 'Image URL must be a valid URI',
+                'any.required': 'Image URL is required'
+            }),
+            is_primary: joi.boolean().optional(),
+            alt_text: joi.string().max(255).allow('', null).optional(),
+            sort_order: joi.number().integer().min(0).optional()
         })
     ).optional()
 });
@@ -228,6 +315,45 @@ export const validateProduct = (req, res, next) => {
     }
     req.body = value;
     next();
+};
+
+export const validateFullProductUpdate = (req, res, next) => {
+    try {
+        // Accept images coming as multipart files via multer (req.files).
+        // If files are present, skip 'images' key validation because files
+        // will be uploaded and converted to image objects in the controller.
+        const bodyToValidate = { ...req.body };
+
+        // If client sent images as a JSON string in a text field, try to parse it
+        if (typeof bodyToValidate.images === 'string') {
+            try {
+                bodyToValidate.images = JSON.parse(bodyToValidate.images);
+            } catch (e) {
+                // leave as-is; Joi will error below if invalid
+            }
+        }
+
+        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+            delete bodyToValidate.images;
+        }
+
+        const { error, value } = productUpdateSchema.validate(bodyToValidate, { abortEarly: false });
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                error: error.details.map(err => ({
+                    field: err.path[0],
+                    message: err.message
+                }))
+            });
+        }
+
+        // preserve files on req; set validated body
+        req.body = value;
+        next();
+    } catch (err) {
+        next(err);
+    }
 };
 
 // middleware to validate category ID in params

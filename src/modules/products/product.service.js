@@ -247,6 +247,7 @@ export const updateProduct = async (id, productData) => {
         }
 
         const { images, attributes, category_name, brand_name, ...productFields } = productData;
+        productFields.is_active = productData.is_active ?? existing.is_active;
         if (productFields.name) {
             productFields.slug = slugify(productFields.name, { lower: true, strict: true });
         }
@@ -286,6 +287,127 @@ export const updateProduct = async (id, productData) => {
         client.release();
     }
 }
+
+export const updateProductDetails = async (id, productData) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        const existing = await productRepository.findProductById(id);
+        if (!existing) throw new AppError('Product not found', 404);
+
+        // basic validations and name/ids resolution
+        if (productData.product_id && Number(productData.product_id) !== Number(id)) {
+            throw new AppError('Product ID does not match the route parameter', 400);
+        }
+
+        await resolveNamesToIds(productData);
+        await ensureNameUnique(id, productData.name, client, existing.name);
+        await validateProvidedIds(productData, existing);
+
+        const mergedProductData = mergeProductFields(existing, productData);
+        const updatedProduct = await productRepository.updateProduct(id, mergedProductData, client);
+
+        if (productData.images !== undefined) {
+            await replaceImages(id, productData.images, client);
+        }
+
+        if (productData.attributes !== undefined) {
+            const normalized = await normalizeAttributes(productData.attributes, client);
+            await replaceAttributes(id, normalized, client);
+        }
+
+        await client.query('COMMIT');
+        return updatedProduct;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
+};
+
+// ---- Helper functions exported for clarity and testing ----
+export const resolveNamesToIds = async (productData) => {
+    if (productData.category_name && !productData.category_id) {
+        const category = await findCategoryByName(productData.category_name);
+        if (!category) throw new AppError('Category not found', 404);
+        productData.category_id = category.category_id;
+    }
+
+    if (productData.brand_name && !productData.brand_id) {
+        const brand = await findBrandByName(productData.brand_name);
+        if (!brand) throw new AppError('Brand not found', 404);
+        productData.brand_id = brand.brand_id;
+    }
+};
+
+export const ensureNameUnique = async (id, name, client = pool, existingName = null) => {
+    if (!name) return;
+    if (name === existingName) return;
+    const found = await productRepository.findProductByName(name, client);
+    if (found) throw new AppError('Product with this name is already exists', 409);
+};
+
+export const validateProvidedIds = async (productData, existing) => {
+    if (productData.category_id && productData.category_id !== existing.category_id) {
+        const category = await findCategoryById(productData.category_id);
+        if (!category) throw new AppError('Category not found', 404);
+    }
+
+    if (productData.brand_id && productData.brand_id !== existing.brand_id) {
+        const brand = await findBrandById(productData.brand_id);
+        if (!brand) throw new AppError('Brand not found', 404);
+    }
+};
+
+export const mergeProductFields = (existing, productData) => ({
+    name: productData.name ?? existing.name,
+    brand_id: productData.brand_id ?? existing.brand_id,
+    category_id: productData.category_id ?? existing.category_id,
+    slug: productData.slug ?? slugify(productData.name ?? existing.name, { lower: true, strict: true }),
+    description: productData.description ?? existing.description,
+    base_price: productData.base_price ?? existing.base_price,
+    selling_price: productData.selling_price ?? existing.selling_price,
+    discounted_price: productData.discounted_price ?? existing.discounted_price,
+    stock_quantity: productData.stock_quantity ?? existing.stock_quantity,
+    warranty_months: productData.warranty_months ?? existing.warranty_months,
+    product_tag: productData.product_tag ?? existing.product_tag,
+    is_active: productData.is_active ?? existing.is_active,
+});
+
+export const normalizeAttributes = async (attributes, client = pool) => {
+    const normalized = [];
+    const list = Array.isArray(attributes) ? attributes : [];
+    for (const attr of list) {
+        const attributeValue = await productRepository.getAttributeValueById(attr.attribute_value_id, client);
+        if (!attributeValue) throw new AppError('Attribute value not found', 404);
+        if (Number(attributeValue.attribute_id) !== Number(attr.attribute_id)) {
+            throw new AppError('Attribute value does not belong to the provided attribute', 400);
+        }
+        normalized.push({
+            attribute_id: attr.attribute_id,
+            attribute_value_id: attr.attribute_value_id,
+            value: attributeValue.value,
+        });
+    }
+    return normalized;
+};
+
+export const replaceImages = async (productId, images, client = pool) => {
+    const imgs = Array.isArray(images) ? images : [];
+    const primary = imgs.filter(i => i.is_primary);
+    if (primary.length > 1) throw new AppError('Only one primary image allowed', 400);
+    await productRepository.deleteProductImages(productId, client);
+    if (imgs.length > 0) await productRepository.insertProductImages(productId, imgs, client);
+};
+
+export const replaceAttributes = async (productId, normalizedAttributes, client = pool) => {
+    await productRepository.deleteProductAttributes(productId, client);
+    if (normalizedAttributes && normalizedAttributes.length > 0) {
+        await productRepository.insertProductAttributes(productId, normalizedAttributes, client);
+    }
+};
 
 // delete product
 export const deleteProduct = async (id) => {

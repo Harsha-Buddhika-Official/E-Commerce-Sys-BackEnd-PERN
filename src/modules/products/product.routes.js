@@ -1,6 +1,6 @@
 import express from 'express';
-import { createProduct, createProductWithoutAttributes, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductByid, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple } from './product.controller.js';
-import { validateProduct, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
+import { createProduct, createProductWithoutAttributes, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductByid, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, updateProductDetails, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple } from './product.controller.js';
+import { validateProduct, validateFullProductUpdate, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import upload from '../../middlewares/multer.js';
@@ -31,6 +31,7 @@ router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager')
 router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById);
 
 // ==================== PROTECTED ROUTES - PUT ====================
+router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'), validateProductId, validateFullProductUpdate, updateProductDetails);
 router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
 router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
 router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
