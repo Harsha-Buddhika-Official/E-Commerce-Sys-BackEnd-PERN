@@ -11,4 +11,3 @@ Summary:
 - Auth: `Authorization: Bearer <token>` (roles: `super_admin`, `admin`)
 
 Use the linked doc for request/response examples and notes about alternate query/body inputs.
-

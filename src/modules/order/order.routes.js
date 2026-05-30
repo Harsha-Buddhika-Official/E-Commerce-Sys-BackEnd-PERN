@@ -18,8 +18,8 @@ router.post('/cart', validateCreateCartOrder, createCartOrder);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin/statuses', authorize('super_admin', 'admin', 'manager'), getStatusData);
-router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'), lowStockAlert);
+router.get('/admin/statuses', authorize('super_admin', 'admin', 'manager'), getStatusData); //using 
+router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'), lowStockAlert); //using 
 router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount);
 router.get('/admin/all', authorize('super_admin', 'admin', 'manager'), getAllOrders);
 router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
