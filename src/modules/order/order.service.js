@@ -85,6 +85,10 @@ export const getAllOrders = async (client) => {
     return await orderRepository.getAllOrders(client);
 };
 
+export const getRecentOrders = async (client) => {
+    return await orderRepository.findRecentOrders(client);
+}
+
 export const updateOrderStatus = async (orderId, newStatus, client) => {
     return await orderRepository.updateOrderStatus(orderId, newStatus, client);
 };

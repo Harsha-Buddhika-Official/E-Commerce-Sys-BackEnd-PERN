@@ -326,6 +326,33 @@ export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
     }
 };
 
+export const findRecentOrders = async (client = pool) => {
+    const query = `SELECT
+        o.order_id,
+        o.total_amount,
+        o.order_status,
+
+        p.name AS product_name,
+        oi.quantity
+    FROM orders o
+    
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+    
+    JOIN products p
+        ON oi.product_id = p.product_id
+
+    ORDER BY o.created_at DESC
+    LIMIT 10;`;
+    try {
+        const result = await client.query(query);
+        return result.rows;
+    } catch (error) {
+        console.error('Error fetching recent orders:', error);
+        throw error;
+    }
+}
+
 export const getAllOrders = async (client = pool) => {
     const query = `SELECT
         o.order_id,
@@ -387,19 +414,41 @@ export const deleteOrder = async (orderId, client = pool) => {
     }
 };
 
-// Combined dashboard metrics fetcher to gather required counts/amounts in one call
 export const getDashboardMetrics = async (client = pool) => {
     const query = `
+        WITH revenue_metrics AS (
+            SELECT
+                COALESCE(SUM(CASE WHEN created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW() THEN total_amount ELSE 0 END), 0) AS total_revenue_this_month,
+                COALESCE(SUM(CASE WHEN created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days' THEN total_amount ELSE 0 END), 0) AS total_revenue_previous_30_days
+            FROM orders
+            WHERE order_status != 'cancelled'
+        ), order_metrics AS (
+            SELECT
+                COALESCE(COUNT(*) FILTER (WHERE created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW()), 0) AS total_orders_this_month,
+                COALESCE(COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days'), 0) AS total_orders_previous_30_days,
+                COALESCE(COUNT(*) FILTER (WHERE order_status = 'pending'), 0) AS pending_order_count,
+                COALESCE(COUNT(*) FILTER (WHERE order_status = 'shipped'), 0) AS shipped_order_count
+            FROM orders
+            WHERE order_status != 'cancelled'
+        ), product_metrics AS (
+            SELECT
+                COALESCE(COUNT(*) FILTER (WHERE is_active = true), 0) AS active_product_count,
+                COALESCE(COUNT(*) FILTER (WHERE stock_quantity = 0 AND is_active = true), 0) AS out_of_stock_product_count
+            FROM products
+        )
         SELECT
-            COALESCE((SELECT SUM(total_amount) FROM orders WHERE order_status != 'cancelled' AND created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW()), 0) AS total_revenue_this_month,
-            COALESCE((SELECT SUM(total_amount) FROM orders WHERE order_status != 'cancelled' AND created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days'), 0) AS total_revenue_previous_30_days,
-            COALESCE((SELECT COUNT(*) FROM orders WHERE order_status != 'cancelled' AND created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW()), 0) AS total_orders_this_month,
-            COALESCE((SELECT COUNT(*) FROM orders WHERE order_status != 'cancelled' AND created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days'), 0) AS total_orders_previous_30_days,
-            COALESCE((SELECT COUNT(*) FROM products WHERE is_active = true), 0) AS active_product_count,
-            COALESCE((SELECT COUNT(*) FROM products WHERE stock_quantity = 0 AND is_active = true), 0) AS out_of_stock_product_count,
-            COALESCE((SELECT COUNT(*) FROM orders WHERE order_status = 'pending'), 0) AS pending_order_count,
-            COALESCE((SELECT COUNT(*) FROM orders WHERE order_status = 'shipped'), 0) AS shipped_order_count
-        `;
+            revenue_metrics.total_revenue_this_month,
+            revenue_metrics.total_revenue_previous_30_days,
+            order_metrics.total_orders_this_month,
+            order_metrics.total_orders_previous_30_days,
+            product_metrics.active_product_count,
+            product_metrics.out_of_stock_product_count,
+            order_metrics.pending_order_count,
+            order_metrics.shipped_order_count
+        FROM revenue_metrics
+        CROSS JOIN order_metrics
+        CROSS JOIN product_metrics;
+    `;
 
     try {
         const result = await client.query(query);

@@ -23,7 +23,7 @@ export const createCartOrder = async (req, res, next) => {
         // orderData.sessionId = sessionId; // Pass sessionId to service layer 
         const sessionId = "ac034102-8835-42ec-b667-9f3c89b64978"; // Assuming sessionId is sent in the request body
         console.log('Received sessionId in controller:', sessionId); // Debug log to check sessionId
-        
+
         const order = await orderService.createCartOrder(orderData, sessionId);
         res.status(201).json({
             success: true,
@@ -64,15 +64,31 @@ export const getOrdersByTrackingCode = async (req, res, next) => {
     }
 };
 
+export const getRecentOrders = async (req, res, next) => {
+    try {
+        const orders = await orderService.getRecentOrders();
+
+        res.status(200).json({
+            success: true,
+            data: orders,
+            message: 'Recent orders retrieved successfully'
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getAllOrders = async (req, res, next) => {
     try {
         const orders = await orderService.getAllOrders();
+
         res.status(200).json({
             success: true,
             data: orders
         });
-    }
-    catch (error) {
+
+    } catch (error) {
         next(error);
     }
 };
