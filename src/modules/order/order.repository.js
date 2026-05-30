@@ -415,14 +415,10 @@ export const getOrderById = async (orderId, client = pool) => {
 
                     'product_name', p.name,
                     'product_slug', p.slug,
-                    'selling_price', p.selling_price,
-                    'stock_quantity', p.stock_quantity,
                     'warranty_months', p.warranty_months,
 
-                    'brand_id', b.brand_id,
                     'brand_name', b.name,
 
-                    'category_id', c.category_id,
                     'category_name', c.name
                 )
             ) FILTER (WHERE oi.order_item_id IS NOT NULL),
