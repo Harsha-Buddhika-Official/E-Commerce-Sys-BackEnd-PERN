@@ -59,44 +59,6 @@ export const createCartOrder = async (orderData, sessionId, client) => {
     return await orderRepository.createCartOrder({ ...orderData, items }, client);
 };
 
-export const getOrderById = async (orderId, client) => {
-    return await orderRepository.getOrderById(orderId, client);
-};
-
-export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
-    const emailCheck = await orderRepository.getOrdersByEmail(email, client);
-    if (!emailCheck || emailCheck.length === 0) {
-        throw new AppError('No orders found for this email', 404);
-    }
-    if(!trackingCode) {
-        throw new AppError('Tracking code is required', 400);
-    }  
-    const TrackingCodeCheck = await orderRepository.getOrderByTrackingCode(trackingCode, client);
-    if (!TrackingCodeCheck) {
-        throw new AppError('No order found for this tracking code', 404);
-    }
-    if (TrackingCodeCheck.customer_email !== email) {
-        throw new AppError('Tracking code does not match the provided email', 400);
-    }
-    return TrackingCodeCheck;
-};
-
-export const getAllOrders = async (client) => {
-    return await orderRepository.getAllOrders(client);
-};
-
-export const getRecentOrders = async (client) => {
-    return await orderRepository.findRecentOrders(client);
-}
-
-export const updateOrderStatus = async (orderId, newStatus, client) => {
-    return await orderRepository.updateOrderStatus(orderId, newStatus, client);
-};
-
-export const deleteOrder = async (orderId, client) => {
-    return await orderRepository.deleteOrder(orderId, client);
-};
-
 //status bar data for admin dashboard
 export const getStatusData = async (client) => {
     const {
@@ -130,12 +92,63 @@ export const getStatusData = async (client) => {
     };
 };
 
+//low stock alert for admin dashboard
 export const lowStockAlert = async (client) => {
     const lowStockProducts = await orderRepository.lowStockAlert(client);
     return lowStockProducts;
 }
 
+//recent orders for admin dashboard
+export const getRecentOrders = async (client) => {
+    return await orderRepository.findRecentOrders(client);
+}
+
+//order status count for order page
 export const getOrderStatusCount = async (client) =>{
     const OrderStatus = await orderRepository.getOrderStatusCount(client);
     return OrderStatus;
 }
+
+//orders for order page
+export const getAllOrders = async (client) => {
+    return await orderRepository.findAllOrders(client);
+};
+
+export const getOrderById = async (orderId, client) => {
+    return await orderRepository.getOrderById(orderId, client);
+};
+
+export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
+    const emailCheck = await orderRepository.getOrdersByEmail(email, client);
+    if (!emailCheck || emailCheck.length === 0) {
+        throw new AppError('No orders found for this email', 404);
+    }
+    if(!trackingCode) {
+        throw new AppError('Tracking code is required', 400);
+    }  
+    const TrackingCodeCheck = await orderRepository.getOrderByTrackingCode(trackingCode, client);
+    if (!TrackingCodeCheck) {
+        throw new AppError('No order found for this tracking code', 404);
+    }
+    if (TrackingCodeCheck.customer_email !== email) {
+        throw new AppError('Tracking code does not match the provided email', 400);
+    }
+    return TrackingCodeCheck;
+};
+
+
+
+
+
+export const updateOrderStatus = async (orderId, newStatus, client) => {
+    return await orderRepository.updateOrderStatus(orderId, newStatus, client);
+};
+
+export const deleteOrder = async (orderId, client) => {
+    return await orderRepository.deleteOrder(orderId, client);
+};
+
+
+
+
+

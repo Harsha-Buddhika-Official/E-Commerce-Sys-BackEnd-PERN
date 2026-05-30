@@ -36,6 +36,78 @@ export const createCartOrder = async (req, res, next) => {
     }
 };
 
+//status data for admin dashboard
+export const getStatusData = async (req, res, next) => {
+    try {
+        const statusData = await orderService.getStatusData();
+        res.status(200).json({
+            success: true,
+            data: statusData
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+//low stock alert for admin dashboard
+export const lowStockAlert = async (req, res, next) => {
+    try {
+        const lowStockProducts = await orderService.lowStockAlert();
+        res.status(200).json({
+            success: true,
+            data: lowStockProducts
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+//recent orders for admin dashboard
+export const getRecentOrders = async (req, res, next) => {
+    try {
+        const orders = await orderService.getRecentOrders();
+
+        res.status(200).json({
+            success: true,
+            data: orders,
+            message: 'Recent orders retrieved successfully'
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+//order status count for order page
+export const OrderStatusCount = async (req, res, next) => {
+    try {
+        const OrderStatus = await orderService.getOrderStatusCount();
+        res.status(200).json({
+            success: true,
+            data: OrderStatus,
+            message: 'Order status count retrieved successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+//orders for order page
+export const getAllOrders = async (req, res, next) => {
+    try {
+        const orders = await orderService.getAllOrders();
+        res.status(200).json({
+            success: true,
+            data: orders,
+            message: 'All orders retrieved successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getOrderById = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -64,34 +136,9 @@ export const getOrdersByTrackingCode = async (req, res, next) => {
     }
 };
 
-export const getRecentOrders = async (req, res, next) => {
-    try {
-        const orders = await orderService.getRecentOrders();
 
-        res.status(200).json({
-            success: true,
-            data: orders,
-            message: 'Recent orders retrieved successfully'
-        });
 
-    } catch (error) {
-        next(error);
-    }
-};
 
-export const getAllOrders = async (req, res, next) => {
-    try {
-        const orders = await orderService.getAllOrders();
-
-        res.status(200).json({
-            success: true,
-            data: orders
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
 
 export const updateOrderStatus = async (req, res, next) => {
     try {
@@ -123,40 +170,8 @@ export const deleteOrder = async (req, res, next) => {
     }
 };
 
-export const getStatusData = async (req, res, next) => {
-    try {
-        const statusData = await orderService.getStatusData();
-        res.status(200).json({
-            success: true,
-            data: statusData
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-};
 
-export const lowStockAlert = async (req, res, next) => {
-    try {
-        const lowStockProducts = await orderService.lowStockAlert();
-        res.status(200).json({
-            success: true,
-            data: lowStockProducts
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-};
 
-export const OrderStatusCount = async (req, res, next) => {
-    try {
-        const OrderStatus = await orderService.getOrderStatusCount();
-        res.status(200).json({
-            success: true,
-            data: OrderStatus
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+
+
+
