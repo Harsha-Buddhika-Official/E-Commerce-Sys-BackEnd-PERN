@@ -11,11 +11,11 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/', authorize('super_admin', 'admin', 'manager'), getAllBrands);
-router.get('/names', authorize('super_admin', 'admin', 'manager'),  getAllBrandnames);
+router.get('/', authorize('super_admin', 'admin', 'manager'), getAllBrands); //using
+router.get('/names', authorize('super_admin', 'admin', 'manager'),  getAllBrandnames); //using
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateCreateBrand, createBrand);
+router.post('/', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateCreateBrand, createBrand); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/:id', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateIdParam, validateUpdateBrand, updateBrand);
@@ -23,6 +23,6 @@ router.put('/:id/soft-delete', authorize('super_admin', 'admin', 'manager'), val
 router.put('/:id/restore', authorize('super_admin', 'admin', 'manager'), validateIdParam, restoreBrand);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand);
+router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand); //using
 
 export default router;
