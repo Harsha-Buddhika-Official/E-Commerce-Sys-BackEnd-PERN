@@ -23,7 +23,7 @@ router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'
 router.get('/admin/recent-orders', authorize('super_admin', 'admin', 'manager'), getRecentOrders); //using
 router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount); //using
 router.get('/admin/orders', authorize('super_admin', 'admin', 'manager'), getAllOrders); //using
-router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById);
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/admin/state/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);

@@ -136,10 +136,6 @@ export const getOrdersByTrackingCode = async (req, res, next) => {
     }
 };
 
-
-
-
-
 export const updateOrderStatus = async (req, res, next) => {
     try {
         const orderId = req.params.id;
