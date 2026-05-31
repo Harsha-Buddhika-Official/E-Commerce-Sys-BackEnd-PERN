@@ -13,7 +13,7 @@ export const createBrand = async (brandData) => {
 };
 
 export const getAllBrands = async () => {
-    const query = `SELECT * FROM brands`;
+    const query = `SELECT brand_id,name,slug,logo_url,is_active,updated_at,created_at FROM brands`;
     const { rows } = await pool.query(query);
     return rows;
 };

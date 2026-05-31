@@ -7,13 +7,11 @@ import upload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
-// ==================== PUBLIC ROUTES - GET ====================
-router.get('/', getAllBrands);
-router.get('/:id', validateIdParam, getBrandById);
-
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
+// ==================== PROTECTED ROUTES - GET ====================
+router.get('/', authorize('super_admin', 'admin', 'manager'), getAllBrands);
 router.get('/names', authorize('super_admin', 'admin', 'manager'),  getAllBrandnames);
 
 // ==================== PROTECTED ROUTES - POST ====================

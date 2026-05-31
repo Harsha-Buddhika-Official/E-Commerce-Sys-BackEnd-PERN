@@ -18,18 +18,18 @@ router.post('/cart', validateCreateCartOrder, createCartOrder);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin/statuses', authorize('super_admin', 'admin', 'manager'), getStatusData); //using 
-router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'), lowStockAlert); //using 
-router.get('/admin/recent-orders', authorize('super_admin', 'admin', 'manager'), getRecentOrders); //using
-router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount); //using
-router.get('/admin/orders', authorize('super_admin', 'admin', 'manager'), getAllOrders); //using
-router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById); //using
+router.get('/admin/statuses', authorize('super_admin', 'admin', 'manager'), getStatusData); //using for admin side
+router.get('/admin/low-stock-alert', authorize('super_admin', 'admin', 'manager'), lowStockAlert); //using for admin side
+router.get('/admin/recent-orders', authorize('super_admin', 'admin', 'manager'), getRecentOrders); //using for admin side
+router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount); //using for admin side
+router.get('/admin/orders', authorize('super_admin', 'admin', 'manager'), getAllOrders); //using for admin side
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById); //using for admin side
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/admin/state/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus);
+router.put('/admin/state/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus); //using for admin side
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder);
+router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder); 
 
 
 export default router;
