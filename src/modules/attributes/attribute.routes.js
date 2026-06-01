@@ -18,15 +18,15 @@ router.get('/', authorize('super_admin', 'admin'), getAttributes); // using
 router.get('/grouped/:categoryId', authorize('super_admin', 'admin'), getAttributesGroupedByCategory);
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/', authorize('super_admin', 'admin'), createAttribute);
-router.post('/:attributeId/value', authorize('super_admin', 'admin'), createAttributeValue);
+router.post('/', authorize('super_admin', 'admin'), createAttribute); //using
+router.post('/:attributeId/value', authorize('super_admin', 'admin'), createAttributeValue); //using
 router.post('/products/:productId/attributes', authorize('super_admin', 'admin'), validateProductAttributeMapping, createProductAttribute);
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/:id', authorize('super_admin', 'admin'), updateAttribute);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin'), deleteAttribute);
-router.delete('/:attributeId/value/:valueId', authorize('super_admin', 'admin'), deleteAttributeValue);
+router.delete('/:id', authorize('super_admin', 'admin'), deleteAttribute); //using
+router.delete('/:attributeId/value/:valueId', authorize('super_admin', 'admin'), deleteAttributeValue); //using
 
 export default router;
