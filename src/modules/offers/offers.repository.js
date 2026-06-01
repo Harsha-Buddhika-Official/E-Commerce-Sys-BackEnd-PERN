@@ -36,45 +36,33 @@ export const createOffer = async (offerData) => {
     return rows[0];
 };
 
+export const addOfferProduct = async (offerId, productId) => {
+    const query = `
+        INSERT INTO offer_products (offer_id, product_id)
+        VALUES ($1, $2)
+        RETURNING *
+    `;
+    const { rows } = await pool.query(query, [offerId, productId]);
+    return rows[0];
+};
+
 export const getAllOffers = async () => {
     const query = `
         SELECT
-            o.*,
-            COALESCE(
-                JSON_AGG(
-                    DISTINCT JSONB_BUILD_OBJECT(
-                        'offer_product_id', op.id,
-                        'product_id', p.product_id,
-                        'name', p.name,
-                        'selling_price', p.selling_price,
-                        'discounted_price', p.discounted_price,
-                        'stock_quantity', p.stock_quantity,
-                        'is_active', p.is_active,
-                        'images', COALESCE(img_agg.images, '[]'::json)
-                    )
-                ) FILTER (WHERE p.product_id IS NOT NULL),
-                '[]'::json
-            ) AS products
+            o.id,
+            o.title,
+            o.description,
+            o.banner_image,
+            o.discount_type,
+            o.discount_value,
+            o.start_date,
+            o.end_date,
+            o.is_active,
+            MIN(p.product_id)::int AS product_id
         FROM offers o
         LEFT JOIN offer_products op ON op.offer_id = o.id
         LEFT JOIN products p ON p.product_id = op.product_id
-        LEFT JOIN LATERAL (
-            SELECT COALESCE(
-                JSON_AGG(
-                    JSON_BUILD_OBJECT(
-                        'image_id', pi.image_id,
-                        'image_url', pi.image_url,
-                        'is_primary', pi.is_primary,
-                        'alt_text', pi.alt_text,
-                        'sort_order', pi.sort_order
-                    ) ORDER BY pi.sort_order
-                ),
-                '[]'::json
-            ) AS images
-            FROM product_images pi
-            WHERE pi.product_id = p.product_id
-        ) img_agg ON TRUE
-        GROUP BY o.id
+        GROUP BY o.id, o.title, o.description, o.banner_image, o.discount_type, o.discount_value, o.start_date, o.end_date, o.is_active
         ORDER BY o.created_at DESC
     `;
     const { rows } = await pool.query(query);
@@ -84,44 +72,21 @@ export const getAllOffers = async () => {
 export const getActiveOffers = async () => {
     const query = `
         SELECT
-            o.*,
-            COALESCE(
-                JSON_AGG(
-                    DISTINCT JSONB_BUILD_OBJECT(
-                        'offer_product_id', op.id,
-                        'product_id', p.product_id,
-                        'name', p.name,
-                        'selling_price', p.selling_price,
-                        'discounted_price', p.discounted_price,
-                        'stock_quantity', p.stock_quantity,
-                        'is_active', p.is_active,
-                        'images', COALESCE(img_agg.images, '[]'::json)
-                    )
-                ) FILTER (WHERE p.product_id IS NOT NULL),
-                '[]'::json
-            ) AS products
+            o.id,
+            o.title,
+            o.description,
+            o.banner_image,
+            o.discount_type,
+            o.discount_value,
+            o.start_date,
+            o.end_date,
+            o.is_active,
+            MIN(p.product_id)::int AS product_id
         FROM offers o
         LEFT JOIN offer_products op ON op.offer_id = o.id
         LEFT JOIN products p ON p.product_id = op.product_id
-        LEFT JOIN LATERAL (
-            SELECT COALESCE(
-                JSON_AGG(
-                    JSON_BUILD_OBJECT(
-                        'image_id', pi.image_id,
-                        'image_url', pi.image_url,
-                        'is_primary', pi.is_primary,
-                        'alt_text', pi.alt_text,
-                        'sort_order', pi.sort_order
-                    ) ORDER BY pi.sort_order
-                ),
-                '[]'::json
-            ) AS images
-            FROM product_images pi
-            WHERE pi.product_id = p.product_id
-        ) img_agg ON TRUE
-        WHERE o.is_active = true
-          AND NOW() BETWEEN o.start_date AND o.end_date
-        GROUP BY o.id
+        WHERE o.is_active = true AND NOW() BETWEEN o.start_date AND o.end_date
+        GROUP BY o.id, o.title, o.description, o.banner_image, o.discount_type, o.discount_value, o.start_date, o.end_date, o.is_active
         ORDER BY o.start_date ASC
     `;
 
@@ -132,44 +97,21 @@ export const getActiveOffers = async () => {
 export const getUpcomingOffers = async () => {
     const query = `
         SELECT
-            o.*,
-            COALESCE(
-                JSON_AGG(
-                    DISTINCT JSONB_BUILD_OBJECT(
-                        'offer_product_id', op.id,
-                        'product_id', p.product_id,
-                        'name', p.name,
-                        'selling_price', p.selling_price,
-                        'discounted_price', p.discounted_price,
-                        'stock_quantity', p.stock_quantity,
-                        'is_active', p.is_active,
-                        'images', COALESCE(img_agg.images, '[]'::json)
-                    )
-                ) FILTER (WHERE p.product_id IS NOT NULL),
-                '[]'::json
-            ) AS products
+            o.id,
+            o.title,
+            o.description,
+            o.banner_image,
+            o.discount_type,
+            o.discount_value,
+            o.start_date,
+            o.end_date,
+            o.is_active,
+            MIN(p.product_id)::int AS product_id
         FROM offers o
         LEFT JOIN offer_products op ON op.offer_id = o.id
         LEFT JOIN products p ON p.product_id = op.product_id
-        LEFT JOIN LATERAL (
-            SELECT COALESCE(
-                JSON_AGG(
-                    JSON_BUILD_OBJECT(
-                        'image_id', pi.image_id,
-                        'image_url', pi.image_url,
-                        'is_primary', pi.is_primary,
-                        'alt_text', pi.alt_text,
-                        'sort_order', pi.sort_order
-                    ) ORDER BY pi.sort_order
-                ),
-                '[]'::json
-            ) AS images
-            FROM product_images pi
-            WHERE pi.product_id = p.product_id
-        ) img_agg ON TRUE
-        WHERE o.is_active = true
-          AND o.start_date > NOW()
-        GROUP BY o.id
+        WHERE o.is_active = true AND o.start_date > NOW()
+        GROUP BY o.id, o.title, o.description, o.banner_image, o.discount_type, o.discount_value, o.start_date, o.end_date, o.is_active
         ORDER BY o.start_date ASC
     `;
 
@@ -186,7 +128,7 @@ export const findOfferByIdBasic = async (id) => {
     return rows[0];
 }
 
-export const findOfferById = async (id) => {
+export const findOfferByIdAdmin = async (id) => {
     const query = `SELECT
         o.*,
         COALESCE(
@@ -202,10 +144,8 @@ export const findOfferById = async (id) => {
                         'discounted_price', p.discounted_price,
                         'stock_quantity', p.stock_quantity,
                         'is_active', p.is_active,
-                        'images',
-                        COALESCE(img_agg.images, '[]'::json),
-                        'attributes',
-                        COALESCE(attr_agg.attributes, '[]'::json)
+                            'image',
+                            COALESCE(img_agg.primary_image, 'null'::json)
                     )
                 )
             ) FILTER (WHERE p.product_id IS NOT NULL),
@@ -217,57 +157,30 @@ export const findOfferById = async (id) => {
     LEFT JOIN products p
     ON p.product_id = op.product_id
     LEFT JOIN LATERAL (
-        SELECT
-            COALESCE(
-                JSON_AGG(
-                    JSON_BUILD_OBJECT(
-                        'image_id', pi.image_id,
-                        'image_url', pi.image_url,
-                        'is_primary', pi.is_primary,
-                        'alt_text', pi.alt_text,
-                        'sort_order', pi.sort_order
-                    )
-                    ORDER BY pi.sort_order
-                ),
-                '[]'::json
-            ) AS images
+            SELECT
+                -- Pick the primary image if available, otherwise the first by sort_order
+                COALESCE(
+                    (
+                        SELECT JSON_BUILD_OBJECT(
+                            'image_id', pi2.image_id,
+                            'image_url', pi2.image_url,
+                            'is_primary', pi2.is_primary,
+                            'alt_text', pi2.alt_text,
+                            'sort_order', pi2.sort_order
+                        )
+                        FROM product_images pi2
+                        WHERE pi2.product_id = p.product_id
+                        ORDER BY (CASE WHEN pi2.is_primary THEN 0 ELSE 1 END), pi2.sort_order
+                        LIMIT 1
+                    ),
+                    'null'::json
+                ) AS primary_image
         FROM product_images pi
         WHERE pi.product_id = p.product_id
     ) img_agg ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT
-            COALESCE(
-                JSON_AGG(
-                    JSON_BUILD_OBJECT(
-                        'product_attribute_id',
-                        pa.product_attribute_id,
-
-                        'attribute_id',
-                        pa.attribute_id,
-
-                        'attribute_name',
-                        a.name,
-
-                        'attribute_value_id',
-                        pa.attribute_value_id,
-
-                        'value',
-                        COALESCE(av.value, pa.value)
-                    )
-                    ORDER BY pa.attribute_id
-                ),
-                '[]'::json
-            ) AS attributes
-        FROM product_attributes pa
-        LEFT JOIN attributes a
-        ON a.attribute_id = pa.attribute_id
-        LEFT JOIN attribute_values av
-        ON av.attribute_value_id = pa.attribute_value_id
-        WHERE pa.product_id = p.product_id
-    ) attr_agg ON TRUE
+    -- attributes removed: product attributes not required for offer detail
     WHERE
         o.id = $1
-        AND o.is_active = true
     GROUP BY o.id;
     `;
     const { rows } = await pool.query(query, [id]);
@@ -367,16 +280,6 @@ export const findOfferProduct = async (offerId, productId) => {
         SELECT *
         FROM offer_products
         WHERE offer_id = $1 AND product_id = $2
-    `;
-    const { rows } = await pool.query(query, [offerId, productId]);
-    return rows[0];
-};
-
-export const addOfferProduct = async (offerId, productId) => {
-    const query = `
-        INSERT INTO offer_products (offer_id, product_id)
-        VALUES ($1, $2)
-        RETURNING *
     `;
     const { rows } = await pool.query(query, [offerId, productId]);
     return rows[0];

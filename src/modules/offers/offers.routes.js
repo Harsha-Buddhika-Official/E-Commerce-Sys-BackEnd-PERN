@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferById, getOfferProducts, getUpcomingOffers, removeOfferProduct, updateOffer, updateOfferStatus } from './offers.controller.js';
+import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferByIdAdmin, getOfferByIdUser, getOfferProducts, getUpcomingOffers, removeOfferProduct, updateOffer, updateOfferStatus } from './offers.controller.js';
 import { validateCreateOffer, validateOfferIdParam, validateOfferProductBody, validateOfferStatusBody, validateProductIdParam, validateUpdateOffer } from './offers.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -12,15 +12,19 @@ const router = express.Router();
 router.get('/', getAllOffers);
 router.get('/active', getActiveOffers);
 router.get('/upcoming', getUpcomingOffers);
-router.get('/:id', validateOfferIdParam, getOfferById);
-router.get('/:id/products', validateOfferIdParam, getOfferProducts);
+router.get('/user/:id', validateOfferIdParam, getOfferByIdUser);
+router.get('/user/:id/products', validateOfferIdParam, getOfferProducts);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
+// ==================== PROTECTED ROUTES - GET ====================
+router.get('/admin', authorize('super_admin', 'admin', 'manager'),getAllOffers); //using
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, getOfferByIdAdmin); //using
+
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/admin/', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateCreateOffer, createOffer);
-router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferProductBody, addOfferProduct);
+router.post('/admin/', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateCreateOffer, createOffer); //working // using
+router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferProductBody, addOfferProduct); //working //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer);

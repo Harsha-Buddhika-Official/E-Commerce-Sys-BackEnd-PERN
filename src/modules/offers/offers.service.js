@@ -34,8 +34,45 @@ export const getUpcomingOffers = async () => {
     return offersRepository.getUpcomingOffers();
 };
 
-export const getOfferById = async (id) => {
-    const offer = await offersRepository.findOfferById(id);
+export const getOfferByIdAdmin = async (id) => {
+    const offer = await offersRepository.findOfferByIdAdmin(id);
+    if (!offer) {
+        throw new AppError('Offer not found', 404);
+    }
+
+    const calculateDiscountedPrice = (price) => {
+        const numericPrice = Number(price) || 0;
+
+        if (offer.discount_type === 'percentage') {
+            return Math.max(0, numericPrice - (numericPrice * Number(offer.discount_value)) / 100);
+        }
+
+        if (offer.discount_type === 'fixed') {
+            return Math.max(0, numericPrice - Number(offer.discount_value));
+        }
+        return numericPrice;
+    };
+
+    offer.products = Array.isArray(offer.products)
+        ? offer.products.map((item) => {
+            const product = item.product || {};
+            const basePrice = product.discounted_price ?? product.selling_price;
+            const numericPrice = calculateDiscountedPrice(basePrice)
+            return {
+                ...item,
+                product: {
+                    ...product,
+                    discounted_price: numericPrice,
+                },
+            };
+        })
+        : [];
+
+    return offer;
+};
+
+export const getOfferByIdUser = async (id) => {
+    const offer = await offersRepository.findOfferByIdAdmin(id);
     if (!offer) {
         throw new AppError('Offer not found', 404);
     }
@@ -72,7 +109,7 @@ export const getOfferById = async (id) => {
 };
 
 export const updateOffer = async (id, offerData) => {
-    const existing = await offersRepository.findOfferById(id);
+    const existing = await offersRepository.findOfferByIdBasic(id);
     if (!existing) {
         throw new AppError('Offer not found', 404);
     }
@@ -114,7 +151,7 @@ export const updateOfferStatus = async (id, isActive) => {
 };
 
 export const deleteOffer = async (id) => {
-    const existing = await offersRepository.findOfferById(id);
+    const existing = await offersRepository.findOfferByIdBasic(id);
     if (!existing) {
         throw new AppError('Offer not found', 404);
     }
@@ -122,11 +159,11 @@ export const deleteOffer = async (id) => {
 };
 
 export const addOfferProduct = async (offerId, productId) => {
-    const offer = await offersRepository.findOfferById(offerId);
+    const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {
         throw new AppError('Offer not found', 404);
     }
-
+    // need to get findProductbyid funciton from the product repo level not createing the product funciton in the offer repo level
     const product = await offersRepository.findProductById(productId);
     if (!product) {
         throw new AppError('Product not found', 404);
@@ -141,7 +178,7 @@ export const addOfferProduct = async (offerId, productId) => {
 };
 
 export const removeOfferProduct = async (offerId, productId) => {
-    const offer = await offersRepository.findOfferById(offerId);
+    const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {
         throw new AppError('Offer not found', 404);
     }
@@ -155,7 +192,7 @@ export const removeOfferProduct = async (offerId, productId) => {
 };
 
 export const getOfferProducts = async (offerId) => {
-    const offer = await offersRepository.findOfferById(offerId);
+    const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {
         throw new AppError('Offer not found', 404);
     }

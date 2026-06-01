@@ -74,10 +74,23 @@ export const getUpcomingOffers = async (req, res, next) => {
     }
 };
 
-export const getOfferById = async (req, res, next) => {
+export const getOfferByIdAdmin = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const offer = await offersService.getOfferById(id);
+        const offer = await offersService.getOfferByIdAdmin(id);
+        res.status(200).json({
+            success: true,
+            data: offer
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getOfferByIdUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const offer = await offersService.getOfferByIdUser(id);
         res.status(200).json({
             success: true,
             data: offer
