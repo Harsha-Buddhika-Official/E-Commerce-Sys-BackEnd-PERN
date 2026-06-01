@@ -49,7 +49,8 @@ export const getAllBrands = async (req, res, next) => {
         const brands = await brandService.getAllBrands();
         res.status(200).json({
             success: true,
-            data: brands
+            data: brands,
+            message: 'Brands retrieved successfully'
         })
     } catch (error) {
         next(error);
@@ -62,26 +63,13 @@ export const getAllBrandnames = async (req, res, next) => {
         const brandNames = await brandService.getAllBrandNames();
         res.status(200).json({
             success: true,
-            data: brandNames
+            data: brandNames,
+            message: 'Brand names retrieved successfully'
         })
     } catch (error) {
         next(error);
     }
 }
-
-// //get brand by name
-// export const getBrandByName = async (req, res, next) => {
-//     try {
-//         const { name } = req.params;
-//         const brand = await brandService.getBrandByName(name)
-//         res.status(200).json({
-//             success: true,
-//             data: brand
-//         })
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 
 //get brand by id
 export const getBrandById = async (req, res, next) => {
@@ -90,7 +78,8 @@ export const getBrandById = async (req, res, next) => {
         const brand = await brandService.getBrandById(id);
         res.status(200).json({
             success: true,
-            data: brand
+            data: brand,
+            message: 'Brand retrieved successfully'
         })
     } catch (error) {
         next(error);
@@ -103,12 +92,9 @@ export const updateBrand = async (req, res, next) => {
         const { id } = req.params;
         const brandData = { ...req.body };
 
-        // Handle logo upload if new file is provided
         if (req.file) {
-            // Get existing brand to delete old logo
             const existingBrand = await brandService.getBrandById(id);
             
-            // Delete old logo from Cloudinary if it exists
             if (existingBrand.logo_public_id) {
                 try {
                     await deleteFromCloudinary(existingBrand.logo_public_id);
@@ -117,7 +103,6 @@ export const updateBrand = async (req, res, next) => {
                 }
             }
 
-            // Upload new logo
             const uploadResult = await uploadToCloudinary(
                 req.file.buffer,
                 `brand-${Date.now()}`,

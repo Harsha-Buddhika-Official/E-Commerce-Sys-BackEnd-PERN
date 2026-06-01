@@ -6,38 +6,6 @@ export const createAttribute = async (attribute) => {
     return await attributeRepository.createAttribute(attribute);
 }
 
-export const getAttributesByCategoryId = async (categoryId) => {
-    return await attributeRepository.getAttributesByCategoryId(categoryId);
-}
-
-export const getAttributeCatalog = async () => {
-    return await attributeRepository.getAttributeCatalog();
-}
-
-export const getAttributesGroupedByCategory = async (categoryId = null) => {
-    return await attributeRepository.getAttributesByCategory(categoryId);
-}
-
-export const getAttributeById = async (id) => {
-    return await attributeRepository.getAttributeById(id);
-}
-
-export const deleteAttribute = async (id) => {
-    await attributeRepository.deleteAttribute(id);
-}
-
-export const updateAttribute = async (id, attribute) => {
-    await attributeRepository.updateAttribute(id, attribute);
-}
-
-export const createAttributeValue = async (attributeValue) => {
-    return await attributeRepository.createAttributeValue(attributeValue);
-}
-
-export const deleteAttributeValue = async (attributeId, valueId) => {
-    return await attributeRepository.deleteAttributeValue(attributeId, valueId);
-}
-
 export const createProductAttribute = async (productId, attributeData) => {
     const product = await productRepository.findProductById(productId);
     if (!product) {
@@ -57,4 +25,36 @@ export const createProductAttribute = async (productId, attributeData) => {
         ...attributeData,
         value: attributeValue.value,
     });
+}
+
+export const createAttributeValue = async (attributeValue) => {
+    return await attributeRepository.createAttributeValue(attributeValue);
+}
+
+export const getAttributeCatalog = async () => {
+    return await attributeRepository.getAttributeCatalog();
+}
+
+export const getAttributeById = async (id) => {
+    return await attributeRepository.getAttributeById(id);
+}
+
+export const getAttributesByCategoryId = async (categoryId) => {
+    return await attributeRepository.getAttributesByCategoryId(categoryId);
+}
+
+export const getAttributesGroupedByCategory = async (categoryId = null) => {
+    return await attributeRepository.getAttributesByCategory(categoryId);
+}
+
+export const updateAttribute = async (id, attribute) => {
+    return await attributeRepository.updateAttribute(id, attribute);
+}
+
+export const deleteAttribute = async (id) => {
+    return await attributeRepository.deleteAttribute(id);
+}
+
+export const deleteAttributeValue = async (attributeId, valueId) => {
+    return await attributeRepository.deleteAttributeValue(attributeId, valueId);
 }

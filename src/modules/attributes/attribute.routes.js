@@ -1,4 +1,4 @@
-import { createAttribute, getAttributesByCategoryId, getAttributeCatalog, getAttributeById, deleteAttribute, updateAttribute, createAttributeValue, deleteAttributeValue, getAttributesGroupedByCategory, createProductAttribute } from './attribute.controller.js';
+import { createAttribute, getAttributesByCategoryId, getAttributes, getAttributeById, deleteAttribute, updateAttribute, createAttributeValue, deleteAttributeValue, getAttributesGroupedByCategory, createProductAttribute } from './attribute.controller.js';
 import express from 'express';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -14,7 +14,7 @@ router.get('/:id', getAttributeById);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/', authorize('super_admin', 'admin'), getAttributeCatalog);
+router.get('/', authorize('super_admin', 'admin'), getAttributes); // using
 router.get('/grouped/:categoryId', authorize('super_admin', 'admin'), getAttributesGroupedByCategory);
 
 // ==================== PROTECTED ROUTES - POST ====================
