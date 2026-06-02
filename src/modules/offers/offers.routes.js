@@ -19,19 +19,19 @@ router.get('/user/:id/products', validateOfferIdParam, getOfferProducts);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin', authorize('super_admin', 'admin', 'manager'),getAllOffers); //using
-router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, getOfferByIdAdmin); //using
+router.get('/admin', authorize('super_admin', 'admin', 'manager'),getAllOffers); //working //using
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, getOfferByIdAdmin); //working //using
 
 // ==================== PROTECTED ROUTES - POST ====================
 router.post('/admin/', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateCreateOffer, createOffer); //working // using
 router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferProductBody, addOfferProduct); //working //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer);
+router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer); //working //using
 router.put('/admin/activation/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer);
-router.delete('/admin/:id/products/:productId', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateProductIdParam, removeOfferProduct);
+router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //working //using
+router.delete('/:id/products/:productId', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateProductIdParam, removeOfferProduct);
 
 export default router;

@@ -122,7 +122,7 @@ export const updateOffer = async (req, res, next) => {
         const updated = await offersService.updateOffer(id, { ...req.body, banner_image, banner_image_id });
         res.status(200).json({
             success: true,
-            data: updated,
+            // data: updated,
             message: 'Offer updated successfully'
         });
     } catch (error) {
