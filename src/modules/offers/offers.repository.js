@@ -58,13 +58,39 @@ export const getAllOffers = async () => {
             o.start_date,
             o.end_date,
             o.is_active,
-            MIN(p.product_id)::int AS product_id
+
+            COALESCE(
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'product_id', p.product_id,
+                        'name', p.name,
+                        'selling_price', p.selling_price,
+                        'discounted_price', p.discounted_price,
+                        'stock_quantity', p.stock_quantity
+                    )
+                ) FILTER (WHERE p.product_id IS NOT NULL),
+                '[]'::json
+            ) AS products
+
         FROM offers o
         LEFT JOIN offer_products op ON op.offer_id = o.id
         LEFT JOIN products p ON p.product_id = op.product_id
-        GROUP BY o.id, o.title, o.description, o.banner_image, o.discount_type, o.discount_value, o.start_date, o.end_date, o.is_active
-        ORDER BY o.created_at DESC
+
+        GROUP BY
+            o.id,
+            o.title,
+            o.description,
+            o.banner_image,
+            o.discount_type,
+            o.discount_value,
+            o.start_date,
+            o.end_date,
+            o.is_active,
+            o.created_at
+
+        ORDER BY o.created_at DESC;
     `;
+
     const { rows } = await pool.query(query);
     return rows;
 };
@@ -256,7 +282,7 @@ export const updateOffer = async (id, offerData) => {
     return rows[0];
 };
 
-export const updateOfferStatus = async (id, isActive) => {
+export const toggleOffer = async (id, isActive) => {
     const query = `
         UPDATE offers
         SET is_active = $1,

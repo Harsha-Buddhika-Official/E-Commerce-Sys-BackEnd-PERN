@@ -28,7 +28,7 @@ router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'),
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer); //working //using
-router.put('/admin/activation/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus);
+router.put('/admin/:id/toggle', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus); // working
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //working //using

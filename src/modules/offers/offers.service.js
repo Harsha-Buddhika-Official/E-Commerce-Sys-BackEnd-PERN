@@ -116,7 +116,7 @@ export const updateOffer = async (id, offerData) => {
 
     const updated = {
         title: offerData.title ?? existing.title,
-        description: offerData.description ?? existing.description,
+        description: offerData.description,
         discount_type: offerData.discount_type ?? existing.discount_type,
         discount_value: offerData.discount_value ?? existing.discount_value,
         start_date: offerData.start_date ?? existing.start_date,
@@ -141,13 +141,14 @@ export const updateOffer = async (id, offerData) => {
     return offersRepository.updateOffer(id, updated);
 };
 
-export const updateOfferStatus = async (id, isActive) => {
+export const toggleOffer = async (id, isActive) => {
+    if (!id) throw new Error("Offer ID is required");
     const existing = await offersRepository.findOfferByIdBasic(id);
     if (!existing) {
         throw new AppError('Offer not found', 404);
     }
 
-    return offersRepository.updateOfferStatus(id, isActive);
+    return offersRepository.toggleOffer(id, isActive);
 };
 
 export const deleteOffer = async (id) => {

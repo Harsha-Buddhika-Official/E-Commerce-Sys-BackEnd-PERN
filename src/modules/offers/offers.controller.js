@@ -122,7 +122,6 @@ export const updateOffer = async (req, res, next) => {
         const updated = await offersService.updateOffer(id, { ...req.body, banner_image, banner_image_id });
         res.status(200).json({
             success: true,
-            // data: updated,
             message: 'Offer updated successfully'
         });
     } catch (error) {
@@ -134,7 +133,7 @@ export const updateOfferStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { is_active } = req.body;
-        const updated = await offersService.updateOfferStatus(id, is_active);
+        const updated = await offersService.toggleOffer(id, is_active);
         res.status(200).json({
             success: true,
             data: updated,
