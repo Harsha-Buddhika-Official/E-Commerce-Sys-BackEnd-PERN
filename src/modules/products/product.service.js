@@ -182,6 +182,11 @@ export const getProductById = async (id) => {
     return applyActiveOfferPricing(product);
 }
 
+export const getImagesById = async (id) => {
+    const images = await productRepository.getImagesById(id);
+    return images
+}
+
 // get product by name (returns minimal fields)
 export const getProductByName = async (name) => {
     if (!name) {

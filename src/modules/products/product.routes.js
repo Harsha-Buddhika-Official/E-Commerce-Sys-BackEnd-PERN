@@ -31,7 +31,7 @@ router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager')
 router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById);
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/admin/products/:id/full-update', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, validateFullProductUpdate, updateProductDetails); //using 
+router.put('/admin/products/:id/full-update', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, validateFullProductUpdate, updateProductDetails); //using //working
 router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
 router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
 router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);

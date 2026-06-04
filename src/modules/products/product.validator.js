@@ -319,40 +319,85 @@ export const validateProduct = (req, res, next) => {
 
 export const validateFullProductUpdate = (req, res, next) => {
     try {
-        // Accept images coming as multipart files via multer (req.files).
-        // If files are present, skip 'images' key validation because files
-        // will be uploaded and converted to image objects in the controller.
         const bodyToValidate = { ...req.body };
 
-        // If client sent images as a JSON string in a text field, try to parse it
-        if (typeof bodyToValidate.images === 'string') {
-            try {
-                bodyToValidate.images = JSON.parse(bodyToValidate.images);
-            } catch (e) {
-                // leave as-is; Joi will error below if invalid
+        // Parse JSON fields coming from multipart/form-data
+        const jsonFields = ["attributes", "images"];
+
+        jsonFields.forEach((field) => {
+            if (
+                typeof bodyToValidate[field] === "string" &&
+                bodyToValidate[field].trim().startsWith("[")
+            ) {
+                try {
+                    bodyToValidate[field] = JSON.parse(bodyToValidate[field]);
+                } catch (error) {
+                    return res.status(400).json({
+                        success: false,
+                        error: `${field} contains invalid JSON`,
+                    });
+                }
             }
+        });
+
+        // Convert numeric fields
+        const numericFields = [
+            "product_id",
+            "brand_id",
+            "category_id",
+            "base_price",
+            "selling_price",
+            "discounted_price",
+            "stock_quantity",
+            "warranty_months",
+        ];
+
+        numericFields.forEach((field) => {
+            if (
+                bodyToValidate[field] !== undefined &&
+                bodyToValidate[field] !== null &&
+                bodyToValidate[field] !== ""
+            ) {
+                bodyToValidate[field] = Number(bodyToValidate[field]);
+            }
+        });
+
+        // Convert boolean fields
+        if (bodyToValidate.is_active !== undefined) {
+            bodyToValidate.is_active =
+                bodyToValidate.is_active === true ||
+                bodyToValidate.is_active === "true";
         }
 
-        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        // When files are uploaded, images are handled by controller
+        if (req.files?.length > 0) {
             delete bodyToValidate.images;
         }
 
-        const { error, value } = productUpdateSchema.validate(bodyToValidate, { abortEarly: false });
+        const { error, value } = productUpdateSchema.validate(
+            bodyToValidate,
+            {
+                abortEarly: false,
+                convert: true,
+                stripUnknown: true,
+            }
+        );
+
         if (error) {
             return res.status(400).json({
                 success: false,
-                error: error.details.map(err => ({
-                    field: err.path[0],
-                    message: err.message
-                }))
+                error: error.details.map((err) => ({
+                    field: err.path.join("."),
+                    message: err.message,
+                })),
             });
         }
 
-        // preserve files on req; set validated body
         req.body = value;
+
         next();
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
     }
 };
 

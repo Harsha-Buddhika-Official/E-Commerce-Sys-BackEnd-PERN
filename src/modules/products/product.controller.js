@@ -24,38 +24,6 @@ const uploadProductImages = async (files = []) => {
     return { uploadedImages, uploadedCloudinaryIds };
 };
 
-// Controller functions for product routes
-// export const createProduct = async (req, res, next) => {
-//     const uploadedCloudinaryIds = [];
-
-//     try {
-//         const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
-//         uploadedCloudinaryIds.push(...imageIds);
-
-//         const newProduct = await productService.createProduct({
-//             ...req.body,
-//             images: uploadedImages
-//         });
-
-//         res.status(201).json({
-//             success: true,
-//             data: newProduct,
-//             message: 'Product created successfully'
-//         });
-//     } catch (error) {
-//         if (uploadedCloudinaryIds.length > 0) {
-//             for (const publicId of uploadedCloudinaryIds) {
-//                 try {
-//                     await deleteFromCloudinary(publicId);
-//                 } catch (deleteError) {
-//                     console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
-//                 }
-//             }
-//         }
-//         next(error);
-//     }
-// };
-
 export const createProductWithoutAttributes = async (req, res, next) => {
     const uploadedCloudinaryIds = [];
 
@@ -305,6 +273,102 @@ export const updateProduct = async (req, res, next) => {
 //     }
 // };
 
+// export const updateProductDetails = async (req, res, next) => {
+
+//     let uploadedCloudinaryIds = [];
+
+//     try {
+//         const { id } = req.params;
+//         const files = req.files ?? [];
+
+//         const { uploadedImages, uploadedCloudinaryIds: imageIds, } = await uploadProductImages(files);
+//         uploadedCloudinaryIds = imageIds;
+
+//         const updatePayload = { ...req.body, };
+
+//         // if (uploadedImages.length) { updatePayload.images = uploadedImages; }
+//         const existingImages = await productService.getImagesById(id);
+        
+//         const updatedProduct = await productService.updateProductDetails(id, updatePayload);
+
+//         return res.status(200).json({
+//             success: true,
+//             data: updatedProduct,
+//             message: "Product details updated successfully",
+//         });
+
+//     } catch (error) {
+//         await Promise.allSettled(
+//             uploadedCloudinaryIds.map((publicId) =>
+//                 deleteFromCloudinary(publicId)
+//             )
+//         );
+
+//         return next(error);
+//     }
+// };
+
+// export const updateProductDetails = async (req, res, next) => {
+//     let uploadedCloudinaryIds = [];
+
+//     try {
+//         const { id } = req.params;
+//         const files = req.files ?? [];
+
+//         const {
+//             uploadedImages,
+//             uploadedCloudinaryIds: imageIds,
+//         } = await uploadProductImages(files);
+
+//         uploadedCloudinaryIds = imageIds;
+
+//         const updatePayload = {
+//             ...req.body,
+//         };
+
+//         // Existing images from database
+//         const existingImages = await productService.getImagesById(id);
+
+//         // Merge existing + newly uploaded images
+//         if (uploadedImages.length > 0) {
+//             updatePayload.images = [
+//                 ...(existingImages || []).map((image) => ({
+//                     image_url: image.image_url,
+//                     is_primary: Boolean(image.is_primary),
+//                     alt_text: image.alt_text || "",
+//                     sort_order: Number(image.sort_order ?? 0),
+//                 })),
+//                 ...uploadedImages.map((image, index) => ({
+//                     ...image,
+//                     sort_order:
+//                         (existingImages?.length || 0) + index,
+//                 })),
+//             ];
+//         }
+
+//         const updatedProduct =
+//             await productService.updateProductDetails(
+//                 id,
+//                 updatePayload
+//             );
+
+//         return res.status(200).json({
+//             success: true,
+//             data: updatedProduct,
+//             message: "Product details updated successfully",
+//         });
+
+//     } catch (error) {
+//         await Promise.allSettled(
+//             uploadedCloudinaryIds.map((publicId) =>
+//                 deleteFromCloudinary(publicId)
+//             )
+//         );
+
+//         return next(error);
+//     }
+// };
+
 export const updateProductDetails = async (req, res, next) => {
     let uploadedCloudinaryIds = [];
 
@@ -323,8 +387,55 @@ export const updateProductDetails = async (req, res, next) => {
             ...req.body,
         };
 
-        if (uploadedImages.length) {
-            updatePayload.images = uploadedImages;
+        // Get current images
+        const existingImages = await productService.getImagesById(id);
+
+        if (uploadedImages.length > 0) {
+            // Keep existing images exactly as they are
+            const normalizedExistingImages = (existingImages || []).map(
+                (image, index) => ({
+                    image_url: image.image_url,
+                    alt_text: image.alt_text || "",
+                    sort_order: Number(image.sort_order ?? index),
+                    is_primary: Boolean(image.is_primary),
+                })
+            );
+
+            // Ensure uploaded images are NEVER primary
+            const normalizedUploadedImages = uploadedImages.map(
+                (image, index) => ({
+                    image_url: image.image_url,
+                    alt_text: image.alt_text || "",
+                    sort_order:
+                        normalizedExistingImages.length + index,
+                    is_primary: false,
+                })
+            );
+
+            const mergedImages = [
+                ...normalizedExistingImages,
+                ...normalizedUploadedImages,
+            ];
+
+            // Safety: allow only ONE primary image
+            let primaryFound = false;
+
+            mergedImages.forEach((image) => {
+                if (image.is_primary) {
+                    if (!primaryFound) {
+                        primaryFound = true;
+                    } else {
+                        image.is_primary = false;
+                    }
+                }
+            });
+
+            // If somehow no primary exists, make first image primary
+            if (!primaryFound && mergedImages.length > 0) {
+                mergedImages[0].is_primary = true;
+            }
+
+            updatePayload.images = mergedImages;
         }
 
         const updatedProduct =
