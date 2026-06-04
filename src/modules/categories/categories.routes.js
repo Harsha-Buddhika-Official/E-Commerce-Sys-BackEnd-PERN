@@ -10,24 +10,24 @@ const router = express.Router();
 // ==================== PUBLIC ROUTES - GET ====================
 router.get('/products', validateGetCategorySchema, getProductCategories);
 router.get('/accessories', validateGetCategorySchema, getAccessoryCategories);
-router.get('/:id', validateCategoryIdParam, getCategoryById);
+// router.get('/:id', validateCategoryIdParam, getCategoryById);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/', authorize('super_admin', 'admin'), getCategories);
-router.get('/names', authorize('super_admin', 'admin'), getCategoryNames);
+router.get('/', authorize('super_admin', 'admin'), getCategories); //using //working
+router.get('/names', authorize('super_admin', 'admin'), getCategoryNames); //using //working
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/', authorize('super_admin', 'admin'), validateCreateCategory, createCategory);
+// router.post('/', authorize('super_admin', 'admin'), validateCreateCategory, createCategory);
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory);
-router.put('/:id/deactivate', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteCategory);
-router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreCategory);
+// router.put('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory);
+// router.put('/:id/deactivate', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteCategory);
+// router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreCategory);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
+// router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
 
 export default router;

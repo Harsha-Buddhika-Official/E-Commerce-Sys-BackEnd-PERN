@@ -11,18 +11,18 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/', authorize('super_admin', 'admin', 'manager'), getAllBrands); //using
-router.get('/names', authorize('super_admin', 'admin', 'manager'),  getAllBrandnames); //using
+router.get('/admin', authorize('super_admin', 'admin', 'manager'), getAllBrands); //using //working
+router.get('/admin/names', authorize('super_admin', 'admin', 'manager'),  getAllBrandnames); //using //working
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateCreateBrand, createBrand); //using
+router.post('/admin', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateCreateBrand, createBrand); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/:id', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateIdParam, validateUpdateBrand, updateBrand);
-router.put('/:id/soft-delete', authorize('super_admin', 'admin', 'manager'), validateIdParam, softDeleteBrand);
-router.put('/:id/restore', authorize('super_admin', 'admin', 'manager'), validateIdParam, restoreBrand);
+// router.put('/:id', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateIdParam, validateUpdateBrand, updateBrand);
+// router.put('/:id/soft-delete', authorize('super_admin', 'admin', 'manager'), validateIdParam, softDeleteBrand);
+// router.put('/:id/restore', authorize('super_admin', 'admin', 'manager'), validateIdParam, restoreBrand);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand); //using
+router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand); //using
 
 export default router;

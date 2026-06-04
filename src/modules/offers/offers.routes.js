@@ -8,6 +8,7 @@ import upload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
+// USER ROUTES
 // ==================== PUBLIC ROUTES - GET ====================
 router.get('/', getAllOffers);
 router.get('/active', getActiveOffers);
@@ -18,6 +19,7 @@ router.get('/user/:id/products', validateOfferIdParam, getOfferProducts);
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
+//ADMIN ROUTES
 // ==================== PROTECTED ROUTES - GET ====================
 router.get('/admin', authorize('super_admin', 'admin', 'manager'),getAllOffers); //working //using
 router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, getOfferByIdAdmin); //working //using
@@ -32,6 +34,5 @@ router.put('/admin/:id/toggle', authorize('super_admin', 'admin', 'manager'), va
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //working //using
-router.delete('/:id/products/:productId', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateProductIdParam, removeOfferProduct);
 
 export default router;

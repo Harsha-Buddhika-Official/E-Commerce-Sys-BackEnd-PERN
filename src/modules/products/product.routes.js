@@ -19,24 +19,22 @@ router.get('/:id', validateProductId, getProductByid);
 
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/', upload.array('images', 3), validateProduct, createProduct);
-router.post('/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes);
+router.post('/admin/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes); //using //working
 router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin/limited-details', authorize('super_admin', 'admin', 'manager'), getAllProductLimitedDetilas);
-router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager'), getAllProductsDetailsSimple);
+router.get('/admin/limited-details', authorize('super_admin', 'admin', 'manager'), getAllProductLimitedDetilas); //using //working
+router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager'), getAllProductsDetailsSimple); //using //working
 router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById);
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'), validateProductId, validateFullProductUpdate, updateProductDetails);
+router.put('/admin/products/:id/full-update', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, validateFullProductUpdate, updateProductDetails); //using 
 router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
 router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
 router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
-
-// ==================== PROTECTED ROUTES - POST ====================
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct);

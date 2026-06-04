@@ -25,36 +25,36 @@ const uploadProductImages = async (files = []) => {
 };
 
 // Controller functions for product routes
-export const createProduct = async (req, res, next) => {
-    const uploadedCloudinaryIds = [];
+// export const createProduct = async (req, res, next) => {
+//     const uploadedCloudinaryIds = [];
 
-    try {
-        const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
-        uploadedCloudinaryIds.push(...imageIds);
+//     try {
+//         const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
+//         uploadedCloudinaryIds.push(...imageIds);
 
-        const newProduct = await productService.createProduct({
-            ...req.body,
-            images: uploadedImages
-        });
+//         const newProduct = await productService.createProduct({
+//             ...req.body,
+//             images: uploadedImages
+//         });
 
-        res.status(201).json({
-            success: true,
-            data: newProduct,
-            message: 'Product created successfully'
-        });
-    } catch (error) {
-        if (uploadedCloudinaryIds.length > 0) {
-            for (const publicId of uploadedCloudinaryIds) {
-                try {
-                    await deleteFromCloudinary(publicId);
-                } catch (deleteError) {
-                    console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
-                }
-            }
-        }
-        next(error);
-    }
-};
+//         res.status(201).json({
+//             success: true,
+//             data: newProduct,
+//             message: 'Product created successfully'
+//         });
+//     } catch (error) {
+//         if (uploadedCloudinaryIds.length > 0) {
+//             for (const publicId of uploadedCloudinaryIds) {
+//                 try {
+//                     await deleteFromCloudinary(publicId);
+//                 } catch (deleteError) {
+//                     console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
+//                 }
+//             }
+//         }
+//         next(error);
+//     }
+// };
 
 export const createProductWithoutAttributes = async (req, res, next) => {
     const uploadedCloudinaryIds = [];
@@ -84,6 +84,49 @@ export const createProductWithoutAttributes = async (req, res, next) => {
             }
         }
         next(error);
+    }
+};
+
+export const createProduct = async (req, res, next) => {
+    let uploadedCloudinaryIds = [];
+
+    try {
+        const {
+            uploadedImages,
+            uploadedCloudinaryIds: imageIds,
+        } = await uploadProductImages(req.files ?? []);
+
+        uploadedCloudinaryIds = imageIds;
+
+        const product =
+            await productService.createProduct({
+                ...req.body,
+                images: uploadedImages,
+            });
+
+        return res.status(201).json({
+            success: true,
+            data: product,
+            message: "Product created successfully",
+        });
+
+    } catch (error) {
+        if (uploadedCloudinaryIds.length) {
+            await Promise.all(
+                uploadedCloudinaryIds.map(async (publicId) => {
+                    try {
+                        await deleteFromCloudinary(publicId);
+                    } catch (cleanupError) {
+                        console.error(
+                            "Cloudinary cleanup failed:",
+                            cleanupError
+                        );
+                    }
+                })
+            );
+        }
+
+        return next(error);
     }
 };
 
@@ -230,35 +273,80 @@ export const updateProduct = async (req, res, next) => {
     }
 }
 
+// export const updateProductDetails = async (req, res, next) => {
+//     const uploadedCloudinaryIds = [];
+
+//     try {
+//         const { id } = req.params;
+//         const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
+//         uploadedCloudinaryIds.push(...imageIds);
+
+//         const updatedProduct = await productService.updateProductDetails(id, {
+//             ...req.body,
+//             ...(req.files && req.files.length > 0 ? { images: uploadedImages } : {})
+//         });
+
+//         res.status(200).json({
+//             success: true,
+//             data: updatedProduct,
+//             message: 'Product details updated successfully'
+//         });
+//     } catch (error) {
+//         if (uploadedCloudinaryIds.length > 0) {
+//             for (const publicId of uploadedCloudinaryIds) {
+//                 try {
+//                     await deleteFromCloudinary(publicId);
+//                 } catch (deleteError) {
+//                     console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
+//                 }
+//             }
+//         }
+//         next(error);
+//     }
+// };
+
 export const updateProductDetails = async (req, res, next) => {
-    const uploadedCloudinaryIds = [];
+    let uploadedCloudinaryIds = [];
 
     try {
         const { id } = req.params;
-        const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
-        uploadedCloudinaryIds.push(...imageIds);
+        const files = req.files ?? [];
 
-        const updatedProduct = await productService.updateProductDetails(id, {
+        const {
+            uploadedImages,
+            uploadedCloudinaryIds: imageIds,
+        } = await uploadProductImages(files);
+
+        uploadedCloudinaryIds = imageIds;
+
+        const updatePayload = {
             ...req.body,
-            ...(req.files && req.files.length > 0 ? { images: uploadedImages } : {})
-        });
+        };
 
-        res.status(200).json({
+        if (uploadedImages.length) {
+            updatePayload.images = uploadedImages;
+        }
+
+        const updatedProduct =
+            await productService.updateProductDetails(
+                id,
+                updatePayload
+            );
+
+        return res.status(200).json({
             success: true,
             data: updatedProduct,
-            message: 'Product details updated successfully'
+            message: "Product details updated successfully",
         });
+
     } catch (error) {
-        if (uploadedCloudinaryIds.length > 0) {
-            for (const publicId of uploadedCloudinaryIds) {
-                try {
-                    await deleteFromCloudinary(publicId);
-                } catch (deleteError) {
-                    console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
-                }
-            }
-        }
-        next(error);
+        await Promise.allSettled(
+            uploadedCloudinaryIds.map((publicId) =>
+                deleteFromCloudinary(publicId)
+            )
+        );
+
+        return next(error);
     }
 };
 
