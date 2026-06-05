@@ -26,6 +26,14 @@ export const getAllOffers = async () => {
     return offersRepository.getAllOffers();
 };
 
+export const getOffers = async (status) => {
+  if (!["active", "upcoming", "all", undefined].includes(status)) {
+    throw new Error("Invalid status filter");
+  }
+
+  return await offersRepository.getOffers({ status });
+};
+
 export const getActiveOffers = async () => {
     return offersRepository.getActiveOffers();
 };

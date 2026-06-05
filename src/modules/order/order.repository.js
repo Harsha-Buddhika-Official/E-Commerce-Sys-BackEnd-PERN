@@ -221,6 +221,9 @@ export const getOrderStatusCount = async (client = pool) => {
     const query = `
         SELECT
             COUNT(*) FILTER (WHERE order_status = 'pending') AS pending_orders,
+            COUNT(*) FILTER (WHERE order_status = 'paid') AS paid_orders,
+            COUNT(*) FILTER (WHERE order_status = 'processing') AS processing_orders,
+            COUNT(*) FILTER (WHERE order_status = 'shipped') AS shipped_orders,
             COUNT(*) FILTER (WHERE order_status = 'cancelled') AS cancelled_orders,
             COUNT(*) FILTER (WHERE order_status = 'delivered') AS completed_orders
         FROM orders;
@@ -229,6 +232,9 @@ export const getOrderStatusCount = async (client = pool) => {
         const result = await client.query(query);
         return {
             pendingOrders: Number(result.rows[0].pending_orders),
+            paidOrders: Number(result.rows[0].paid_orders),
+            processingOrders: Number(result.rows[0].processing_orders),
+            shippedOrders: Number(result.rows[0].shipped_orders),
             cancelledOrders: Number(result.rows[0].cancelled_orders),
             completedOrders: Number(result.rows[0].completed_orders)
         };

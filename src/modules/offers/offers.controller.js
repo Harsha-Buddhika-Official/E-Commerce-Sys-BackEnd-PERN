@@ -50,6 +50,21 @@ export const getAllOffers = async (req, res, next) => {
     }
 };
 
+export const getOffers = async (req, res, next) => {
+  try {
+    const { status } = req.query;
+
+    const offers = await offersService.getOffers(status);
+
+    res.status(200).json({
+      success: true,
+      data: offers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getActiveOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getActiveOffers();
