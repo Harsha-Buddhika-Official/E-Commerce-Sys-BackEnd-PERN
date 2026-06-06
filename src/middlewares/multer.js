@@ -7,7 +7,10 @@ const ALLOWED_MIME_TYPES = [
     'image/jpeg',
     'image/jpg',
     'image/png',
-    'image/webp'
+    'image/webp',
+    'video/mp4',
+    'video/webm',
+    'video/ogg'
 ];
 
 const fileFilter = (req, file, cb) => {

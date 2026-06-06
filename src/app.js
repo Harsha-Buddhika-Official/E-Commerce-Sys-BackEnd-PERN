@@ -11,6 +11,7 @@ import orderRoutes from './modules/order/order.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
 import attributeRoutes from './modules/attributes/attribute.routes.js';
 import offerRoutes from './modules/offers/offers.routes.js';
+import bannerRoutes from './modules/banners/banner.router.js';
 
 const app = express();
 app.use(express.json());
@@ -25,6 +26,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes); 
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/offers', offerRoutes);
+app.use("/api/banners", bannerRoutes);
 
 app.use(errorHandler);
 
