@@ -194,6 +194,7 @@ const productUpdateSchema = joi.object({
     ).optional(),
     images: joi.array().items(
         joi.object({
+            image_id: joi.number().integer().positive().optional(),
             image_url: joi.string().uri().required().messages({
                 'string.base': 'Image URL must be a string',
                 'string.uri': 'Image URL must be a valid URI',

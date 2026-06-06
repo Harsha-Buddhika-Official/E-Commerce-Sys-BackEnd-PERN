@@ -971,7 +971,14 @@ export const getFilteredProducts = async ({ categoryId, attributeFilters = [], p
 
 export const getImagesById = async(id) => {
   const quary = `SELECT * FROM product_images WHERE product_id = $1`;
-  const values = [id];
-  const { rows } = await pool.query(quary, values);
+  const { rows } = await pool.query(quary, [id]);
+  return rows;
+}
+
+export const deleteImagesById = async(id) => {
+  // console.log("Deleting image with ID:", id);
+  const quary = `DELETE FROM product_images WHERE image_id = $1 RETURNING *`;
+  const{ rows } = await pool.query(quary,[id]);
+  // console.log("rows",rows)
   return rows;
 }

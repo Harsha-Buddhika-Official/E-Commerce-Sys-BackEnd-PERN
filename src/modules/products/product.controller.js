@@ -99,6 +99,7 @@ import * as productService from './product.service.js';
 // };
 
 export const createProductWithoutAttributes = async (req, res, next) => {
+    console.log("Creating product without attributes with data:", { body: req.body, files: req.files || [] }); // Debug log to check incoming data
     try {
         const product = await productService.createProductWithoutAttributes({
             body: req.body,
@@ -374,6 +375,8 @@ export const updateProductDetails = async (req, res, next) => {
 
     try {
         const { id } = req.params;
+
+        // console.log("row data: ", req.body); //Debug log to check incoming data
 
         const result = await productService.updateProductDetails(
             id,{...req.body,files: req.files || []}

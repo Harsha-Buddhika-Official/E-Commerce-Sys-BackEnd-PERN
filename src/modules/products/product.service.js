@@ -308,7 +308,7 @@ export const getAllDetialsProductById = async (id) => {
         throw new AppError('Product not found', 404);
     }
     return applyActiveOfferPricing(products)
-    };
+};
 
 export const getProductsByCategory = async (categoryId) => {
     const products = await productRepository.getProductsByCategory(categoryId);
@@ -361,374 +361,7 @@ export const getProductByName = async (name) => {
     return product;
 };
 
-// update product with transaction
-// export const updateProduct = async (id, productData) => {
-//     const client = await pool.connect();
-//     try {
-//         await client.query("BEGIN");
-
-//         const existing = await productRepository.findProductById(id);
-//         if (!existing) {
-//             throw new AppError('Product not found', 404);
-//         }
-
-//         // Convert category name to ID if provided
-//         if (productData.category_name && !productData.category_id) {
-//             const categoryNameCheck = await findCategoryByName(productData.category_name);
-//             if (!categoryNameCheck) {
-//                 throw new AppError("Category not found", 404);
-//             }
-//             productData.category_id = categoryNameCheck.category_id;
-//         }
-
-//         // Convert brand name to ID if provided
-//         if (productData.brand_name && !productData.brand_id) {
-//             const brandNameCheck = await findBrandByName(productData.brand_name);
-//             if (!brandNameCheck) {
-//                 throw new AppError("Brand not found", 404);
-//             }
-//             productData.brand_id = brandNameCheck.brand_id;
-//         }
-
-//         if (productData.name && productData.name !== existing.name) {
-//             const nameExists = await productRepository.findProductByName(productData.name, client);
-//             if (nameExists) {
-//                 throw new AppError('Product with this name is already exists', 409);
-//             }
-//         }
-
-//         // Check if category exists (if provided)
-//         if (productData.category_id && productData.category_id !== existing.category_id) {
-//             const categoryIdCheck = await findCategoryById(productData.category_id);
-//             if (!categoryIdCheck) {
-//                 throw new AppError("Category not found", 404);
-//             }
-//         }
-
-//         // Check if brand exists (if provided)
-//         if (productData.brand_id && productData.brand_id !== existing.brand_id) {
-//             const brandIdCheck = await findBrandById(productData.brand_id);
-//             if (!brandIdCheck) {
-//                 throw new AppError("Brand not found", 404);
-//             }
-//         }
-
-//         const { images, attributes, category_name, brand_name, ...productFields } = productData;
-//         productFields.is_active = productData.is_active ?? existing.is_active;
-//         if (productFields.name) {
-//             productFields.slug = slugify(productFields.name, { lower: true, strict: true });
-//         }
-
-//         // Update product
-//         const updatedProduct = await productRepository.updateProduct(id, productFields, client);
-
-//         // Handle images if provided
-//         if (images && Array.isArray(images)) {
-//             const primaryImages = images.filter(img => img.is_primary);
-//             if (primaryImages.length > 1) {
-//                 throw new AppError("Only one primary image allowed", 400);
-//             }
-//             // Delete old images
-//             await productRepository.deleteProductImages(id, client);
-//             // Insert new images
-//             if (images.length > 0) {
-//                 await productRepository.insertProductImages(id, images, client);
-//             }
-//         }
-
-//         // Replace product attributes if payload is provided
-//         if (attributes && Array.isArray(attributes)) {
-//             await productRepository.deleteProductAttributes(id, client);
-//             if (attributes.length > 0) {
-//                 await productRepository.insertProductAttributes(id, attributes, client);
-//             }
-//         }
-
-//         await client.query("COMMIT");
-//         return updatedProduct;
-
-//     } catch (error) {
-//         await client.query("ROLLBACK");
-//         throw error;
-//     } finally {
-//         client.release();
-//     }
-// }
-
-// export const updateProductDetails = async (id, productData) => {
-//     const client = await pool.connect();
-//     try {
-//         await client.query('BEGIN');
-
-//         const existing = await productRepository.findProductById(id);
-//         if (!existing) throw new AppError('Product not found', 404);
-
-//         // basic validations and name/ids resolution
-//         if (productData.product_id && Number(productData.product_id) !== Number(id)) {
-//             throw new AppError('Product ID does not match the route parameter', 400);
-//         }
-
-//         await resolveNamesToIds(productData);
-//         await ensureNameUnique(id, productData.name, client, existing.name);
-//         await validateProvidedIds(productData, existing);
-
-//         const mergedProductData = mergeProductFields(existing, productData);
-//         const updatedProduct = await productRepository.updateProduct(id, mergedProductData, client);
-
-//         if (productData.images !== undefined) {
-//             await replaceImages(id, productData.images, client);
-//         }
-
-//         if (productData.attributes !== undefined) {
-//             const normalized = await normalizeAttributes(productData.attributes, client);
-//             await replaceAttributes(id, normalized, client);
-//         }
-
-//         await client.query('COMMIT');
-//         return updatedProduct;
-//     } catch (error) {
-//         await client.query('ROLLBACK');
-//         throw error;
-//     } finally {
-//         client.release();
-//     }
-// };
-
-// export const updateProductDetails = async (id, productData) => {
-//     const client = await pool.connect();
-
-//     try {
-//         await client.query('BEGIN');
-
-//         const existing = await productRepository.findProductById(id);
-//         if (!existing) throw new AppError('Product not found', 404);
-//         const imageDetails = await productRepository.getImagesById(id)
-//         console.log("excisting images", imageDetails) //debuging 
-//         const files = productData.files || [];
-//         console.log("new images details", files) //debuging
-//         // -----------------------------------
-//         // 1. UPLOAD IMAGES
-//         // -----------------------------------
-//         let uploadedImages = [];
-//         let uploadedCloudinaryIds = [];
-
-//         if (files.length > 0) {
-//             for (const [index, file] of files.entries()) {
-//                 const uploadResult = await uploadToCloudinary(
-//                     file.buffer,
-//                     `product-${Date.now()}-${index + 1}`,
-//                     'ecommerce/products'
-//                 );
-
-//                 uploadedImages.push({
-//                     image_url: uploadResult.secure_url,
-//                     is_primary: false,
-//                     alt_text: file.originalname,
-//                     sort_order: imageDetails.length + index
-//                 });
-
-//                 uploadedCloudinaryIds.push(uploadResult.public_id);
-//             }
-//         }
-
-//         // -----------------------------------
-//         // 2. VALIDATION / ID RESOLUTION
-//         // -----------------------------------
-//         if (productData.product_id &&
-//             Number(productData.product_id) !== Number(id)
-//         ) {
-//             throw new AppError('Product ID mismatch', 400);
-//         }
-
-//         if (productData.category_name && !productData.category_id) {
-//             const category = await findCategoryByName(productData.category_name);
-//             if (!category) throw new AppError('Category not found', 404);
-//             productData.category_id = category.category_id;
-//         }
-
-//         if (productData.brand_name && !productData.brand_id) {
-//             const brand = await findBrandByName(productData.brand_name);
-//             if (!brand) throw new AppError('Brand not found', 404);
-//             productData.brand_id = brand.brand_id;
-//         }
-
-//         // -----------------------------------
-//         // 3. MERGE EXISTING + NEW IMAGES
-//         // -----------------------------------
-//         let mergedImages = [...(existing.images || [])];
-
-//         if (uploadedImages.length > 0) {
-//             mergedImages = [...mergedImages, ...uploadedImages];
-//         }
-
-//         // enforce only ONE primary image
-//         let primaryFound = mergedImages.some(i => i.is_primary);
-
-//         if (!primaryFound && mergedImages.length > 0) {
-//             mergedImages[0].is_primary = true;
-//         }
-
-//         // -----------------------------------
-//         // 4. UPDATE PRODUCT FIELDS
-//         // -----------------------------------
-//         const { images, files: _, ...rest } = productData;
-
-//         const mergedProductData = {
-//             ...existing,
-//             ...rest,
-//             images: mergedImages,
-//             slug: productData.name
-//                 ? slugify(productData.name, { lower: true, strict: true })
-//                 : existing.slug
-//         };
-
-//         const updatedProduct = await productRepository.updateProduct(
-//             id,
-//             mergedProductData,
-//             client
-//         );
-
-//         await client.query('COMMIT');
-
-//         return {
-//             ...updatedProduct,
-//             images: mergedImages
-//         };
-
-//     } catch (error) {
-//         await client.query('ROLLBACK');
-
-//         throw error;
-//     } finally {
-//         client.release();
-//     }
-// };
-
-// export const updateProductDetails = async (id, productData) => {
-//     const client = await pool.connect();
-//     let uploadedCloudinaryIds = []; // track for rollback
-
-//     try {
-//         await client.query('BEGIN');
-
-//         const existing = await productRepository.findProductById(id);
-//         if (!existing) throw new AppError('Product not found', 404);
-
-//         const existingImages = await productRepository.getImagesById(id);
-//         const files = productData.files || [];
-
-//         // -----------------------------------
-//         // 1. VALIDATION / ID RESOLUTION
-//         // -----------------------------------
-//         if (productData.product_id &&
-//             Number(productData.product_id) !== Number(id)
-//         ) {
-//             throw new AppError('Product ID mismatch', 400);
-//         }
-
-//         if (productData.category_name && !productData.category_id) {
-//             const category = await findCategoryByName(productData.category_name);
-//             if (!category) throw new AppError('Category not found', 404);
-//             productData.category_id = category.category_id;
-//         }
-
-//         if (productData.brand_name && !productData.brand_id) {
-//             const brand = await findBrandByName(productData.brand_name);
-//             if (!brand) throw new AppError('Brand not found', 404);
-//             productData.brand_id = brand.brand_id;
-//         }
-
-//         // -----------------------------------
-//         // 2. UPLOAD NEW IMAGES (if any)
-//         // -----------------------------------
-//         let finalImages;
-
-//         if (files.length > 0) {
-//             // Upload new images first
-//             const uploadedImages = [];
-
-//             for (const [index, file] of files.entries()) {
-//                 const uploadResult = await uploadToCloudinary(
-//                     file.buffer,
-//                     `product-${Date.now()}-${index + 1}`,
-//                     'ecommerce/products'
-//                 );
-
-//                 uploadedCloudinaryIds.push(uploadResult.public_id);
-
-//                 uploadedImages.push({
-//                     image_url: uploadResult.secure_url,
-//                     cloudinary_public_id: uploadResult.public_id,
-//                     is_primary: false,
-//                     alt_text: file.originalname,
-//                     sort_order: index
-//                 });
-//             }
-
-//             // -----------------------------------
-//             // 3. DELETE OLD IMAGES FROM CLOUDINARY
-//             // -----------------------------------
-//             const oldPublicIds = existingImages
-//                 .map(img => img.cloudinary_public_id)
-//                 .filter(Boolean); // only if you store public_id in DB
-
-//             if (oldPublicIds.length > 0) {
-//                 await deleteFromCloudinary(oldPublicIds); // implement this helper
-//             }
-
-//             // New images fully replace the old ones
-//             uploadedImages[0].is_primary = true; // first new image is primary
-//             finalImages = uploadedImages;
-
-//         } else {
-//             // No new files — keep existing images as-is
-//             finalImages = existingImages;
-//         }
-
-//         // -----------------------------------
-//         // 4. UPDATE PRODUCT FIELDS + IMAGES IN DB
-//         // -----------------------------------
-//         const { images, files: _, ...rest } = productData;
-
-//         const mergedProductData = {
-//             ...existing,
-//             ...rest,
-//             images: finalImages,
-//             slug: productData.name
-//                 ? slugify(productData.name, { lower: true, strict: true })
-//                 : existing.slug
-//         };
-
-//         // Repository must: UPDATE product fields, DELETE old image rows, INSERT new ones
-//         const updatedProduct = await productRepository.updateProduct(
-//             id,
-//             mergedProductData,
-//             client
-//         );
-
-//         await client.query('COMMIT');
-
-//         return {
-//             ...updatedProduct,
-//             images: finalImages
-//         };
-
-//     } catch (error) {
-//         await client.query('ROLLBACK');
-
-//         // If DB failed AFTER uploading to Cloudinary, clean up the new uploads
-//         if (uploadedCloudinaryIds.length > 0) {
-//             await deleteFromCloudinary(uploadedCloudinaryIds).catch(err =>
-//                 console.error('Cloudinary cleanup failed after rollback:', err)
-//             );
-//         }
-
-//         throw error;
-//     } finally {
-//         client.release();
-//     }
-// };
-
+// update product
 export const updateProductDetails = async (id, productData) => {
     const client = await pool.connect();
     let uploadedCloudinaryIds = [];
@@ -742,6 +375,36 @@ export const updateProductDetails = async (id, productData) => {
         const existingImages = await productRepository.getImagesById(id);
         const files = productData.files || [];
 
+        // find excisting images is still need to the excist
+        // First array (new images from request)
+        // const requestImages = productData.images;
+
+        let requestImages = productData.images;
+        if (typeof requestImages === "string") {
+            try { requestImages = JSON.parse(requestImages); }
+            catch { requestImages = []; }
+        }
+        if (!Array.isArray(requestImages)) requestImages = [];
+
+        // Second array (existing images from DB)
+        const dbImages = existingImages;
+
+        // console.log("request images", requestImages) //debuging
+        // console.log("db images", dbImages) //debuging
+
+        // Get all image_ids from the request
+        const requestImageIds = requestImages.map(img => img.image_id);
+
+        // Find images that need to be deleted
+        for (const dbImage of dbImages) {
+            if (!requestImageIds.includes(dbImage.image_id)) {
+                await productRepository.deleteImagesById(dbImage.image_id);
+                deleteFromCloudinary(dbImage.product_image_id).catch(err =>
+                    console.error('Cloudinary cleanup failed for image ID:', dbImage.product_image_id, err)
+                );
+            }
+        }
+
         // -----------------------------------
         // 1. VALIDATION / ID RESOLUTION
         // -----------------------------------
@@ -749,6 +412,11 @@ export const updateProductDetails = async (id, productData) => {
             Number(productData.product_id) !== Number(id)
         ) {
             throw new AppError('Product ID mismatch', 400);
+        }
+
+        if (typeof productData.attributes === "string") {
+            try { productData.attributes = JSON.parse(productData.attributes); }
+            catch { productData.attributes = []; }
         }
 
         if (productData.category_name && !productData.category_id) {
@@ -766,7 +434,10 @@ export const updateProductDetails = async (id, productData) => {
         // -----------------------------------
         // 2. UPLOAD NEW IMAGES & APPEND
         // -----------------------------------
-        let finalImages = [...existingImages]; // always start with existing
+
+        let finalImages = existingImages.filter(dbImage =>
+            requestImageIds.includes(dbImage.image_id)
+        );
 
         if (files.length > 0) {
             const uploadedImages = [];
@@ -781,16 +452,15 @@ export const updateProductDetails = async (id, productData) => {
                 uploadedCloudinaryIds.push(uploadResult.public_id);
 
                 uploadedImages.push({
-                    image_url:        uploadResult.secure_url,
+                    image_url: uploadResult.secure_url,
                     product_image_id: uploadResult.public_id,
-                    is_primary:       false,           // will be resolved below
-                    alt_text:         file.originalname,
-                    sort_order:       existingImages.length + index  // append after existing
+                    is_primary: false,
+                    alt_text: file.originalname,
+                    sort_order: finalImages.length + index
                 });
             }
 
-            // Append new images after existing ones
-            finalImages = [...existingImages, ...uploadedImages];
+            finalImages.push(...uploadedImages);
         }
 
         // -----------------------------------
