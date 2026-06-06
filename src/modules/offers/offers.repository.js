@@ -290,7 +290,7 @@ GROUP BY
 export const findOfferByProductId = async (id) => {
     const query = `
         SELECT *
-        FROM offer_products op
+        FROM offer_products
         WHERE product_id = $1
     `;
     const { rows } = await pool.query(query, [id]);

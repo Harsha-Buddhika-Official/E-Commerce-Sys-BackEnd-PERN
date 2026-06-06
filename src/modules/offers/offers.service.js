@@ -1,7 +1,20 @@
 import AppError from '../../utils/AppError.js';
 import * as offersRepository from './offers.repository.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-export const createOffer = async (offerData) => {
+export const createOffer = async (offerData, file) => {
+    // console.log(offerData, file)
+
+    if(file){
+        const uploadResult = await uploadToCloudinary(
+            file.buffer,
+            `offer-banner-${Date.now()}`,
+            'ecommerce/offers'
+        );
+        offerData.banner_image_url = uploadResult.secure_url;
+        offerData.banner_image_public_id = uploadResult.public_id;
+    }
+
     if (!offerData.title) {
         throw new AppError('Offer title is required', 400);
     }
@@ -18,6 +31,7 @@ export const createOffer = async (offerData) => {
     if (offerData.discount_type === 'percentage' && offerData.discount_value > 100) {
         throw new AppError('Percentage discount cannot exceed 100', 400);
     }
+    console.log("offerData", offerData);
 
     return offersRepository.createOffer(offerData);
 };
@@ -116,7 +130,18 @@ export const getOfferByIdUser = async (id) => {
     return offer;
 };
 
-export const updateOffer = async (id, offerData) => {
+export const updateOffer = async (id, offerData, file) => {
+
+    if(file){
+        const uploadResult = await uploadToCloudinary(
+            file.buffer,
+            `offer-banner-${Date.now()}`,
+            'ecommerce/offers'
+        );
+        offerData.banner_image_url = uploadResult.secure_url;
+        offerData.banner_image_public_id = uploadResult.public_id;
+    }
+
     const existing = await offersRepository.findOfferByIdBasic(id);
     if (!existing) {
         throw new AppError('Offer not found', 404);
@@ -131,6 +156,7 @@ export const updateOffer = async (id, offerData) => {
         end_date: offerData.end_date ?? existing.end_date,
         is_active: offerData.is_active ?? existing.is_active,
         banner_image: offerData.banner_image ?? existing.banner_image,
+        banner_image_public_id: offerData.banner_image_public_id ?? existing.banner_image_public_id,
     };
 
     const startDate = new Date(updated.start_date);
@@ -164,6 +190,7 @@ export const deleteOffer = async (id) => {
     if (!existing) {
         throw new AppError('Offer not found', 404);
     }
+    await deleteFromCloudinary(existing.banner_image_id);
     return offersRepository.deleteOffer(id);
 };
 

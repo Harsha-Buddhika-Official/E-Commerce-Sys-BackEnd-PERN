@@ -37,7 +37,7 @@ router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCatego
 router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct);
+router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); //using //working
 router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
 
 export default router;

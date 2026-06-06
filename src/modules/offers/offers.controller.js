@@ -3,24 +3,7 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary
 
 export const createOffer = async (req, res, next) => {
     try {
-        let bannerImageUrl = null;
-        let bannerImagePublicId = null;
-
-        if (req.file) {
-            const uploadResult = await uploadToCloudinary(
-                req.file.buffer,
-                `offer-banner-${Date.now()}`,
-                'ecommerce/offers'
-            );
-            bannerImageUrl = uploadResult.secure_url;
-            bannerImagePublicId = uploadResult.public_id;
-        }
-
-        const offer = await offersService.createOffer({
-            ...req.body,
-            banner_image_url: bannerImageUrl,
-            banner_image_public_id: bannerImagePublicId
-        });
+        const offer = await offersService.createOffer(req.body, req.file);
         res.status(201).json({
             success: true,
             data: offer,
@@ -53,7 +36,6 @@ export const getAllOffers = async (req, res, next) => {
 export const getOffers = async (req, res, next) => {
   try {
     const { status } = req.query;
-
     const offers = await offersService.getOffers(status);
 
     res.status(200).json({
@@ -117,24 +99,8 @@ export const getOfferByIdUser = async (req, res, next) => {
 
 export const updateOffer = async (req, res, next) => {
     try {
-        let bannerImageUrl = null;
-        let bannerImagePublicId = null;
-
-        if (req.file) {
-            const uploadResult = await uploadToCloudinary(
-                req.file.buffer,
-                `offer-banner-${Date.now()}`,
-                'ecommerce/offers'
-            );
-            bannerImageUrl = uploadResult.secure_url;
-            bannerImagePublicId = uploadResult.public_id;
-        }
-
-        const banner_image = bannerImageUrl;
-        const banner_image_id = bannerImagePublicId;
-
         const { id } = req.params;
-        const updated = await offersService.updateOffer(id, { ...req.body, banner_image, banner_image_id });
+        await offersService.updateOffer(id, req.body, req.file);
         res.status(200).json({
             success: true,
             message: 'Offer updated successfully'
