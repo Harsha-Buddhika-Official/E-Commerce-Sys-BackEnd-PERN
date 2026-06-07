@@ -1,6 +1,6 @@
 import express from 'express';
 import { createProduct, createProductWithoutAttributes, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductByid, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, updateProductDetails, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple, addProductImage, removeProductImage, reorderProductImages, } from './product.controller.js';
-import { validateProduct, validateFullProductUpdate, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId } from './product.validator.js';
+import { validateProduct, validateFullProductUpdate, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId, validateProductIdAndImageId } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import upload from '../../middlewares/multer.js';
@@ -48,7 +48,7 @@ router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'),
 router.post('/admin/products/:id/images', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, addProductImage); //using // working
 
 // 3. Remove single image — DB + Cloudinary
-router.delete('/admin/products/:id/images/:imageId', authorize('super_admin', 'admin'), validateProductId, removeProductImage); //using //working
+router.delete('/admin/products/:id/images/:imageId', authorize('super_admin', 'admin'), validateProductIdAndImageId, removeProductImage); //using //working
 
 // 4. Reorder / set primary — pure JSON
 router.patch('/admin/products/:id/images/reorder', authorize('super_admin', 'admin'), validateProductId, reorderProductImages); //using //working

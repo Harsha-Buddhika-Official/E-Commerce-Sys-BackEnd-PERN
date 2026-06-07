@@ -300,8 +300,8 @@ export const addProductImage = async (req, res, next) => {
 };
 
 export const removeProductImage = async (req, res, next) => {
-    // console.log(req.params); // Debug log to check incoming parameters
-  try {
+    try {
+    // console.log('Removing product image with params:', req.params); // Debug log to check incoming parameters
     const { id, imageId } = req.params;
     const result = await productService.removeProductImage(id, imageId);
     return res.status(200).json({

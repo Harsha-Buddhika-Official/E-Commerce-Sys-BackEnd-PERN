@@ -290,9 +290,41 @@ const productidSchema = joi.object({
         })
 });
 
+const productImageIdParamSchema = joi.object({
+    id: joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Product ID must be a number',
+            'number.positive': 'Product ID must be a positive number',
+            'any.required': 'Product ID is required'
+        }),
+    imageId: joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': 'Image ID must be a number',
+            'number.positive': 'Image ID must be a positive number',
+            'any.required': 'Image ID is required'
+        })
+});
+
 export const validateProductId = (req, res, next) => {
     const { error, value } = productidSchema.validate(req.params);
+    // console.log('Values : ', value); 
     if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details[0].message
+        });
+    }
+    req.params = value;
+    next();
+};
+
+export const validateProductIdAndImageId = (req, res, next) => {
+    const { error, value } = productImageIdParamSchema.validate(req.params);
+    if(error) {
         return res.status(400).json({
             success: false,
             error: error.details[0].message
@@ -412,6 +444,7 @@ export const validateCategoryIdParam = (req, res, next) => {
         });
     }
     req.params = value;
+    // console.log(req.params)
     next();
 };
 

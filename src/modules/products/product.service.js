@@ -535,7 +535,7 @@ export const updateProductDetails = async (id, productData) => {
 
         const attributeValues = await Promise.all(
             productData.attributes.map((attr) =>{
-            console.log('Processing attribute:', attr);
+            // console.log('Processing attribute:', attr);
             return productRepository.getAttributeValueById(attr.attribute_value_id, client);
             })
         );
