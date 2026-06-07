@@ -513,6 +513,10 @@ export const updateProductDetails = async (id, productData) => {
       if (!brand) throw new AppError('Brand not found', 404);
       productData.brand_id = brand.brand_id;
     }
+    if(!productData.description) {
+        productData.description = null;
+    }
+    // console.log(productData.description);
 
     const mergedProductData = {
       ...existing,

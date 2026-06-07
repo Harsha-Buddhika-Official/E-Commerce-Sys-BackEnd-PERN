@@ -119,58 +119,59 @@ export const createCartOrder = async (orderData, client = pool) => {
 
 export const getDashboardMetrics = async (client = pool) => {
     const query = `
-        WITH revenue_metrics AS (
-            SELECT
-                COALESCE(SUM(CASE WHEN created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW() THEN total_amount ELSE 0 END), 0) AS total_revenue_this_month,
-                COALESCE(SUM(CASE WHEN created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days' THEN total_amount ELSE 0 END), 0) AS total_revenue_previous_30_days
-            FROM orders
-            WHERE order_status != 'cancelled'
-        ), order_metrics AS (
-            SELECT
-                COALESCE(COUNT(*) FILTER (WHERE created_at BETWEEN NOW() - INTERVAL '30 days' AND NOW()), 0) AS total_orders_this_month,
-                COALESCE(COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '60 days' AND created_at < NOW() - INTERVAL '30 days'), 0) AS total_orders_previous_30_days,
-                COALESCE(COUNT(*) FILTER (WHERE order_status = 'pending'), 0) AS pending_order_count,
-                COALESCE(COUNT(*) FILTER (WHERE order_status = 'shipped'), 0) AS shipped_order_count
-            FROM orders
-            WHERE order_status != 'cancelled'
-        ), product_metrics AS (
-            SELECT
-                COALESCE(COUNT(*) FILTER (WHERE is_active = true), 0) AS active_product_count,
-                COALESCE(COUNT(*) FILTER (WHERE stock_quantity = 0 AND is_active = true), 0) AS out_of_stock_product_count
-            FROM products
-        )
         SELECT
-            revenue_metrics.total_revenue_this_month,
-            revenue_metrics.total_revenue_previous_30_days,
-            order_metrics.total_orders_this_month,
-            order_metrics.total_orders_previous_30_days,
-            product_metrics.active_product_count,
-            product_metrics.out_of_stock_product_count,
-            order_metrics.pending_order_count,
-            order_metrics.shipped_order_count
-        FROM revenue_metrics
-        CROSS JOIN order_metrics
-        CROSS JOIN product_metrics;
+            (
+                SELECT COALESCE(SUM(total_amount), 0)
+                FROM orders
+                WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)
+            ) AS "totalRevenueThisMonth",
+
+            (
+                SELECT COALESCE(SUM(total_amount), 0)
+                FROM orders
+                WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+            ) AS "totalRevenueLastMonth",
+
+            (
+                SELECT COUNT(*)
+                FROM orders
+                WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)
+            ) AS "totalOrdersThisMonth",
+
+            (
+                SELECT COUNT(*)
+                FROM orders
+                WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+            ) AS "totalOrdersLastMonth",
+
+            (
+                SELECT COUNT(*)
+                FROM products
+                WHERE is_active = true
+            ) AS "activeProducts",
+
+            (
+                SELECT COUNT(*)
+                FROM products
+                WHERE stock_quantity <= 10
+                  AND is_active = true
+            ) AS "lowStockProducts",
+
+            (
+                SELECT COUNT(*)
+                FROM orders
+                WHERE order_status = 'pending'
+            ) AS "pendingOrders",
+
+            (
+                SELECT COUNT(*)
+                FROM orders
+                WHERE order_status = 'shipped'
+            ) AS "shippedOrders"
     `;
 
-    try {
-        const result = await client.query(query);
-        const row = result.rows[0] || {};
-
-        return {
-            totalRevenueThisMonth: Number(row.total_revenue_this_month) || 0,
-            totalRevenueLastMonth: Number(row.total_revenue_previous_30_days) || 0,
-            totalOrdersThisMonth: Number(row.total_orders_this_month) || 0,
-            totalOrdersLastMonth: Number(row.total_orders_previous_30_days) || 0,
-            activeProducts: Number(row.active_product_count) || 0,
-            lowStockProducts: Number(row.out_of_stock_product_count) || 0,
-            pendingOrders: Number(row.pending_order_count) || 0,
-            shippedOrders: Number(row.shipped_order_count) || 0
-        };
-    } catch (error) {
-        console.error('Error fetching dashboard metrics:', error);
-        throw error;
-    }
+    const { rows } = await client.query(query);
+    return rows[0];
 };
 
 export const lowStockAlert = async (threshold = 5, client = pool) => {

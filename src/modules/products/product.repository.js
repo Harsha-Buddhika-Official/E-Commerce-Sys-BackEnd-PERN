@@ -429,7 +429,8 @@ export const getBestSellingProducts = async () => {
     ) img_agg ON img_agg.product_id = p.product_id
     WHERE p.is_active = true
     AND p.product_tag = 'BEST_SELLER'
-    ORDER BY p.product_id ASC;
+    ORDER BY p.product_id DESC
+    LIMIT 8;
   `;
   const { rows } = await pool.query(query);
   return rows;
