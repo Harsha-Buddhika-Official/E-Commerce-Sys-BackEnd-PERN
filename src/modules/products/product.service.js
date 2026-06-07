@@ -540,7 +540,7 @@ export const updateProductDetails = async (id, productData) => {
         const validAttributeValues = attributeValues.filter(Boolean);
         await productRepository.insertProductAttributes(id, validAttributeValues, client);
     } else {
-        console.log("id ", id );
+        // console.log("id ", id );
         await productRepository.deleteProductAttributes(id, client);
     }
 
