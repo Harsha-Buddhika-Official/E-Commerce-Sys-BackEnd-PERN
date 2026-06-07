@@ -291,7 +291,6 @@ const productidSchema = joi.object({
 });
 
 export const validateProductId = (req, res, next) => {
-    console.log(req.params); // Debug log to check incoming parameters
     const { error, value } = productidSchema.validate(req.params);
     if (error) {
         return res.status(400).json({

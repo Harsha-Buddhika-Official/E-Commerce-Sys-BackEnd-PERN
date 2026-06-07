@@ -1,105 +1,7 @@
 import * as productService from './product.service.js';
-// import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
-
-// const uploadProductImages = async (files = []) => {
-//     const uploadedImages = [];
-//     const uploadedCloudinaryIds = [];
-
-//     for (const [index, file] of files.entries()) {
-//         const uploadResult = await uploadToCloudinary(
-//             file.buffer,
-//             `product-${Date.now()}-${index + 1}`,
-//             'ecommerce/products'
-//         );
-
-//         uploadedImages.push({
-//             image_url: uploadResult.secure_url,
-//             is_primary: index === 0,
-//             alt_text: file.originalname,
-//             sort_order: index
-//         });
-//         uploadedCloudinaryIds.push(uploadResult.public_id);
-//     }
-
-//     return { uploadedImages, uploadedCloudinaryIds };
-// };
-
-// export const createProductWithoutAttributes = async (req, res, next) => {
-//     const uploadedCloudinaryIds = [];
-
-//     try {
-//         const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
-//         uploadedCloudinaryIds.push(...imageIds);
-
-//         const newProduct = await productService.createProductWithoutAttributes({
-//             ...req.body,
-//             images: uploadedImages
-//         });
-
-//         res.status(201).json({
-//             success: true,
-//             data: newProduct,
-//             message: 'Product created successfully without attributes'
-//         });
-//     } catch (error) {
-//         if (uploadedCloudinaryIds.length > 0) {
-//             for (const publicId of uploadedCloudinaryIds) {
-//                 try {
-//                     await deleteFromCloudinary(publicId);
-//                 } catch (deleteError) {
-//                     console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
-//                 }
-//             }
-//         }
-//         next(error);
-//     }
-// };
-
-// export const createProduct = async (req, res, next) => {
-//     let uploadedCloudinaryIds = [];
-
-//     try {
-//         const {
-//             uploadedImages,
-//             uploadedCloudinaryIds: imageIds,
-//         } = await uploadProductImages(req.files ?? []);
-
-//         uploadedCloudinaryIds = imageIds;
-
-//         const product =
-//             await productService.createProduct({
-//                 ...req.body,
-//                 images: uploadedImages,
-//             });
-
-//         return res.status(201).json({
-//             success: true,
-//             data: product,
-//             message: "Product created successfully",
-//         });
-
-//     } catch (error) {
-//         if (uploadedCloudinaryIds.length) {
-//             await Promise.all(
-//                 uploadedCloudinaryIds.map(async (publicId) => {
-//                     try {
-//                         await deleteFromCloudinary(publicId);
-//                     } catch (cleanupError) {
-//                         console.error(
-//                             "Cloudinary cleanup failed:",
-//                             cleanupError
-//                         );
-//                     }
-//                 })
-//             );
-//         }
-
-//         return next(error);
-//     }
-// };
 
 export const createProductWithoutAttributes = async (req, res, next) => {
-    console.log("Creating product without attributes with data:", { body: req.body, files: req.files || [] }); // Debug log to check incoming data
+    // console.log("Creating product without attributes with data:", { body: req.body, files: req.files || [] }); // Debug log to check incoming data
     try {
         const product = await productService.createProductWithoutAttributes({
             body: req.body,
@@ -276,38 +178,6 @@ export const updateProduct = async (req, res, next) => {
     }
 }
 
-// export const updateProductDetails = async (req, res, next) => {
-//     let uploadedCloudinaryIds = [];
-
-//     try {
-//         const { id } = req.params;
-
-//         // console.log("row data: ", req.body); //Debug log to check incoming data
-
-//         const result = await productService.updateProductDetails(
-//             id,{...req.body,files: req.files || []}
-//         );
-
-//         return res.status(200).json({
-//             success: true,
-//             data: result,
-//             message: "Product details updated successfully",
-//         });
-
-//     } catch (error) {
-//         // cleanup cloudinary if anything fails
-//         if (uploadedCloudinaryIds.length) {
-//             await Promise.allSettled(
-//                 uploadedCloudinaryIds.map((publicId) =>
-//                     deleteFromCloudinary(publicId)
-//                 )
-//             );
-//         }
-
-//         return next(error);
-//     }
-// };
-
 export const deleteProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -430,7 +300,7 @@ export const addProductImage = async (req, res, next) => {
 };
 
 export const removeProductImage = async (req, res, next) => {
-    console.log(req.params); // Debug log to check incoming parameters
+    // console.log(req.params); // Debug log to check incoming parameters
   try {
     const { id, imageId } = req.params;
     const result = await productService.removeProductImage(id, imageId);

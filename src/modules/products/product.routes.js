@@ -31,7 +31,6 @@ router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager')
 router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById);
 
 // ==================== PROTECTED ROUTES - PUT ====================
-// router.put('/admin/products/:id/full-update', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, updateProductDetails);
 router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
 router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
 router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
@@ -40,8 +39,10 @@ router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryId
 router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); //using //working
 router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
 
+
+// ==================== PROTECTED ROUTES - UPDATE PRODUCT DETAILS / IMAGES ====================
 // 1. Product data update — pure JSON, no images
-router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'), validateProductId, updateProductDetails); //using
+router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'), validateProductId, updateProductDetails); //using //working
 
 // 2. Add images — multipart, 0 to 3 files
 router.post('/admin/products/:id/images', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, addProductImage); //using // working
