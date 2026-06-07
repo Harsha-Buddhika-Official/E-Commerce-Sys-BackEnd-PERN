@@ -254,55 +254,55 @@ export const getProductByName = async (name) => {
 
 //
 // update product
-export const updateProductDetails = async (id, productData) => {
-    const client = await pool.connect();
-    let uploadedCloudinaryIds = [];
+// export const updateProductDetails = async (id, productData) => {
+//     const client = await pool.connect();
+//     let uploadedCloudinaryIds = [];
 
-    try {
-        await client.query('BEGIN');
+//     try {
+//         await client.query('BEGIN');
 
-        const existing = await productRepository.findProductById(id);
-        if (!existing) throw new AppError('Product not found', 404);
+//         const existing = await productRepository.findProductById(id);
+//         if (!existing) throw new AppError('Product not found', 404);
 
-        // -----------------------------------
-        // 1. VALIDATION / ID RESOLUTION
-        // -----------------------------------
-        if (productData.product_id &&
-            Number(productData.product_id) !== Number(id)
-        ) {
-            throw new AppError('Product ID mismatch', 400);
-        }
+//         // -----------------------------------
+//         // 1. VALIDATION / ID RESOLUTION
+//         // -----------------------------------
+//         if (productData.product_id &&
+//             Number(productData.product_id) !== Number(id)
+//         ) {
+//             throw new AppError('Product ID mismatch', 400);
+//         }
 
-        if (typeof productData.attributes === "string") {
-            try { productData.attributes = JSON.parse(productData.attributes); }
-            catch { productData.attributes = []; }
-        }
+//         if (typeof productData.attributes === "string") {
+//             try { productData.attributes = JSON.parse(productData.attributes); }
+//             catch { productData.attributes = []; }
+//         }
 
-        if (productData.category_name && !productData.category_id) {
-            const category = await findCategoryByName(productData.category_name);
-            if (!category) throw new AppError('Category not found', 404);
-            productData.category_id = category.category_id;
-        }
+//         if (productData.category_name && !productData.category_id) {
+//             const category = await findCategoryByName(productData.category_name);
+//             if (!category) throw new AppError('Category not found', 404);
+//             productData.category_id = category.category_id;
+//         }
 
-        if (productData.brand_name && !productData.brand_id) {
-            const brand = await findBrandByName(productData.brand_name);
-            if (!brand) throw new AppError('Brand not found', 404);
-            productData.brand_id = brand.brand_id;
-        }
+//         if (productData.brand_name && !productData.brand_id) {
+//             const brand = await findBrandByName(productData.brand_name);
+//             if (!brand) throw new AppError('Brand not found', 404);
+//             productData.brand_id = brand.brand_id;
+//         }
 
-        await client.query('COMMIT');
+//         await client.query('COMMIT');
 
-        return {
-            ...updatedProduct,
-            images: finalImages
-        };
+//         return {
+//             ...updatedProduct,
+//             images: finalImages
+//         };
 
-    } catch (error) {
-        throw error;
-    } finally {
-        client.release();
-    }
-};
+//     } catch (error) {
+//         throw error;
+//     } finally {
+//         client.release();
+//     }
+// };
 
 // ---- Helper functions exported for clarity and testing ----
 export const resolveNamesToIds = async (productData) => {
