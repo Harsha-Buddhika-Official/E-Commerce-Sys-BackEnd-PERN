@@ -37,8 +37,7 @@ export const getBannerImages = async () => {
     const query = `
         SELECT media_url
         FROM banners
-        WHERE is_active = true,
-        media_type = 'image'
+        WHERE media_type = 'image';
     `;
     const { rows } = await pool.query(query);
     return rows;

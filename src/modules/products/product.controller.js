@@ -1,105 +1,7 @@
 import * as productService from './product.service.js';
-// import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
-
-// const uploadProductImages = async (files = []) => {
-//     const uploadedImages = [];
-//     const uploadedCloudinaryIds = [];
-
-//     for (const [index, file] of files.entries()) {
-//         const uploadResult = await uploadToCloudinary(
-//             file.buffer,
-//             `product-${Date.now()}-${index + 1}`,
-//             'ecommerce/products'
-//         );
-
-//         uploadedImages.push({
-//             image_url: uploadResult.secure_url,
-//             is_primary: index === 0,
-//             alt_text: file.originalname,
-//             sort_order: index
-//         });
-//         uploadedCloudinaryIds.push(uploadResult.public_id);
-//     }
-
-//     return { uploadedImages, uploadedCloudinaryIds };
-// };
-
-// export const createProductWithoutAttributes = async (req, res, next) => {
-//     const uploadedCloudinaryIds = [];
-
-//     try {
-//         const { uploadedImages, uploadedCloudinaryIds: imageIds } = await uploadProductImages(req.files || []);
-//         uploadedCloudinaryIds.push(...imageIds);
-
-//         const newProduct = await productService.createProductWithoutAttributes({
-//             ...req.body,
-//             images: uploadedImages
-//         });
-
-//         res.status(201).json({
-//             success: true,
-//             data: newProduct,
-//             message: 'Product created successfully without attributes'
-//         });
-//     } catch (error) {
-//         if (uploadedCloudinaryIds.length > 0) {
-//             for (const publicId of uploadedCloudinaryIds) {
-//                 try {
-//                     await deleteFromCloudinary(publicId);
-//                 } catch (deleteError) {
-//                     console.error('Failed to delete uploaded product image from Cloudinary:', deleteError);
-//                 }
-//             }
-//         }
-//         next(error);
-//     }
-// };
-
-// export const createProduct = async (req, res, next) => {
-//     let uploadedCloudinaryIds = [];
-
-//     try {
-//         const {
-//             uploadedImages,
-//             uploadedCloudinaryIds: imageIds,
-//         } = await uploadProductImages(req.files ?? []);
-
-//         uploadedCloudinaryIds = imageIds;
-
-//         const product =
-//             await productService.createProduct({
-//                 ...req.body,
-//                 images: uploadedImages,
-//             });
-
-//         return res.status(201).json({
-//             success: true,
-//             data: product,
-//             message: "Product created successfully",
-//         });
-
-//     } catch (error) {
-//         if (uploadedCloudinaryIds.length) {
-//             await Promise.all(
-//                 uploadedCloudinaryIds.map(async (publicId) => {
-//                     try {
-//                         await deleteFromCloudinary(publicId);
-//                     } catch (cleanupError) {
-//                         console.error(
-//                             "Cloudinary cleanup failed:",
-//                             cleanupError
-//                         );
-//                     }
-//                 })
-//             );
-//         }
-
-//         return next(error);
-//     }
-// };
 
 export const createProductWithoutAttributes = async (req, res, next) => {
-    console.log("Creating product without attributes with data:", { body: req.body, files: req.files || [] }); // Debug log to check incoming data
+    // console.log("Creating product without attributes with data:", { body: req.body, files: req.files || [] }); // Debug log to check incoming data
     try {
         const product = await productService.createProductWithoutAttributes({
             body: req.body,
@@ -276,132 +178,6 @@ export const updateProduct = async (req, res, next) => {
     }
 }
 
-// export const updateProductDetails = async (req, res, next) => {
-//     let uploadedCloudinaryIds = [];
-
-//     try {
-//         const { id } = req.params;
-//         const files = req.files ?? [];
-
-//         const {
-//             uploadedImages,
-//             uploadedCloudinaryIds: imageIds,
-//         } = await uploadProductImages(files);
-
-//         uploadedCloudinaryIds = imageIds;
-
-//         const updatePayload = {
-//             ...req.body,
-//         };
-
-//         // Get current images
-//         const existingImages = await productService.getImagesById(id);
-
-//         if (uploadedImages.length > 0) {
-//             // Keep existing images exactly as they are
-//             const normalizedExistingImages = (existingImages || []).map(
-//                 (image, index) => ({
-//                     image_url: image.image_url,
-//                     alt_text: image.alt_text || "",
-//                     sort_order: Number(image.sort_order ?? index),
-//                     is_primary: Boolean(image.is_primary),
-//                 })
-//             );
-
-//             // Ensure uploaded images are NEVER primary
-//             const normalizedUploadedImages = uploadedImages.map(
-//                 (image, index) => ({
-//                     image_url: image.image_url,
-//                     alt_text: image.alt_text || "",
-//                     sort_order:
-//                         normalizedExistingImages.length + index,
-//                     is_primary: false,
-//                 })
-//             );
-
-//             const mergedImages = [
-//                 ...normalizedExistingImages,
-//                 ...normalizedUploadedImages,
-//             ];
-
-//             // Safety: allow only ONE primary image
-//             let primaryFound = false;
-
-//             mergedImages.forEach((image) => {
-//                 if (image.is_primary) {
-//                     if (!primaryFound) {
-//                         primaryFound = true;
-//                     } else {
-//                         image.is_primary = false;
-//                     }
-//                 }
-//             });
-
-//             // If somehow no primary exists, make first image primary
-//             if (!primaryFound && mergedImages.length > 0) {
-//                 mergedImages[0].is_primary = true;
-//             }
-
-//             updatePayload.images = mergedImages;
-//         }
-
-//         const updatedProduct =
-//             await productService.updateProductDetails(
-//                 id,
-//                 updatePayload
-//             );
-
-//         return res.status(200).json({
-//             success: true,
-//             data: updatedProduct,
-//             message: "Product details updated successfully",
-//         });
-
-//     } catch (error) {
-//         await Promise.allSettled(
-//             uploadedCloudinaryIds.map((publicId) =>
-//                 deleteFromCloudinary(publicId)
-//             )
-//         );
-
-//         return next(error);
-//     }
-// };
-
-// Delete product by ID
-
-export const updateProductDetails = async (req, res, next) => {
-    let uploadedCloudinaryIds = [];
-
-    try {
-        const { id } = req.params;
-
-        // console.log("row data: ", req.body); //Debug log to check incoming data
-
-        const result = await productService.updateProductDetails(
-            id,{...req.body,files: req.files || []}
-        );
-
-        return res.status(200).json({
-            success: true,
-            data: result,
-            message: "Product details updated successfully",
-        });
-
-    } catch (error) {
-        // cleanup cloudinary if anything fails
-        if (uploadedCloudinaryIds.length) {
-            await Promise.allSettled(
-                uploadedCloudinaryIds.map((publicId) =>
-                    deleteFromCloudinary(publicId)
-                )
-            );
-        }
-
-        return next(error);
-    }
-};
-
 export const deleteProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -490,4 +266,73 @@ export const getFilteredProducts = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+export const updateProductDetails = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await productService.updateProductDetails(id, req.body);
+    return res.status(200).json({
+      success: true,
+      data: result,
+      message: 'Product details updated successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addProductImage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const files = req.files || [];
+    const images = await productService.addProductImage(id, files);
+    return res.status(201).json({
+      success: true,
+      data: images,
+      message: files.length === 0
+        ? 'No images uploaded, current images returned'
+        : `${files.length} image(s) added successfully`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeProductImage = async (req, res, next) => {
+    // console.log(req.params); // Debug log to check incoming parameters
+  try {
+    const { id, imageId } = req.params;
+    const result = await productService.removeProductImage(id, imageId);
+    return res.status(200).json({
+      success: true,
+      data: result,
+      message: 'Image removed successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const reorderProductImages = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { primary_image_id, order } = req.body;
+
+    if (!Array.isArray(order) || order.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'order array is required',
+      });
+    }
+
+    const updated = await productService.reorderProductImages(id, primary_image_id, order);
+    return res.status(200).json({
+      success: true,
+      data: updated,
+      message: 'Images reordered successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
 };
