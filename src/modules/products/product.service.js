@@ -302,6 +302,7 @@ export const getAllProductLimitedDetilas = async () => {
     return products;
 };
 
+//
 export const getAllDetialsProductById = async (id) => {
     const products = await productRepository.getAllDetialsProductById(id);
     if (!products) {
@@ -361,6 +362,7 @@ export const getProductByName = async (name) => {
     return product;
 };
 
+//
 // update product
 export const updateProductDetails = async (id, productData) => {
     const client = await pool.connect();

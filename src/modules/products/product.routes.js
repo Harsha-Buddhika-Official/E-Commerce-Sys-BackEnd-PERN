@@ -28,7 +28,7 @@ router.use(authMiddleware);
 // ==================== PROTECTED ROUTES - GET ====================
 router.get('/admin/limited-details', authorize('super_admin', 'admin', 'manager'), getAllProductLimitedDetilas); //using //working
 router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager'), getAllProductsDetailsSimple); //using //working
-router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById);
+router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById); //using //working
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/admin/products/:id/full-update', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, updateProductDetails); //using 
