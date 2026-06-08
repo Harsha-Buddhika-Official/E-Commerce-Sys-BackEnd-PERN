@@ -19,8 +19,8 @@ export const getAllAdmins = async () => {
     return rows;
 }
 
-export const updateAdminRole = async (AdminData) => {
-    const { adminId, newRole } = AdminData;
+export const updateAdminRole = async (adminId, adminData) => {
+    const { newRole } = adminData;
     const query = 'UPDATE admins SET role = $1 WHERE admin_id = $2 RETURNING *';
     const values = [newRole, adminId];
     const { rows } = await pool.query(query, values);

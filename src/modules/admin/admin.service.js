@@ -51,12 +51,12 @@ export const getAllAdmins = async () => {
     });
 }
 
-export const updateAdminRole = async (AdminData) => {
-    if (!AdminData.adminId || !AdminData.newRole) {
+export const updateAdminRole = async (adminId, adminData) => {
+    if (!adminId || !adminData.newRole) {
         throw new AppError('Admin ID and new role are required', 400);
     }
-    await adminRepository.updateUpdatedAt(AdminData.adminId);
-    return await adminRepository.updateAdminRole(AdminData);
+    await adminRepository.updateUpdatedAt(adminId);
+    return await adminRepository.updateAdminRole(adminId, adminData);
 }
 
 export const deleteAdmin = async (adminEmail) => {
@@ -70,7 +70,7 @@ export const deleteAdmin = async (adminEmail) => {
     return await adminRepository.deleteAdmin(admin.admin_id);
 }
 
-export const updateAdminPassword = async (AdminData, adminId) => {
+export const updateAdminPassword = async (adminId, AdminData) => {
     if (!adminId) {
         throw new AppError('Admin ID is required', 400);
     }

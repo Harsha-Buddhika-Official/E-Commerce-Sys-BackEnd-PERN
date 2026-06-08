@@ -153,7 +153,7 @@ export const getDashboardMetrics = async (client = pool) => {
             (
                 SELECT COUNT(*)
                 FROM products
-                WHERE stock_quantity <= 10
+                WHERE stock_quantity = 0
                   AND is_active = true
             ) AS "lowStockProducts",
 

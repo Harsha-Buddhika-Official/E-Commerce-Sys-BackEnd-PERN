@@ -33,7 +33,10 @@ export const getAllAdmins = async (req, res,next) => {
 export const updateAdminRole = async (req, res,next) => {
     try {
         const adminData = req.body;
-        const updatedAdmin = await adminService.updateAdminRole(adminData);
+        const adminId = req.params.id;
+        // console.log('Admin ID:', adminId); //debugging log
+        // console.log('Admin Data:', adminData); //debugging log
+        const updatedAdmin = await adminService.updateAdminRole(adminId, adminData);
         const { password_hash, ...safeAdmin } = updatedAdmin;
         res.status(200).json(safeAdmin);
     } catch (error) {
@@ -55,8 +58,10 @@ export const deleteAdmin = async (req, res,next) => {
 export const updateAdminPassword = async (req, res,next) => {
     try {
         const adminId = req.params.id;
-        const adminData = req.body;
-        const updatedAdmin = await adminService.updateAdminPassword(adminData, adminId);
+        const adminData = req.body.passwordData;
+        // console.log('Admin ID:', adminId); //debugging log
+        // console.log('Admin Data:', adminData); //debugging log
+        const updatedAdmin = await adminService.updateAdminPassword(adminId, adminData);
         const { password_hash, ...safeAdmin } = updatedAdmin;
         res.status(200).json(safeAdmin);
     } catch (error) {
