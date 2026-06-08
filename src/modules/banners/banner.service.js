@@ -1,21 +1,27 @@
 import AppError from "../../utils/AppError.js";
 import * as repo from "./banner.repository.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
 
-export const createBanner = async (data) => {
+export const createBanner = async (data, file) => {
+  let media_type = null;
+  if (file) {
+    if(file.mimetype.startsWith("image/")) {
+      media_type = "image";
+    } else if(file.mimetype.startsWith("video/")) {
+      media_type = "video";
+    }
+    const uploadResult = await uploadToCloudinary(
+      file.buffer,
+      `offer-banner-${Date.now()}`,
+      'ecommerce/offers'
+    );
+    data.media_url = uploadResult.secure_url;
+    data.media_public_id = uploadResult.public_id;
+    data.media_type = media_type;
+  }
+  // console.log("Banner data before validation:", data);
   if (!data.title) {
     throw new AppError("Banner title is required", 400);
-  }
-
-  if (!data.media_url) {
-    throw new AppError("Banner media is required", 400);
-  }
-
-  if (!data.media_type) {
-    throw new AppError("Banner media type is required", 400);
-  }
-
-  if (!data.media_public_id) {
-    throw new AppError("Banner media public ID is required", 400);
   }
 
   return repo.createBanner(data);
@@ -62,10 +68,9 @@ export const updateBanner = async (id, data) => {
 
 export const deleteBanner = async (id) => {
   const existing = await repo.getBannerById(id);
-
   if (!existing) {
     throw new AppError("Banner not found", 404);
   }
-
+  await deleteFromCloudinary(existing.media_public_id);
   return repo.deleteBanner(id);
 };
