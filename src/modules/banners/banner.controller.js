@@ -3,31 +3,9 @@ import * as service from "./banner.service.js";
 
 export const createBanner = async (req, res, next) => {
     try {
-        let bannerImageUrl = null;
-        let bannerImagePublicId = null;
-        let media_type = null;
-
-        if (req.file) {
-            if (req.file.mimetype.startsWith("image/")) {
-                media_type = "image";
-            } else if (req.file.mimetype.startsWith("video/")) {
-                media_type = "video";
-            }
-            const uploadResult = await uploadToCloudinary(
-                req.file.buffer,
-                `offer-banner-${Date.now()}`,
-                'ecommerce/offers'
-            );
-            bannerImageUrl = uploadResult.secure_url;
-            bannerImagePublicId = uploadResult.public_id;
-        }
-
-        const banner = await service.createBanner({
-            ...req.body,
-            media_url: bannerImageUrl,
-            media_type: media_type,
-            media_public_id: bannerImagePublicId
-        });
+        // console.log("Received body:", req.body);
+        // console.log("Received file:", req.file);
+        const banner = await service.createBanner(req.body, req.file)
 
         res.status(201).json({
             success: true,
