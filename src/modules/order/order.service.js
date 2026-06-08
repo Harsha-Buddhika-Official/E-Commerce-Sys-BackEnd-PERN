@@ -72,23 +72,12 @@ export const getStatusData = async (client) => {
         shippedOrders
     } = await orderRepository.getDashboardMetrics(client);
 
-    console.log('Dashboard Metrics:', {
-        totalRevenueThisMonth,
-        totalRevenueLastMonth,
-        totalOrdersThisMonth,
-        totalOrdersLastMonth,
-        activeProducts,
-        lowStockProducts,
-        pendingOrders,
-        shippedOrders
-    }); // Debug log to check retrieved metrics
-
     const comparedRevenuePercentage = totalRevenueLastMonth
-        ? ((totalRevenueThisMonth - totalRevenueLastMonth) / totalRevenueLastMonth) * 100
+        ? (((totalRevenueThisMonth - totalRevenueLastMonth) / totalRevenueLastMonth) * 100).toFixed(2)
         : null;
 
     const comparedOrdersPercentage = totalOrdersLastMonth
-        ? ((totalOrdersThisMonth - totalOrdersLastMonth) / totalOrdersLastMonth) * 100
+        ? (((totalOrdersThisMonth - totalOrdersLastMonth) / totalOrdersLastMonth) * 100).toFixed(2)
         : null;
 
     return {
