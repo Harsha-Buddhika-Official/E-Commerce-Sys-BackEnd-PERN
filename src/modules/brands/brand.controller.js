@@ -4,27 +4,7 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary
 //create brand
 export const createBrand = async (req, res, next) => {
     try {
-        let logoUrl = null;
-        let logoPublicId = null;
-
-        // Handle logo upload if file is provided
-        if (req.file) {
-            const uploadResult = await uploadToCloudinary(
-                req.file.buffer,
-                `brand-${Date.now()}`,
-                'ecommerce/brands'
-            );
-            logoUrl = uploadResult.secure_url;
-            logoPublicId = uploadResult.public_id;
-        }
-
-        const brandData = {
-            ...req.body,
-            logo_url: logoUrl,
-            logo_public_id: logoPublicId
-        };
-
-        const newBrand = await brandService.createBrand(brandData);
+        const newBrand = await brandService.createBrand(req.body, req.file);
         res.status(201).json({
             success: true,
             data: newBrand,

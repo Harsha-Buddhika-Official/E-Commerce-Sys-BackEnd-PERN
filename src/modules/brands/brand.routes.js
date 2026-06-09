@@ -23,6 +23,6 @@ router.post('/admin', authorize('super_admin', 'admin', 'manager'), upload.singl
 // router.put('/:id/restore', authorize('super_admin', 'admin', 'manager'), validateIdParam, restoreBrand);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBrand); //using
+router.delete('/admin/:id', authorize('super_admin', 'admin'), validateIdParam, deleteBrand); //using
 
 export default router;

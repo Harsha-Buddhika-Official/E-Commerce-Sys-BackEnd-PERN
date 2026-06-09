@@ -1,9 +1,25 @@
 import slugify from 'slugify';
 import * as brandRepository from './brand.repository.js';
 import AppError from '../../utils/AppError.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
 //create brand
-export const createBrand = async (brandData) => {
+export const createBrand = async (brandData, file) => {
+    let logoUrl = null;
+    let logoPublicId = null;
+
+    if (file) {
+        const uploadResult = await uploadToCloudinary(
+            file.buffer,
+            `brand-${Date.now()}`,
+            'ecommerce/brands'
+        );
+        logoUrl = uploadResult.secure_url;
+        logoPublicId = uploadResult.public_id;
+    }
+    brandData.logo_url = logoUrl;
+    brandData.logo_public_id = logoPublicId;
+
     if (!brandData.name) throw new AppError('Brand name is required', 400);
 
     const existing = await brandRepository.findBrandByName(brandData.name);
@@ -53,15 +69,6 @@ export const updateBrand = async(id, brandData) => {
     return await brandRepository.updateBrand(id, brandData);
 }
 
-//delete brand
-export const deleteBrand = async (id) => {
-    const selectedBrand = await brandRepository.findBrandById(id);
-    if(!selectedBrand){
-        throw new AppError('Brand not found', 404);
-    }
-    return await brandRepository.deleteBrand(id);
-}
-
 //soft delete brand
 export const softDeleteBrand = async (id) => {
     const selectedBrand = await brandRepository.findBrandById(id);
@@ -78,4 +85,14 @@ export const restoreBrand = async (id) => {
         throw new AppError('Brand not found', 404);
     }
     return await brandRepository.restoreBrand(id);
+}
+
+//delete brand
+export const deleteBrand = async (id) => {
+    const selectedBrand = await brandRepository.findBrandById(id);
+    if(!selectedBrand){
+        throw new AppError('Brand not found', 404);
+    }
+    await deleteFromCloudinary(selectedBrand.logo_public_id);
+    return await brandRepository.deleteBrand(id);
 }

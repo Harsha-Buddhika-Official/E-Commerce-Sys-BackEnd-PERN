@@ -22,6 +22,6 @@ router.post('/admin', authorize('super_admin', 'admin', 'manager'), upload.singl
 // router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('media'), validateIdParam, validateUpdateBanner, updateBanner);
 
 // DELETE
-router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, deleteBanner);
+router.delete('/admin/:id', authorize('super_admin', 'admin'), validateIdParam, deleteBanner);
 
 export default router;

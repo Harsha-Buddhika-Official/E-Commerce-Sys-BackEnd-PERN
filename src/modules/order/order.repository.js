@@ -402,6 +402,7 @@ export const getOrderById = async (orderId, client = pool) => {
     const query = `SELECT 
         o.order_id,
         o.tracking_code,
+        o.full_name,
         o.customer_email,
         o.phone_number,
         o.total_amount,

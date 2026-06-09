@@ -31,7 +31,7 @@ export const createOffer = async (offerData, file) => {
     if (offerData.discount_type === 'percentage' && offerData.discount_value > 100) {
         throw new AppError('Percentage discount cannot exceed 100', 400);
     }
-    console.log("offerData", offerData);
+    // console.log("offerData", offerData);
 
     return offersRepository.createOffer(offerData);
 };

@@ -13,7 +13,7 @@ export const createBanner = async (data, file) => {
     const uploadResult = await uploadToCloudinary(
       file.buffer,
       `offer-banner-${Date.now()}`,
-      'ecommerce/offers'
+      'ecommerce/banners'
     );
     data.media_url = uploadResult.secure_url;
     data.media_public_id = uploadResult.public_id;
