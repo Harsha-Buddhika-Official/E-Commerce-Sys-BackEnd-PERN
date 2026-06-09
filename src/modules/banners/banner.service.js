@@ -35,6 +35,10 @@ export const getBannerImages = async () => {
     return repo.getBannerImages();
 }
 
+export const getBannerVideo = async () => {
+    return repo.getBannerVideo();
+}
+
 export const getBannerById = async (id) => {
   const banner = await repo.getBannerById(id);
 

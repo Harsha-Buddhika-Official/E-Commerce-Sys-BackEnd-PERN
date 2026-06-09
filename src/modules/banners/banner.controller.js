@@ -28,6 +28,18 @@ export const getBannerImages = async (req, res, next) => {
     }
 };
 
+export const getBannerVideo = async (req, res, next) => {
+    try {
+        const banners = await service.getBannerVideo();
+         res.json({
+            success: true,
+            data: banners
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 export const getAllBanners = async (req, res, next) => {
     try {
         const banners = await service.getAllBanners();

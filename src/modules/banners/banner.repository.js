@@ -45,6 +45,16 @@ export const getBannerImages = async () => {
     return rows;
 }
 
+export const getBannerVideo = async () => {
+    const query = `
+        SELECT media_url
+        FROM banners
+        WHERE media_type = 'video'
+    `;
+    const { rows } = await pool.query(query);
+    return rows;
+}
+
 export const getBannerById = async (bannerId) => {
     const query = `
         SELECT *

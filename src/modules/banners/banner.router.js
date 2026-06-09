@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBanner, deleteBanner, getAllBanners, getBannerById, updateBanner, getBannerImages } from './banner.controller.js';
+import { createBanner, deleteBanner, getAllBanners, getBannerById, updateBanner, getBannerImages,getBannerVideo } from './banner.controller.js';
 import { validateCreateBanner, validateIdParam, validateUpdateBanner } from './banner.validator.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import { authorize } from '../../middlewares/authorize.js';
@@ -8,6 +8,7 @@ import upload from '../../middlewares/multer.js';
 const router = express.Router();
 
 router.get('/public/images', getBannerImages);
+router.get('/public/video', getBannerVideo);
 
 router.use(authMiddleware);
 
