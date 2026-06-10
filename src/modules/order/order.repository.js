@@ -61,7 +61,7 @@ export const createDirectOrder = async (orderData, client = pool) => {
 };
 
 export const createCartOrder = async (orderData, client = pool) => {
-    
+
     const {
         tracking_code,
         customer_email,
@@ -115,6 +115,66 @@ export const createCartOrder = async (orderData, client = pool) => {
         console.error('Error creating cart order:', error);
         throw error;
     }
+};
+
+export const createOrder = async (orderData, client = pool) => {
+
+    const { tracking_code, customer_email, phone_number, total_amount, order_status, shipping_address, city, postal_code, items, full_name } = orderData;
+
+    const orderQuery = `
+        INSERT INTO orders (
+            tracking_code,
+            customer_email,
+            phone_number,
+            total_amount,
+            order_status,
+            shipping_address,
+            city,
+            postal_code,
+            full_name
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+        RETURNING *;
+    `;
+
+    const orderResult = await client.query(
+        orderQuery,
+        [
+            tracking_code,
+            customer_email,
+            phone_number,
+            total_amount,
+            order_status,
+            shipping_address,
+            city,
+            postal_code,
+            full_name
+        ]
+    );
+
+    const order = orderResult.rows[0];
+
+    for (const item of items) {
+        await client.query(
+            `
+            INSERT INTO order_items (
+                order_id,
+                product_id,
+                quantity,
+                price_at_purchase
+            )
+            VALUES ($1,$2,$3,$4)
+            `,
+            [
+                order.order_id,
+                item.product_id,
+                item.quantity,
+                item.price_at_purchase
+            ]
+        );
+    }
+
+    return order;
 };
 
 export const getDashboardMetrics = async (client = pool) => {

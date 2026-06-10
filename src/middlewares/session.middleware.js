@@ -6,6 +6,7 @@ const COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
 // Attach session to every cart request
 export const attachSession = (req, _res, next) => {
   const existing = req.cookies?.[COOKIE_NAME];
+  // console.log('Existing session ID:', existing);
 
   req.sessionId = existing || uuidv4();
   req.isNewSession = !existing;

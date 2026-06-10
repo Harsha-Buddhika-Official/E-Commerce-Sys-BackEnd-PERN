@@ -2,6 +2,7 @@ import * as cartService from './cart.service.js';
 
 export const getCart = async (req, res, next) => {
     try {
+        // console.log(req.cookies.sid);
         const cart = await cartService.getCart(req.sessionId);
         res.status(200).json({
             success: true,

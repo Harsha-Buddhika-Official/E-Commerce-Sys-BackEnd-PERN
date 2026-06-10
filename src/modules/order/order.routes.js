@@ -1,15 +1,20 @@
 import express from 'express';
-import { createCartOrder, createDirectOrder, getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders } from './order.controller.js';
-import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus } from './order.validator.js';
+import { createCartOrder, createDirectOrder, getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder } from './order.controller.js';
+import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus, validateCreateOrder } from './order.validator.js';
+import { attachSession } from '../../middlewares/session.middleware.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
+router.use(attachSession);
+
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/direct', validateCreateDirectOrder, createDirectOrder);
 router.post('/cart', validateCreateCartOrder, createCartOrder);
+router.post('/create',  createOrder); //validateCreateOrder,
 router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode);
+// router.post('/slip-upload', getPaymentSlip);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);

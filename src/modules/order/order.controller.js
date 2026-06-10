@@ -18,12 +18,7 @@ export const createDirectOrder = async (req, res, next) => {
 export const createCartOrder = async (req, res, next) => {
     try {
         const orderData = req.body;
-        //const sessionId = req.body.sessionId; // temparary for testing, will be removed later when we integrate with frontend
-        // const sessionId = req.cookies.sessionId; // Using sessionId from cookies
-        // orderData.sessionId = sessionId; // Pass sessionId to service layer 
-        const sessionId = "ac034102-8835-42ec-b667-9f3c89b64978"; // Assuming sessionId is sent in the request body
-        console.log('Received sessionId in controller:', sessionId); // Debug log to check sessionId
-
+        // const sessionId = 
         const order = await orderService.createCartOrder(orderData, sessionId);
         res.status(201).json({
             success: true,
@@ -32,6 +27,26 @@ export const createCartOrder = async (req, res, next) => {
         });
     }
     catch (error) {
+        next(error);
+    }
+};
+
+export const createOrder = async (req, res, next) => {
+    // console.log('Received request body in controller:', req.body);
+    const sessionId = req.cookies.sid
+    
+    try {
+        const order = await orderService.createOrder(
+            req.body,
+            sessionId
+        );
+
+        res.status(201).json({
+            success: true,
+            data: order,
+            message: 'Order created successfully'
+        });
+    } catch (error) {
         next(error);
     }
 };

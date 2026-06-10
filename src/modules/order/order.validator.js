@@ -1,6 +1,8 @@
 import joi from 'joi';
 
 const orderStatusValues = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'];
+const ORDER_STATUS = ["pending","paid","processing","shipped","delivered","cancelled",];
+const ORDER_TYPES = ["direct", "cart"];
 
 const directOrderSchema = joi.object({
 	customer_email: joi.string()
@@ -118,6 +120,104 @@ const cartOrderSchema = joi.object({
 		.messages({
 			'any.only': `Order status must be one of: ${orderStatusValues.join(', ')}`
 		})
+});
+
+const customerSchema = {
+  customer_email: joi.string()
+    .trim()
+    .email()
+    .required()
+    .messages({
+      "string.email": "Customer email must be valid",
+      "any.required": "Customer email is required",
+    }),
+
+  phone_number: joi.string()
+    .trim()
+    .min(7)
+    .max(20)
+    .required()
+    .messages({
+      "string.empty": "Phone number is required",
+      "string.min": "Phone number must be at least 7 characters",
+      "string.max": "Phone number cannot exceed 20 characters",
+    }),
+
+  shipping_address: joi.string()
+    .trim()
+    .min(5)
+    .max(255)
+    .required()
+    .messages({
+      "string.empty": "Shipping address is required",
+    }),
+
+  city: joi.string()
+    .trim()
+    .min(2)
+    .max(100)
+    .required()
+    .messages({
+      "string.empty": "City is required",
+    }),
+
+  postal_code: joi.string()
+    .trim()
+    .min(3)
+    .max(20)
+    .required()
+    .messages({
+      "string.empty": "Postal code is required",
+    }),
+};
+
+const createOrderSchema = joi.object({
+  ...customerSchema,
+
+  order_type: joi.string()
+    .valid(...ORDER_TYPES)
+    .required()
+    .messages({
+      "any.only": `Order type must be one of: ${ORDER_TYPES.join(", ")}`,
+      "any.required": "Order type is required",
+    }),
+
+  order_status: joi.string()
+    .valid(...ORDER_STATUS)
+    .default("pending")
+    .messages({
+      "any.only": `Order status must be one of: ${ORDER_STATUS.join(", ")}`,
+    }),
+
+  product_id: joi.when("order_type", {
+    is: "direct",
+    then: joi.number()
+      .integer()
+      .positive()
+      .required()
+      .messages({
+        "number.base": "Product ID must be a number",
+        "number.integer": "Product ID must be an integer",
+        "number.positive": "Product ID must be positive",
+        "any.required": "Product ID is required for direct orders",
+      }),
+    otherwise: joi.forbidden(),
+  }),
+
+  quantity: joi.when("order_type", {
+    is: "direct",
+    then: joi.number()
+      .integer()
+      .positive()
+      .required()
+      .messages({
+        "number.base": "Quantity must be a number",
+        "number.integer": "Quantity must be an integer",
+        "number.positive": "Quantity must be positive",
+        "any.required": "Quantity is required for direct orders",
+      }),
+    otherwise: joi.forbidden(),
+  }),
 });
 
 const trackingSchema = joi.object({
@@ -243,4 +343,21 @@ export const validateUpdateOrderStatus = (req, res, next) => {
 
 	req.body = value;
 	next();
+};
+
+export const validateCreateOrder = (req, res, next) => {
+  const { error, value } = createOrderSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid order payload",
+    });
+  }
+
+  req.body = value;
+  next();
 };
