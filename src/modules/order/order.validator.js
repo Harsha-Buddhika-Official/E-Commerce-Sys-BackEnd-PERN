@@ -201,12 +201,9 @@ export const validateCreateCartOrder = (req, res, next) => {
 };
 
 export const validateTrackingLookup = (req, res, next) => {
-	const source = {
-		email: req.query.email ?? req.body?.email,
-		trackingCode: req.query.trackingCode ?? req.body?.trackingCode
-	};
+	const { email, trackingCode } = req.body;
 
-	const { error, value } = trackingSchema.validate(source, { abortEarly: false, stripUnknown: true });
+	const { error, value } = trackingSchema.validate({ email, trackingCode }, { abortEarly: false, stripUnknown: true });
 	if (error) {
 		return res.status(400).json({
 			success: false,

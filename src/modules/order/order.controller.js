@@ -124,6 +124,7 @@ export const getOrderById = async (req, res, next) => {
 
 export const getOrdersByTrackingCode = async (req, res, next) => {
     try {
+        // console.log('Received request body in controller:', req.body); // Debug log to check request body
         const { email, trackingCode } = req.body;
         const orders = await orderService.getOrdersByTrackingCode(trackingCode, email);
         res.status(200).json({

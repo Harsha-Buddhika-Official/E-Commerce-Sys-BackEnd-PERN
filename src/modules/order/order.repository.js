@@ -460,7 +460,24 @@ export const getOrderById = async (orderId, client = pool) => {
 };
 
 export const getOrdersByEmail = async (email, client = pool) => {
-    const query = `SELECT o.order_id, o.tracking_code, o.customer_email, o.phone_number, o.total_amount, o.order_status, o.shipping_address, o.city, o.postal_code, oi.product_id, oi.quantity, oi.price_at_purchase FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.customer_email = $1`;
+    const query = `SELECT 
+    o.order_id, 
+    o.tracking_code, 
+    o.customer_email, 
+    o.phone_number, 
+    o.total_amount, 
+    o.order_status, 
+    o.shipping_address, 
+    o.city, 
+    o.postal_code, 
+    oi.product_id, 
+    oi.quantity, 
+    oi.price_at_purchase 
+    FROM orders o JOIN order_items oi 
+    ON o.order_id = oi.order_id 
+    WHERE o.customer_email = $1
+    `;
+
     const values = [email];
     try {
         const result = await client.query(query, values);
@@ -471,21 +488,77 @@ export const getOrdersByEmail = async (email, client = pool) => {
     }
 };
 
+// export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
+//     const query = `SELECT 
+//     o.order_id, 
+//     o.tracking_code, 
+//     o.customer_email, 
+//     o.phone_number, 
+//     o.total_amount, 
+//     o.order_status, 
+//     o.shipping_address, 
+//     o.city, 
+//     o.postal_code, 
+//     oi.product_id, 
+//     oi.quantity, 
+//     oi.price_at_purchase 
+//     FROM orders o JOIN order_items oi 
+//     ON o.order_id = oi.order_id 
+//     WHERE o.tracking_code = $1`;
+//     const values = [trackingCode];
+//     try {
+//         const result = await client.query(query, values);
+//         return result.rows[0];
+//     } catch (error) {
+//         console.error('Error fetching order by tracking code:', error);
+//         throw error;
+//     }
+// };
+
 export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
-    const query = `SELECT o.order_id, o.tracking_code, o.customer_email, o.phone_number, o.total_amount, o.order_status, o.shipping_address, o.city, o.postal_code, oi.product_id, oi.quantity, oi.price_at_purchase FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.tracking_code = $1`;
+    const query = `
+        SELECT 
+            o.order_id,
+            o.tracking_code,
+            o.customer_email,
+            o.total_amount,
+            o.order_status,
+            o.created_at,
+
+            json_agg(
+                json_build_object(
+                    'product_id', oi.product_id,
+                    'quantity', oi.quantity,
+                    'price_at_purchase', oi.price_at_purchase,
+                    'product_name', p.name
+                )
+            ) AS items
+
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON p.product_id = oi.product_id
+
+        WHERE o.tracking_code = $1
+
+        GROUP BY 
+            o.order_id,
+            o.tracking_code,
+            o.customer_email,
+            o.total_amount,
+            o.order_status,
+            o.created_at
+    `;
+
     const values = [trackingCode];
+
     try {
         const result = await client.query(query, values);
         return result.rows[0];
     } catch (error) {
-        console.error('Error fetching order by tracking code:', error);
+        console.error("Error fetching order by tracking code:", error);
         throw error;
     }
 };
-
-
-
-
 
 export const updateOrderStatus = async (orderId, newStatus, client = pool) => {
     const query = `UPDATE orders

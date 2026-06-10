@@ -6,12 +6,10 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
-// ==================== PUBLIC ROUTES - GET ====================
-router.get('/tracking', validateTrackingLookup, getOrdersByTrackingCode);
-
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/direct', validateCreateDirectOrder, createDirectOrder);
 router.post('/cart', validateCreateCartOrder, createCartOrder);
+router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
