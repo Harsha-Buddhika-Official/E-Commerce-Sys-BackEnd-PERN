@@ -18,7 +18,7 @@ export const createBanner = async (data, file) => {
     data.media_url = uploadResult.secure_url;
     data.media_public_id = uploadResult.public_id;
     data.media_type = media_type;
-  }
+  } 
   // console.log("Banner data before validation:", data);
   if (!data.title) {
     throw new AppError("Banner title is required", 400);

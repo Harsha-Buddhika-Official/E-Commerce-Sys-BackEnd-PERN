@@ -422,6 +422,18 @@ export const getOrderById = async (orderId, client = pool) => {
     }
 };
 
+export const findOrderImageById = async (orderId, client = pool) => {
+    const query = `SELECT * FROM order_receipts WHERE order_id = $1`;
+    try {
+        const result = await
+            client.query(query, [orderId]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error fetching order image by ID:', error);
+        throw error;
+    }
+};
+
 export const getOrdersByEmail = async (email, client = pool) => {
     const query = `SELECT 
     o.order_id, 
@@ -450,33 +462,6 @@ export const getOrdersByEmail = async (email, client = pool) => {
         throw error;
     }
 };
-
-// export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
-//     const query = `SELECT 
-//     o.order_id, 
-//     o.tracking_code, 
-//     o.customer_email, 
-//     o.phone_number, 
-//     o.total_amount, 
-//     o.order_status, 
-//     o.shipping_address, 
-//     o.city, 
-//     o.postal_code, 
-//     oi.product_id, 
-//     oi.quantity, 
-//     oi.price_at_purchase 
-//     FROM orders o JOIN order_items oi 
-//     ON o.order_id = oi.order_id 
-//     WHERE o.tracking_code = $1`;
-//     const values = [trackingCode];
-//     try {
-//         const result = await client.query(query, values);
-//         return result.rows[0];
-//     } catch (error) {
-//         console.error('Error fetching order by tracking code:', error);
-//         throw error;
-//     }
-// };
 
 export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
     const query = `

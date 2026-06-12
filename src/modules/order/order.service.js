@@ -70,7 +70,7 @@ export const createOrder = async (orderData, sessionId) => {
 
 export const getPaymentSlip = async (orderId, file) => {
     let media_url, media_public_id;
-    console.log('Received file in service:', file); // Debug log to check received file
+    // console.log('Received file in service:', file); // Debug log to check received file
     const uploadResult = await uploadToCloudinary(
         file.buffer,
         `offer-orders-${Date.now()}`,
@@ -78,7 +78,7 @@ export const getPaymentSlip = async (orderId, file) => {
     );
     media_url = uploadResult.secure_url;
     media_public_id = uploadResult.public_id;
-    console.log('Upload result:', uploadResult); // Debug log to check upload result
+    // console.log('Upload result:', uploadResult); // Debug log to check upload result
     return orderRepository.importPaymentSlipData({orderId,media_url,media_public_id});
 }
 
@@ -164,7 +164,10 @@ export const updateOrderStatus = async (orderId, newStatus, client) => {
 };
 
 export const deleteOrder = async (orderId, client) => {
-    return await orderRepository.deleteOrder(orderId, client);
+    const ImageData = await orderRepository.findOrderImageById(orderId, client);
+    await deleteFromCloudinary(ImageData.media_public_id);
+    const deletedOrder = await orderRepository.deleteOrder(orderId, client);
+    return deletedOrder;
 };
 
 

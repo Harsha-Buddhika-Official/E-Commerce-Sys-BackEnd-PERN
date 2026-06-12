@@ -13,7 +13,7 @@ router.use(attachSession);
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/create',  createOrder); //validateCreateOrder, //working //using
 router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode); //working using
-router.post('/upload-receipt/:id', upload.single('media'), updatePaymentSlip);
+router.post('/upload-receipt/:id', upload.single('media'), updatePaymentSlip); //working //using
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
@@ -30,7 +30,7 @@ router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateO
 router.put('/admin/state/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus); //using for admin side
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-// router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder); 
+// router.delete('/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, deleteOrder); //waiting list
 
 
 export default router;
