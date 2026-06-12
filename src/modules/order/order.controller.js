@@ -1,36 +1,5 @@
 import * as orderService from './order.service.js';
 
-export const createDirectOrder = async (req, res, next) => {
-    try {
-        const orderData = req.body;
-        const order = await orderService.createDirectOrder(orderData);
-        res.status(201).json({
-            success: true,
-            data: order,
-            message: 'Direct order created successfully'
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-};
-
-export const createCartOrder = async (req, res, next) => {
-    try {
-        const orderData = req.body;
-        // const sessionId = 
-        const order = await orderService.createCartOrder(orderData, sessionId);
-        res.status(201).json({
-            success: true,
-            data: order,
-            message: 'Cart order created successfully'
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-};
-
 export const createOrder = async (req, res, next) => {
     // console.log('Received request body in controller:', req.body);
     const sessionId = req.cookies.sid
@@ -50,6 +19,20 @@ export const createOrder = async (req, res, next) => {
         next(error);
     }
 };
+
+export const updatePaymentSlip = async (req, res, next) => {
+    try {
+        const orderId = req.params.id;
+        const slipUrl = await orderService.getPaymentSlip(orderId, req.file);
+        res.status(200).json({
+            success: true,
+            // data: { slipUrl },
+            message: 'Payment slip URL retrieved successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+}
 
 //status data for admin dashboard
 export const getStatusData = async (req, res, next) => {

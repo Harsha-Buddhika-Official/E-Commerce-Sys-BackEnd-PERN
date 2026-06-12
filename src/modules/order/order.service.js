@@ -3,61 +3,7 @@ import * as cartRepository from '../cart/cart.repository.js';
 import * as productRepository from '../products/product.repository.js';
 import { generateTrackingCode } from '../../utils/generateTrackingCode.js';
 import AppError from '../../utils/AppError.js';
-
-export const createDirectOrder = async (orderData, client) => {
-    const productData = await productRepository.findProductById(orderData.product_id);
-    if (!productData) {
-        throw new AppError('Product not found', 404);
-    }
-    let total_amount = 0;
-    total_amount += orderData.quantity * productData.selling_price;
-    orderData.total_amount = total_amount;
-
-    orderData.price_at_purchase = productData.selling_price;
-
-    orderData.tracking_code = generateTrackingCode();
-
-    orderData.order_status = 'pending';
-
-    return await orderRepository.createDirectOrder(orderData, client);
-};
-
-export const createCartOrder = async (orderData, sessionId, client) => {
-    if (!sessionId) {
-        throw new AppError('sessionId is required to create a cart order', 401);
-    }
-
-    const cart = await cartRepository.findCartBySessionId(sessionId, client);
-    if (!cart) {
-        throw new AppError('Cart not found for this session', 404);
-    }
-
-    const cartItems = await cartRepository.getCartItems(cart.cart_id, client);
-    if (!cartItems || cartItems.length === 0) {
-        throw new AppError('Cannot create order from an empty cart', 400);
-    }
-
-    let total_amount = 0;
-    for (const item of cartItems) {
-        total_amount += item.quantity * item.price_at_purchase;
-    }
-
-    orderData.total_amount = total_amount;
-
-    orderData.tracking_code = generateTrackingCode();
-
-    if (!orderData.order_status) {
-        orderData.order_status = 'pending';
-    }
-
-    const items = cartItems.map((item, index) => ({
-        product_id: item.product_id,
-        quantity: item.quantity,
-        price_at_purchase: item.price_at_purchase
-    }));
-
-    return await orderRepository.createCartOrder({ ...orderData, items }, client);
-};
+import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
 
 export const createOrder = async (orderData, sessionId) => {
     // console.log('Received order data in service:', orderData);
@@ -121,6 +67,20 @@ export const createOrder = async (orderData, sessionId) => {
         items
     });
 };
+
+export const getPaymentSlip = async (orderId, file) => {
+    let media_url, media_public_id;
+    console.log('Received file in service:', file); // Debug log to check received file
+    const uploadResult = await uploadToCloudinary(
+        file.buffer,
+        `offer-orders-${Date.now()}`,
+        'ecommerce/orders'
+    );
+    media_url = uploadResult.secure_url;
+    media_public_id = uploadResult.public_id;
+    console.log('Upload result:', uploadResult); // Debug log to check upload result
+    return orderRepository.importPaymentSlipData({orderId,media_url,media_public_id});
+}
 
 //status bar data for admin dashboard
 export const getStatusData = async (client) => {
@@ -198,10 +158,6 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     }
     return TrackingCodeCheck;
 };
-
-
-
-
 
 export const updateOrderStatus = async (orderId, newStatus, client) => {
     return await orderRepository.updateOrderStatus(orderId, newStatus, client);

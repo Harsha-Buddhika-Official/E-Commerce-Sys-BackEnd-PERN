@@ -1,20 +1,19 @@
 import express from 'express';
-import { createCartOrder, createDirectOrder, getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder } from './order.controller.js';
+import { getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder, updatePaymentSlip } from './order.controller.js';
 import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus, validateCreateOrder } from './order.validator.js';
 import { attachSession } from '../../middlewares/session.middleware.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
+import upload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
 router.use(attachSession);
 
 // ==================== PUBLIC ROUTES - POST ====================
-router.post('/direct', validateCreateDirectOrder, createDirectOrder);
-router.post('/cart', validateCreateCartOrder, createCartOrder);
-router.post('/create',  createOrder); //validateCreateOrder,
-router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode);
-// router.post('/slip-upload', getPaymentSlip);
+router.post('/create',  createOrder); //validateCreateOrder, //working //using
+router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode); //working using
+router.post('/upload-receipt/:id', upload.single('media'), updatePaymentSlip);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
