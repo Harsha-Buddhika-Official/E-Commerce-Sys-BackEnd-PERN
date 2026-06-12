@@ -154,33 +154,6 @@ export const lowStockAlert = async (threshold = 5, client = pool) => {
     }
 };
 
-export const findRecentOrders = async (client = pool) => {
-    const query = `SELECT
-        o.order_id,
-        o.total_amount,
-        o.order_status,
-
-        p.name AS product_name,
-        oi.quantity
-    FROM orders o
-    
-    JOIN order_items oi
-        ON o.order_id = oi.order_id
-    
-    JOIN products p
-        ON oi.product_id = p.product_id
-
-    ORDER BY o.created_at DESC
-    LIMIT 10;`;
-    try {
-        const result = await client.query(query);
-        return result.rows;
-    } catch (error) {
-        console.error('Error fetching recent orders:', error);
-        throw error;
-    }
-}
-
 export const getOrderStatusCount = async (client = pool) => {
     const query = `
         SELECT
@@ -204,6 +177,33 @@ export const getOrderStatusCount = async (client = pool) => {
         };
     } catch (error) {
         console.error('Error fetching order status count:', error);
+        throw error;
+    }
+}
+
+export const findRecentOrders = async (client = pool) => {
+    const query = `SELECT
+        o.order_id,
+        o.total_amount,
+        o.order_status,
+
+        p.name AS product_name,
+        oi.quantity
+    FROM orders o
+    
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+    
+    JOIN products p
+        ON oi.product_id = p.product_id
+
+    ORDER BY o.created_at DESC
+    LIMIT 10;`;
+    try {
+        const result = await client.query(query);
+        return result.rows;
+    } catch (error) {
+        console.error('Error fetching recent orders:', error);
         throw error;
     }
 }
@@ -423,7 +423,7 @@ export const getOrderById = async (orderId, client = pool) => {
 };
 
 export const findOrderImageById = async (orderId, client = pool) => {
-    const query = `SELECT * FROM order_receipts WHERE order_id = $1`;
+    const query = `SELECT media_url, media_public_id FROM order_receipts WHERE order_id = $1`;
     try {
         const result = await
             client.query(query, [orderId]);
@@ -538,7 +538,19 @@ export const deleteOrder = async (orderId, client = pool) => {
     }
 };
 
-
-
-
-
+export const changeOrderStatus = async (orderId, newStatus, client = pool) => {
+    const query = `UPDATE orders
+    SET
+        order_status = $1,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE order_id = $2
+    RETURNING *;`;
+    const values = [newStatus, orderId];
+    try {
+        const result = await client.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error changing order status:', error);
+        throw error;
+    }
+};

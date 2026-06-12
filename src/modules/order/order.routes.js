@@ -1,5 +1,5 @@
 import express from 'express';
-import { getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder, updatePaymentSlip } from './order.controller.js';
+import { getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder, updatePaymentSlip, findOrderImageById } from './order.controller.js';
 import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus, validateCreateOrder } from './order.validator.js';
 import { attachSession } from '../../middlewares/session.middleware.js';
 import { authorize } from '../../middlewares/authorize.js';
@@ -25,6 +25,7 @@ router.get('/admin/recent-orders', authorize('super_admin', 'admin', 'manager'),
 router.get('/admin/order-status-count', authorize('super_admin', 'admin', 'manager'), OrderStatusCount); //using for admin side
 router.get('/admin/orders', authorize('super_admin', 'admin', 'manager'), getAllOrders); //using for admin side
 router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, getOrderById); //using for admin side
+router.get('/receipt/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, findOrderImageById); //using for admin side
 
 // ==================== PROTECTED ROUTES - PUT ====================
 router.put('/admin/state/:id', authorize('super_admin', 'admin', 'manager'), validateOrderIdParam, validateUpdateOrderStatus, updateOrderStatus); //using for admin side

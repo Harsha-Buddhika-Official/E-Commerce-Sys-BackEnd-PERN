@@ -62,24 +62,28 @@ export const createOrder = async (orderData, sessionId) => {
     return await orderRepository.createOrder({
         ...orderData,
         tracking_code: generateTrackingCode(),
-        order_status: orderData.order_status || 'pending',
+        order_status: 'pending_payment',
         total_amount,
         items
     });
 };
 
-export const getPaymentSlip = async (orderId, file) => {
-    let media_url, media_public_id;
-    // console.log('Received file in service:', file); // Debug log to check received file
-    const uploadResult = await uploadToCloudinary(
-        file.buffer,
-        `offer-orders-${Date.now()}`,
-        'ecommerce/orders'
-    );
-    media_url = uploadResult.secure_url;
-    media_public_id = uploadResult.public_id;
-    // console.log('Upload result:', uploadResult); // Debug log to check upload result
-    return orderRepository.importPaymentSlipData({orderId,media_url,media_public_id});
+export const UpdatePaymentSlip = async (orderId, file) => {
+    try{
+        let media_url, media_public_id;
+        const uploadResult = await uploadToCloudinary(
+            file.buffer,
+            `offer-orders-${Date.now()}`,
+            'ecommerce/orders'
+        );
+        media_url = uploadResult.secure_url;
+        media_public_id = uploadResult.public_id;
+        const result = await orderRepository.importPaymentSlipData({orderId,media_url,media_public_id});
+        await orderRepository.changeOrderStatus(orderId, 'paid');
+        return result;
+    } catch (error) {
+        throw new AppError('Failed to upload payment slip', 500);
+    }
 }
 
 //status bar data for admin dashboard
@@ -140,6 +144,10 @@ export const getAllOrders = async (client) => {
 export const getOrderById = async (orderId, client) => {
     return await orderRepository.getOrderById(orderId, client);
 };
+
+export const findOrderImageById = async (orderId, client) => {
+    return await orderRepository.findOrderImageById(orderId, client);
+}
 
 export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     const emailCheck = await orderRepository.getOrdersByEmail(email, client);

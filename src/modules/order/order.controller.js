@@ -22,8 +22,9 @@ export const createOrder = async (req, res, next) => {
 
 export const updatePaymentSlip = async (req, res, next) => {
     try {
+        console.log('Received file in controller:', req.file); // Debug log to check received file
         const orderId = req.params.id;
-        const slipUrl = await orderService.getPaymentSlip(orderId, req.file);
+        const slipUrl = await orderService.UpdatePaymentSlip(orderId, req.file);
         res.status(200).json({
             success: true,
             // data: { slipUrl },
@@ -139,6 +140,7 @@ export const updateOrderStatus = async (req, res, next) => {
     try {
         const orderId = req.params.id;
         const { newStatus } = req.body;
+        console.log(newStatus)
         const updatedOrder = await orderService.updateOrderStatus(orderId, newStatus);
         res.status(200).json({
             success: true,
@@ -158,6 +160,21 @@ export const deleteOrder = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Order deleted successfully'
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+export const findOrderImageById = async (req, res, next) => {
+    try {
+        const orderId = req.params.id;
+        const imageData = await orderService.findOrderImageById(orderId);
+        res.status(200).json({
+            success: true,
+            data: imageData,
+            message: 'Order image data retrieved successfully'
         });
     }
     catch (error) {

@@ -1,7 +1,7 @@
 import joi from 'joi';
 
-const orderStatusValues = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'];
-const ORDER_STATUS = ["pending","paid","processing","shipped","delivered","cancelled",];
+const orderStatusValues = ['pending_payment','pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'];
+const ORDER_STATUS = ["pending_payment","pending","paid","processing","shipped","delivered","cancelled",];
 const ORDER_TYPES = ["direct", "cart"];
 
 const directOrderSchema = joi.object({
