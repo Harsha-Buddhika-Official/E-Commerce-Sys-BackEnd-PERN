@@ -1,11 +1,22 @@
 import slugify from "slugify";
 import * as categoryRepository from "./categories.repository.js";
 import AppError from "../../utils/AppError.js";
+import { uploadToCloudinary } from "../../utils/cloudinaryUpload.js";
 
 //create category
-export const createCategory = async (categoryData) => {
+export const createCategory = async (categoryData, file) => {
     if (!categoryData.name) throw new AppError('Category name is required', 400);
     if (!categoryData.category_type) throw new AppError('Category type is required', 400);
+    if (!file) throw new AppError('Category image is required', 400);
+
+    const uploadResult = await uploadToCloudinary(
+        file.buffer,
+        `category-${Date.now()}`,
+        'ecommerce/categories'
+    );
+    categoryData.img_url = uploadResult.secure_url;
+    categoryData.media_public_id = uploadResult.public_id;
+    console.log(" result:", categoryData);
 
     const existing = await categoryRepository.findCategoryByName(categoryData.name);
     if (existing) {

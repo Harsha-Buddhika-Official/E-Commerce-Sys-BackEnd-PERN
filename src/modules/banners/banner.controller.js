@@ -3,8 +3,8 @@ import * as service from "./banner.service.js";
 
 export const createBanner = async (req, res, next) => {
     try {
-        // console.log("Received body:", req.body);
-        // console.log("Received file:", req.file);
+        console.log("Received body:", req.body);
+        console.log("Received file:", req.file);
         const banner = await service.createBanner(req.body, req.file)
 
         res.status(201).json({

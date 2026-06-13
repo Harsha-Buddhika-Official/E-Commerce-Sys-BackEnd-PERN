@@ -3,7 +3,7 @@ import { createCategory, getCategories, getCategoryById, softDeleteCategory, del
 import { validateCreateCategory, validateGetCategorySchema, validateUpdateCategory, validateCategoryIdParam } from './categories.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
-
+import upload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.get('/', authorize('super_admin', 'admin'), getCategories); //using //wor
 router.get('/names', authorize('super_admin', 'admin'), getCategoryNames); //using //working
 
 // ==================== PROTECTED ROUTES - POST ====================
-// router.post('/', authorize('super_admin', 'admin'), validateCreateCategory, createCategory);
+router.post('/', authorize('super_admin', 'admin'), upload.single('media'), createCategory);
 
 // ==================== PROTECTED ROUTES - PUT ====================
 // router.put('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory);
@@ -28,6 +28,6 @@ router.get('/names', authorize('super_admin', 'admin'), getCategoryNames); //usi
 // router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreCategory);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-// router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
+router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
 
 export default router;
