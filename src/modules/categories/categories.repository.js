@@ -83,6 +83,7 @@ export const deleteCategory = async (id) => {
     const query = `DELETE FROM categories WHERE category_id = $1 RETURNING *`;
     const values = [id];
     const { rows } = await pool.query(query, values);
+    console.log("Deleted category:", rows[0]);
     return rows[0];
 };
 
