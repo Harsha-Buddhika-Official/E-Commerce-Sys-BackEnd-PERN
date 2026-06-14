@@ -484,6 +484,7 @@ export const getLatestProducts = async () => {
   return rows;
 };
 
+//using
 export const findProductById = async (id, client = pool) => {
   const query = `SELECT
         p.*,

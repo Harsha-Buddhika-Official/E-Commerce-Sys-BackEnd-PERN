@@ -1,16 +1,15 @@
 import db from '../../config/db.js';
 
-export const createAttribute = async (attribute) => {
-    const { name, category_id } = attribute;
+//using
+export const createAttribute = async ({ name, category_id }) => {
 
     const query = `
         INSERT INTO attributes (name, category_id)
         VALUES ($1, $2)
         RETURNING *
     `;
-    const values = [name, category_id];
     
-    const { rows } = await db.query(query, values);
+    const { rows } = await db.query(query, [name, category_id]);
     return rows[0];
 }
 
@@ -47,23 +46,22 @@ export const getAttributeValueById = async (attributeValueId) => {
         WHERE av.attribute_value_id = $1
         LIMIT 1
     `;
-
     const { rows } = await db.query(query, [attributeValueId]);
     return rows[0];
 };
 
-export const createAttributeValue = async (attributeValue) => {
-    const { attribute_id, value } = attributeValue;
+//using
+export const insertAttributeValue = async ({ attribute_id, value }) => {
     const query = `
         INSERT INTO attribute_values (attribute_id, value)
         VALUES ($1, $2)
         RETURNING *
     `;
-    const values = [attribute_id, value];
-    const { rows } = await db.query(query, values);
+    const { rows } = await db.query(query, [attribute_id, value]);
     return rows[0];
 }
 
+//using
 export const getAttributeCatalog = async () => {
     const categoriesQuery = `
         SELECT category_id, name
@@ -120,6 +118,7 @@ export const getAttributesByCategoryId = async (categoryId) => {
     return rows;
 }
 
+//using
 export const getAttributesByCategory = async (categoryId) => {
     const query = `
         SELECT
@@ -147,26 +146,26 @@ export const getAttributesByCategory = async (categoryId) => {
     return rows;
 };
 
-export const updateAttribute = async (id, attribute) => {
+export const updateAttributeById = async (id, {name, category_id}) => {
     const query = `
         UPDATE attributes
         SET name = $1, category_id = $2
         WHERE attribute_id = $3 
         RETURNING *
     `;
-    const { name, category_id } = attribute;
-    const values = [name, category_id, id];
-    const { rows } = await db.query(query, values);
+    const { rows } = await db.query(query, [name, category_id, id]);
     return rows[0];
 }
 
-export const deleteAttribute = async (id) => {
+//using
+export const deleteAttributeById = async (id) => {
     const query = `DELETE FROM attributes WHERE attribute_id = $1 RETURNING *`;
     const { rows } = await db.query(query, [id]);
     return rows[0];
 }
 
-export const deleteAttributeValue = async (attributeId, valueId) => {
+//using
+export const deleteAttributeValueById = async (attributeId, valueId) => {
     const query = `
         DELETE FROM attribute_values
         WHERE attribute_id = $1 AND attribute_value_id = $2
