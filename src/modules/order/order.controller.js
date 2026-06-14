@@ -27,7 +27,7 @@ export const updatePaymentSlip = async (req, res, next) => {
         const slipUrl = await orderService.UpdatePaymentSlip(orderId, req.file);
         res.status(200).json({
             success: true,
-            // data: { slipUrl },
+            data: { slipUrl },
             message: 'Payment slip URL retrieved successfully'
         });
     } catch (error) {

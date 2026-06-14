@@ -1,11 +1,13 @@
 import * as cartService from './cart.service.js';
+import { setSessionCookie } from '../../middlewares/session.middleware.js';
 
 export const getCart = async (req, res, next) => {
     try {
-        // console.log(req.cookies.sid);
         const cart = await cartService.getCart(req.sessionId);
+
         res.status(200).json({
             success: true,
+            message: 'Cart retrieved successfully',
             data: cart,
         });
     } catch (error) {
@@ -16,18 +18,22 @@ export const getCart = async (req, res, next) => {
 export const addItem = async (req, res, next) => {
     try {
         const { product_id, quantity } = req.body;
+
         const cart = await cartService.addItem({
             sessionId: req.sessionId,
-            isNewSession: req.isNewSession,
             productId: product_id,
             quantity,
-            res,
         });
+
+        // HTTP responsibility ONLY
+        if (req.isNewSession) {
+            setSessionCookie(res, req.sessionId);
+        }
 
         res.status(201).json({
             success: true,
-            data: cart,
             message: 'Item added to cart successfully',
+            data: cart,
         });
     } catch (error) {
         next(error);
@@ -47,8 +53,8 @@ export const updateQuantity = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: cart,
             message: 'Cart item updated successfully',
+            data: cart,
         });
     } catch (error) {
         next(error);
@@ -58,6 +64,7 @@ export const updateQuantity = async (req, res, next) => {
 export const removeItem = async (req, res, next) => {
     try {
         const { itemId } = req.params;
+
         const cart = await cartService.removeItem({
             sessionId: req.sessionId,
             itemId,
@@ -65,8 +72,8 @@ export const removeItem = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: cart,
             message: 'Cart item removed successfully',
+            data: cart,
         });
     } catch (error) {
         next(error);
@@ -76,9 +83,11 @@ export const removeItem = async (req, res, next) => {
 export const clearCart = async (req, res, next) => {
     try {
         await cartService.clearCart(req.sessionId);
+
         res.status(200).json({
             success: true,
             message: 'Cart cleared successfully',
+            data: null,
         });
     } catch (error) {
         next(error);
