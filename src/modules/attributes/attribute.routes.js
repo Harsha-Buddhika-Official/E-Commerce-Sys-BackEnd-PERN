@@ -23,7 +23,7 @@ router.post('/admin/:attributeId/value', authorize('super_admin', 'admin'), crea
 router.post('/admin/products/:productId/attributes', authorize('super_admin', 'admin'), validateProductAttributeMapping, createProductAttribute); //working // using in product module in FE
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/:id', authorize('super_admin', 'admin'), updateAttribute);
+// router.put('/:id', authorize('super_admin', 'admin'), updateAttribute);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/:id', authorize('super_admin', 'admin'), deleteAttribute); //using //working

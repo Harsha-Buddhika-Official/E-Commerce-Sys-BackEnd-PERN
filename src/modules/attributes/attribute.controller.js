@@ -7,7 +7,8 @@ export const createAttribute = async (req, res, next) => {
         res.status(201).json({
             success: true,
             message: 'Attribute created successfully',
-            data: attributeData });
+            data: attributeData 
+        });
     } catch (error) {
         next(error);
     }

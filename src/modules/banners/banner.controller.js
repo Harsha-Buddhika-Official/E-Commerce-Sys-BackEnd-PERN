@@ -1,15 +1,13 @@
-import { uploadToCloudinary } from "../../utils/cloudinaryUpload.js";
 import * as service from "./banner.service.js";
 
 export const createBanner = async (req, res, next) => {
     try {
-        // console.log("Received body:", req.body);
-        // console.log("Received file:", req.file);
-        const banner = await service.createBanner(req.body, req.file)
+        const banner = await service.createBanner(req.body, req.file);
 
         res.status(201).json({
             success: true,
-            data: banner
+            message: "Banner created successfully",
+            data: banner,
         });
     } catch (err) {
         next(err);
@@ -19,9 +17,11 @@ export const createBanner = async (req, res, next) => {
 export const getBannerImages = async (req, res, next) => {
     try {
         const banners = await service.getBannerImages();
-         res.json({
+
+        res.status(200).json({
             success: true,
-            data: banners
+            message: "Banner images retrieved successfully",
+            data: banners,
         });
     } catch (err) {
         next(err);
@@ -31,9 +31,11 @@ export const getBannerImages = async (req, res, next) => {
 export const getBannerVideo = async (req, res, next) => {
     try {
         const banners = await service.getBannerVideo();
-         res.json({
+
+        res.status(200).json({
             success: true,
-            data: banners
+            message: "Banner videos retrieved successfully",
+            data: banners,
         });
     } catch (err) {
         next(err);
@@ -44,9 +46,10 @@ export const getAllBanners = async (req, res, next) => {
     try {
         const banners = await service.getAllBanners();
 
-        res.json({
+        res.status(200).json({
             success: true,
-            data: banners
+            message: "Banners retrieved successfully",
+            data: banners,
         });
     } catch (err) {
         next(err);
@@ -56,9 +59,11 @@ export const getAllBanners = async (req, res, next) => {
 export const getBannerById = async (req, res, next) => {
     try {
         const banner = await service.getBannerById(req.params.id);
-        res.json({
+
+        res.status(200).json({
             success: true,
-            data: banner
+            message: "Banner retrieved successfully",
+            data: banner,
         });
     } catch (err) {
         next(err);
@@ -72,9 +77,10 @@ export const updateBanner = async (req, res, next) => {
             req.body
         );
 
-        res.json({
+        res.status(200).json({
             success: true,
-            data: banner
+            message: "Banner updated successfully",
+            data: banner,
         });
     } catch (err) {
         next(err);
@@ -83,10 +89,14 @@ export const updateBanner = async (req, res, next) => {
 
 export const deleteBanner = async (req, res, next) => {
     try {
-        await service.deleteBanner(req.params.id);
-        res.json({
+        const deleted = await service.deleteBanner(req.params.id);
+
+        res.status(200).json({
             success: true,
-            message: "Banner deleted successfully"
+            message: "Banner deleted successfully",
+            data: {
+                id: deleted.banner_id,
+            },
         });
     } catch (err) {
         next(err);

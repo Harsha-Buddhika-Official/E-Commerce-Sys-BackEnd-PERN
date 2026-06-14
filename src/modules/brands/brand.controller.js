@@ -11,7 +11,6 @@ export const createBrand = async (req, res, next) => {
             message: 'Brand created successfully'
         });
     } catch (error) {
-        // Delete uploaded file if brand creation fails
         if (req.file && error.logoPublicId) {
             try {
                 await deleteFromCloudinary(error.logoPublicId);
@@ -29,8 +28,8 @@ export const getAllBrands = async (req, res, next) => {
         const brands = await brandService.getAllBrands();
         res.status(200).json({
             success: true,
-            data: brands,
-            message: 'Brands retrieved successfully'
+            message: 'Brands retrieved successfully',
+            data: brands
         })
     } catch (error) {
         next(error);
@@ -43,8 +42,8 @@ export const getAllBrandnames = async (req, res, next) => {
         const brandNames = await brandService.getAllBrandNames();
         res.status(200).json({
             success: true,
-            data: brandNames,
-            message: 'Brand names retrieved successfully'
+            message: 'Brand names retrieved successfully',
+            data: brandNames
         })
     } catch (error) {
         next(error);
@@ -58,70 +57,61 @@ export const getBrandById = async (req, res, next) => {
         const brand = await brandService.getBrandById(id);
         res.status(200).json({
             success: true,
-            data: brand,
-            message: 'Brand retrieved successfully'
+            message: 'Brand retrieved successfully',
+            data: brand
         })
     } catch (error) {
         next(error);
     }
 };
 
-//update brand
-export const updateBrand = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const brandData = { ...req.body };
+// export const updateBrand = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
+//         // const brandData = { ...req.body };
 
-        if (req.file) {
-            const existingBrand = await brandService.getBrandById(id);
+//         // if (req.file) {
+//         //     const existingBrand = await brandService.getBrandById(id);
             
-            if (existingBrand.logo_public_id) {
-                try {
-                    await deleteFromCloudinary(existingBrand.logo_public_id);
-                } catch (deleteError) {
-                    console.error('Failed to delete old logo:', deleteError);
-                }
-            }
+//         //     if (existingBrand.logo_public_id) {
+//         //         try {
+//         //             await deleteFromCloudinary(existingBrand.logo_public_id);
+//         //         } catch (deleteError) {
+//         //             console.error('Failed to delete old logo:', deleteError);
+//         //         }
+//         //     }
 
-            const uploadResult = await uploadToCloudinary(
-                req.file.buffer,
-                `brand-${Date.now()}`,
-                'ecommerce/brands'
-            );
-            brandData.logo_url = uploadResult.secure_url;
-            brandData.logo_public_id = uploadResult.public_id;
-        }
+//         //     const uploadResult = await uploadToCloudinary(
+//         //         req.file.buffer,
+//         //         `brand-${Date.now()}`,
+//         //         'ecommerce/brands'
+//         //     );
+//         //     brandData.logo_url = uploadResult.secure_url;
+//         //     brandData.logo_public_id = uploadResult.public_id;
+//         // }
 
-        const updatedBrand = await brandService.updateBrand(id, brandData);
-        res.status(200).json({
-            success: true,
-            data: updatedBrand,
-            message: 'Brand updated successfully'
-        })
-    } catch (error) {
-        next(error);
-    }
-}
+//         // const updatedBrand = await brandService.updateBrand(id, brandData);
+//         const updatedBrand = await brandService.updateBrand(id, req.body, req.file);
+//         res.status(200).json({
+//             success: true,
+//             data: updatedBrand,
+//             message: 'Brand updated successfully'
+//         })
+//     } catch (error) {
+//         next(error);
+//     }
+// }
 
-//delete brand
 export const deleteBrand = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const brand = await brandService.getBrandById(id);
-
-        // Delete logo from Cloudinary if it exists
-        if (brand.logo_public_id) {
-            try {
-                await deleteFromCloudinary(brand.logo_public_id);
-            } catch (deleteError) {
-                console.error('Failed to delete logo from Cloudinary:', deleteError);
-            }
-        }
+        const deleted = await brandService.getBrandById(id);
 
         await brandService.deleteBrand(id);
         res.status(200).json({
             success: true,
-            message: 'Brand deleted successfully'
+            message: 'Brand deleted successfully',
+            data: {id: deleted.brand_id}
         });
     } catch (error) {
         next(error);
@@ -129,29 +119,29 @@ export const deleteBrand = async (req, res, next) => {
 }
 
 //soft delete brand
-export const softDeleteBrand = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        await brandService.softDeleteBrand(id);
-        res.status(200).json({
-            success: true,
-            message: 'Brand soft deleted successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-}
+// export const softDeleteBrand = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
+//         await brandService.softDeleteBrand(id);
+//         res.status(200).json({
+//             success: true,
+//             message: 'Brand soft deleted successfully'
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }
 
-//restore brand
-export const restoreBrand = async (req, res, next) => {
-    try {
-        const { id } = req.params
-        await brandService.restoreBrand(id);
-        res.status(200).json({
-            success: true,
-            message: 'Brand restore successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-}
+// //restore brand
+// export const restoreBrand = async (req, res, next) => {
+//     try {
+//         const { id } = req.params
+//         await brandService.restoreBrand(id);
+//         res.status(200).json({
+//             success: true,
+//             message: 'Brand restore successfully'
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }

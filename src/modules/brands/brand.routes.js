@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBrand, deleteBrand, getAllBrandnames, getAllBrands, getBrandById, restoreBrand, softDeleteBrand, updateBrand } from './brand.controller.js';
+import { createBrand, deleteBrand, getAllBrandnames, getAllBrands, getBrandById } from './brand.controller.js';
 import { validateCreateBrand, validateIdParam, validateUpdateBrand } from './brand.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
