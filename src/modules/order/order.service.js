@@ -4,68 +4,171 @@ import * as productRepository from '../products/product.repository.js';
 import { generateTrackingCode } from '../../utils/generateTrackingCode.js';
 import AppError from '../../utils/AppError.js';
 import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
+import { sendOrderConfirmationEmail } from '../../services/mail.service.js';
+import pool from '../../config/db.js';
+
+
+// export const createOrder = async (orderData, sessionId) => {
+//     // console.log('Received order data in service:', orderData);
+//     let items = [];
+
+//     if (orderData.type === 'direct') {
+
+//         const product = await productRepository.findProductById(
+//             orderData.product_id
+//         );
+
+//         if (!product) {
+//             throw new AppError('Product not found', 404);
+//         }
+
+//         items.push({
+//             product_id: product.product_id,
+//             quantity: orderData.quantity,
+//             price_at_purchase: product.selling_price
+//         });
+
+//     } else if (orderData.type === 'cart') {
+
+//         if (!sessionId) {
+//             throw new AppError('Session not found', 401);
+//         }
+
+//         const cart = await cartRepository.findCartBySession(sessionId);
+//         if (!cart) {
+//             throw new AppError('Cart not found', 404);
+//         }
+//         // console.log('Cart found for session:', cart);
+
+//         const cartItems = await cartRepository.getCartWithItems(cart.cart_id);
+//         if (!cartItems.items.length) {
+//             throw new AppError('Cart is empty', 400);
+//         }
+//         // console.log('Cart items:', cartItems.items);
+
+//         items = cartItems.items.map(item => ({
+//             product_id: item.product_id,
+//             quantity: item.quantity,
+//             price_at_purchase: item.price_at_add
+//         }));
+
+//     } else {
+//         throw new AppError('Invalid order type', 400);
+//     }
+
+//     const total_amount = items.reduce(
+//         (sum, item) =>
+//             sum + item.quantity * item.price_at_purchase,
+//         0
+//     );
+
+//     return await orderRepository.createOrder({
+//         ...orderData,
+//         tracking_code: generateTrackingCode(),
+//         order_status: 'pending_payment',
+//         total_amount,
+//         items
+//     });
+// };
+
 
 export const createOrder = async (orderData, sessionId) => {
-    // console.log('Received order data in service:', orderData);
-    let items = [];
+    const client = await pool.connect();
 
-    if (orderData.type === 'direct') {
+    let order;
 
-        const product = await productRepository.findProductById(
-            orderData.product_id
+    try {
+        await client.query('BEGIN');
+
+        let items = [];
+
+        // ---------------------------
+        // DIRECT ORDER
+        // ---------------------------
+        if (orderData.type === 'direct') {
+
+            const product = await productRepository.findProductById(
+                orderData.product_id,
+                client
+            );
+
+            if (!product) throw new AppError('Product not found', 404);
+
+            items.push({
+                product_id: product.product_id,
+                quantity: orderData.quantity,
+                price_at_purchase: product.selling_price
+            });
+
+        }
+
+        // ---------------------------
+        // CART ORDER
+        // ---------------------------
+        else if (orderData.type === 'cart') {
+
+            if (!sessionId) throw new AppError('Session not found', 401);
+
+            const cart = await cartRepository.findCartBySession(sessionId, client);
+            if (!cart) throw new AppError('Cart not found', 404);
+
+            const cartItems = await cartRepository.getCartWithItems(cart.cart_id, client);
+            if (!cartItems.items.length) throw new AppError('Cart is empty', 400);
+
+            items = cartItems.items.map(item => ({
+                product_id: item.product_id,
+                quantity: item.quantity,
+                price_at_purchase: item.price_at_add
+            }));
+        }
+
+        else {
+            throw new AppError('Invalid order type', 400);
+        }
+
+        const total_amount = items.reduce(
+            (sum, item) => sum + item.quantity * item.price_at_purchase,
+            0
         );
 
-        if (!product) {
-            throw new AppError('Product not found', 404);
-        }
+        // ---------------------------
+        // CREATE ORDER
+        // ---------------------------
+        order = await orderRepository.createOrder({
+            ...orderData,
+            tracking_code: generateTrackingCode(),
+            order_status: 'pending_payment',
+            total_amount,
+            items
+        }, client);
 
-        items.push({
-            product_id: product.product_id,
-            quantity: orderData.quantity,
-            price_at_purchase: product.selling_price
-        });
+        await client.query('COMMIT');
 
-    } else if (orderData.type === 'cart') {
-
-        if (!sessionId) {
-            throw new AppError('Session not found', 401);
-        }
-
-        const cart = await cartRepository.findCartBySession(sessionId);
-        if (!cart) {
-            throw new AppError('Cart not found', 404);
-        }
-        // console.log('Cart found for session:', cart);
-
-        const cartItems = await cartRepository.getCartWithItems(cart.cart_id);
-        if (!cartItems.items.length) {
-            throw new AppError('Cart is empty', 400);
-        }
-        // console.log('Cart items:', cartItems.items);
-
-        items = cartItems.items.map(item => ({
-            product_id: item.product_id,
-            quantity: item.quantity,
-            price_at_purchase: item.price_at_add
-        }));
-
-    } else {
-        throw new AppError('Invalid order type', 400);
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
     }
 
-    const total_amount = items.reduce(
-        (sum, item) =>
-            sum + item.quantity * item.price_at_purchase,
-        0
-    );
+    // ---------------------------
+    // EMAIL AFTER COMMIT
+    // ---------------------------
+    // await sendOrderConfirmationEmail({
+    //     to: orderData.customer_email,
+    //     customerName: orderData.full_name,
+    //     total: order.total_amount,
+    // });
 
-    return await orderRepository.createOrder({
-        ...orderData,
-        tracking_code: generateTrackingCode(),
-        order_status: 'pending_payment',
-        total_amount,
-        items
+    await sendOrderConfirmationEmail({
+        full_name: orderData.full_name,
+        email: orderData.customer_email,
+        order_id: order.order_id,
+        tracking_code: order.tracking_code,
+        total_amount: order.total_amount,
     });
+
+    return order;
 };
 
 export const UpdatePaymentSlip = async (orderId, file) => {

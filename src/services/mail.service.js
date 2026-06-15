@@ -1,10 +1,14 @@
-import nodemailer from "nodemailer";
+import transporter from '../config/mailer.config.js';
+import { orderConfirmationTemplate } from '../templates/orderConfirmation.template.js';
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
+export const sendOrderConfirmationEmail = async (order) => {
+  console.log('Preparing to send order confirmation email for order:', order);
+  const html = orderConfirmationTemplate(order);
 
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD,
-    },
-});
+  await transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to: order.email,
+    subject: `Order Confirmation - #${order.order_id}`,
+    html,
+  });
+};
