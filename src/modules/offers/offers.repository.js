@@ -10,7 +10,7 @@ export const createOffer = async (offerData) => {
         end_date,
         is_active,
         banner_image_url,
-        banner_image_public_id
+        banner_image_id
     } = offerData;
 
     const query = `
@@ -29,7 +29,7 @@ export const createOffer = async (offerData) => {
         end_date,
         is_active ?? true,
         banner_image_url || null,
-        banner_image_public_id || null
+        banner_image_id || null
     ];
 
     const { rows } = await pool.query(query, values);
@@ -140,8 +140,8 @@ export const getOffers = async ({ status }) => {
     ORDER BY o.created_at DESC
   `;
 
-  const result = await pool.query(query, values);
-  return result.rows;
+    const { rows } = await pool.query(query, values);
+    return rows;
 };
 
 export const getActiveOffers = async () => {
@@ -202,6 +202,77 @@ export const findOfferByIdBasic = async (id) => {
     const { rows } = await pool.query(query, [id]);
     return rows[0];
 }
+
+export const findOfferByIdUser = async (id) => {
+    const query = `SELECT
+        o.id,
+        o.title,
+        o.description,
+        o.discount_type,
+        o.discount_value,
+        o.start_date,
+        o.end_date,
+        o.is_active,
+        o.banner_image,
+
+        COALESCE(
+            JSON_AGG(
+                JSONB_BUILD_OBJECT(
+                    'product', JSONB_BUILD_OBJECT(
+                        'product_id', p.product_id,
+                        'name', p.name,
+                        'description', p.description,
+                        'selling_price', p.selling_price,
+                        'discounted_price', p.discounted_price,
+                        'stock_quantity', p.stock_quantity,
+                        'is_active', p.is_active,
+
+                        -- 🖼️ IMAGE
+                        'image',
+                        (
+                            SELECT JSON_BUILD_OBJECT(
+                                'image_id', pi.image_id,
+                                'image_url', pi.image_url,
+                                'is_primary', pi.is_primary,
+                                'alt_text', pi.alt_text,
+                                'sort_order', pi.sort_order
+                            )
+                            FROM product_images pi
+                            WHERE pi.product_id = p.product_id
+                            ORDER BY
+                                CASE WHEN pi.is_primary THEN 0 ELSE 1 END,
+                                pi.sort_order
+                            LIMIT 1
+                        )
+                    )
+                )
+            ) FILTER (WHERE p.product_id IS NOT NULL),
+            '[]'::json
+        ) AS products
+
+    FROM offers o
+
+    LEFT JOIN offer_products op
+        ON op.offer_id = o.id
+
+    LEFT JOIN products p
+        ON p.product_id = op.product_id
+
+    WHERE o.id = $1
+
+    GROUP BY
+        o.id,
+        o.title,
+        o.description,
+        o.discount_type,
+        o.discount_value,
+        o.start_date,
+        o.end_date,
+        o.is_active,
+        o.banner_image;`;
+    const { rows } = await pool.query(query, [id]);
+    return rows[0];
+};
 
 export const findOfferByIdAdmin = async (id) => {
     const query = `SELECT
@@ -309,7 +380,7 @@ export const findOfferByIdWhenItsActive = async (id) => {
     return rows[0];
 };
 
-export const updateOffer = async (id, offerData) => {
+export const updateOffer = async (id, Payload) => {
     const {
         title,
         description,
@@ -320,7 +391,7 @@ export const updateOffer = async (id, offerData) => {
         is_active,
         banner_image,
         banner_image_id
-    } = offerData;
+    } = Payload;
 
     const query = `
         UPDATE offers
@@ -412,16 +483,6 @@ export const getOfferProducts = async (offerId) => {
     `;
     const { rows } = await pool.query(query, [offerId]);
     return rows;
-};
-
-export const findProductById = async (productId) => {
-    const query = `
-        SELECT product_id, name, selling_price, stock_quantity, is_active
-        FROM products
-        WHERE product_id = $1
-    `;
-    const { rows } = await pool.query(query, [productId]);
-    return rows[0];
 };
 
 export const findOfferByProductIdFullOfferData = async (productId) => {

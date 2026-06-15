@@ -4,19 +4,13 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary
 export const createOffer = async (req, res, next) => {
     try {
         const offer = await offersService.createOffer(req.body, req.file);
+
         res.status(201).json({
             success: true,
+            message: 'Offer created successfully',
             data: offer,
-            message: 'Offer created successfully'
         });
     } catch (error) {
-        if (req.file && bannerImagePublicId) {
-            try {
-                await deleteFromCloudinary(bannerImagePublicId);
-            } catch (err) {
-                console.error('Failed to delete uploaded banner after error:', err);
-            }
-        }
         next(error);
     }
 };
@@ -100,10 +94,11 @@ export const getOfferByIdUser = async (req, res, next) => {
 export const updateOffer = async (req, res, next) => {
     try {
         const { id } = req.params;
-        await offersService.updateOffer(id, req.body, req.file);
+        const updatedOffer = await offersService.updateOffer(id, req.body, req.file);
         res.status(200).json({
             success: true,
-            message: 'Offer updated successfully'
+            message: 'Offer updated successfully',
+            data: updatedOffer,
         });
     } catch (error) {
         next(error);
