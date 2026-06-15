@@ -3,98 +3,135 @@ import { hashPassword, comparePasswords } from '../../utils/hash.js';
 import { generateToken } from '../../utils/jwt.js';
 import AppError from '../../utils/AppError.js';
 
-export const createAdmin = async (AdminData) => {
-    if (!AdminData.fullname || !AdminData.email || !AdminData.password) {
+export const createAdmin = async (adminData) => {
+    if (!adminData.fullname || !adminData.email || !adminData.password) {
         throw new AppError('All fields are required', 400);
     }
-    if(!AdminData.role){
-        AdminData.role = 'manager';
-    }
-    const exsitingAdmin = await adminRepository.getAdminByEmail(AdminData.email);
-    if (exsitingAdmin) {
+
+    adminData.role = adminData.role || 'manager';
+
+    const existingAdmin = await adminRepository.getAdminByEmail(adminData.email);
+    if (existingAdmin) {
         throw new AppError('Admin with this email already exists', 409);
     }
-    AdminData.password = await hashPassword(AdminData.password);
-    return await adminRepository.createAdmin(AdminData);
-}
 
-export const loginAdmin = async (AdminData) => {
-    const { email, password } = AdminData;
+    adminData.password = await hashPassword(adminData.password);
+
+    const created = await adminRepository.createAdmin(adminData);
+
+    // remove password before returning
+    const { password_hash, ...safe } = created;
+    return safe;
+};
+
+export const loginAdmin = async (adminData) => {
+    const { email, password } = adminData;
+
     if (!email || !password) {
         throw new AppError('Email and password are required', 400);
     }
-    const Admin = await adminRepository.getAdminByEmail(email);
-    if (!Admin) {
+
+    const admin = await adminRepository.getAdminByEmail(email);
+    if (!admin) {
         throw new AppError('credentials are incorrect', 401);
     }
-    const passwordMatch = await comparePasswords(password, Admin.password_hash);
+
+    const passwordMatch = await comparePasswords(password, admin.password_hash);
     if (!passwordMatch) {
         throw new AppError('credentials are incorrect', 401);
     }
-    await adminRepository.updateLastLogin(Admin.admin_id);
-    const token = generateToken({ adminId: Admin.admin_id, role: Admin.role });
-    return { token, admin: Admin };
-}
+
+    await adminRepository.updateLastLogin(admin.admin_id);
+
+    const token = generateToken({
+        adminId: admin.admin_id,
+        role: admin.role
+    });
+
+    const { password_hash, ...safeAdmin } = admin;
+
+    return { token, admin: safeAdmin };
+};
 
 export const getAdminByEmail = async (email) => {
     if (!email) {
         throw new AppError('Email is required', 400);
     }
-    return await adminRepository.getAdminByEmail(email);
-}
+
+    const admin = await adminRepository.getAdminByEmail(email);
+    if (!admin) throw new AppError('Admin not found', 404);
+
+    const { password_hash, ...safe } = admin;
+    return safe;
+};
 
 export const getAllAdmins = async () => {
     const admins = await adminRepository.getAllAdmins();
-    return admins.map(admin => {
-        const { password_hash, ...adminWithoutPassword } = admin;
-        return adminWithoutPassword;
-    });
-}
+
+    return admins.map(({ password_hash, ...rest }) => rest);
+};
 
 export const updateAdminRole = async (adminId, adminData) => {
     if (!adminId || !adminData.newRole) {
         throw new AppError('Admin ID and new role are required', 400);
     }
+
     await adminRepository.updateUpdatedAt(adminId);
-    return await adminRepository.updateAdminRole(adminId, adminData);
-}
+
+    const updated = await adminRepository.updateAdminRole(adminId, adminData);
+
+    const { password_hash, ...safe } = updated;
+    return safe;
+};
 
 export const deleteAdmin = async (adminEmail) => {
     if (!adminEmail) {
         throw new AppError('Admin email is required', 400);
     }
+
     const admin = await adminRepository.getAdminByEmail(adminEmail);
     if (!admin) {
         throw new AppError('Admin not found', 404);
     }
-    return await adminRepository.deleteAdmin(admin.admin_id);
-}
 
-export const updateAdminPassword = async (adminId, AdminData) => {
-    if (!adminId) {
-        throw new AppError('Admin ID is required', 400);
+    await adminRepository.deleteAdmin(admin.admin_id);
+
+    const { password_hash, ...safe } = admin;
+    return safe;
+};
+
+export const updateAdminPassword = async (adminId, adminData) => {
+    if (!adminId) throw new AppError('Admin ID is required', 400);
+
+    const { oldPassword, newPassword, confirmPassword } = adminData;
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+        throw new AppError('All password fields are required', 400);
     }
-    if(!AdminData.newPassword){
-        throw new AppError('New password is required', 400);
+
+    if (newPassword !== confirmPassword) {
+        throw new AppError('Passwords do not match', 422);
     }
-    if(!AdminData.confirmPassword){
-        throw new AppError('Confirm password is required', 400);
-    }
-    if(!AdminData.oldPassword){
-        throw new AppError('Old password is required', 400);
-    }
-    if(AdminData.newPassword !== AdminData.confirmPassword){
-        throw new AppError('new password and confirm password do not match', 422);
-    }
+
     const admin = await adminRepository.getAdminById(adminId);
-    const oldPasswordMatch = await comparePasswords(AdminData.oldPassword, admin.password_hash);
-    const passwordMatch = await comparePasswords(AdminData.newPassword, admin.password_hash);
-    if(!oldPasswordMatch){
-        throw new AppError('old password is incorrect', 401);
+
+    const oldMatch = await comparePasswords(oldPassword, admin.password_hash);
+    if (!oldMatch) {
+        throw new AppError('Old password is incorrect', 401);
     }
-    if (passwordMatch) {
-        throw new AppError('New password cannot be the same as the old password', 409);
+
+    const sameAsOld = await comparePasswords(newPassword, admin.password_hash);
+    if (sameAsOld) {
+        throw new AppError('New password cannot be same as old password', 409);
     }
-    AdminData.newPassword = await hashPassword(AdminData.newPassword);
-    return await adminRepository.updateAdminPassword(AdminData, adminId);
-}
+
+    const hashed = await hashPassword(newPassword);
+
+    const updated = await adminRepository.updateAdminPassword(
+        { newPassword: hashed },
+        adminId
+    );
+
+    const { password_hash, ...safe } = updated;
+    return safe;
+};
