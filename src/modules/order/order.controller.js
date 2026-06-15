@@ -22,7 +22,7 @@ export const createOrder = async (req, res, next) => {
 
 export const updatePaymentSlip = async (req, res, next) => {
     try {
-        console.log('Received file in controller:', req.file); // Debug log to check received file
+        // console.log('Received file in controller:', req.file); // Debug log to check received file
         const orderId = req.params.id;
         const slipUrl = await orderService.UpdatePaymentSlip(orderId, req.file);
         res.status(200).json({
