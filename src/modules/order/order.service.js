@@ -267,10 +267,11 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
 
 export const updateOrderStatus = async (orderId, newStatus, client) => {
     const order = await orderRepository.getOrderById(orderId, client);
-    console.log('Current order:', order);
+    // console.log('Current order:', order);
     await sendOrderStatusUpdateEmail({
         full_name: order.full_name,
         email: order.customer_email,
+        order_status: newStatus,
         order_id: order.order_id,
         tracking_code: order.tracking_code,
         total_amount: order.total_amount,
