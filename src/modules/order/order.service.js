@@ -4,7 +4,7 @@ import * as productRepository from '../products/product.repository.js';
 import { generateTrackingCode } from '../../utils/generateTrackingCode.js';
 import AppError from '../../utils/AppError.js';
 import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
-import { sendOrderConfirmationEmail } from '../../services/mail.service.js';
+import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '../../services/mail.service.js';
 import pool from '../../config/db.js';
 
 
@@ -154,11 +154,6 @@ export const createOrder = async (orderData, sessionId) => {
     // ---------------------------
     // EMAIL AFTER COMMIT
     // ---------------------------
-    // await sendOrderConfirmationEmail({
-    //     to: orderData.customer_email,
-    //     customerName: orderData.full_name,
-    //     total: order.total_amount,
-    // });
 
     await sendOrderConfirmationEmail({
         full_name: orderData.full_name,
@@ -271,6 +266,15 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
 };
 
 export const updateOrderStatus = async (orderId, newStatus, client) => {
+    const order = await orderRepository.getOrderById(orderId, client);
+    console.log('Current order:', order);
+    await sendOrderStatusUpdateEmail({
+        full_name: order.full_name,
+        email: order.customer_email,
+        order_id: order.order_id,
+        tracking_code: order.tracking_code,
+        total_amount: order.total_amount,
+    });
     return await orderRepository.updateOrderStatus(orderId, newStatus, client);
 };
 
