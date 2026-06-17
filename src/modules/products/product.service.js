@@ -1,21 +1,11 @@
 import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
-import {
-  findCategoryById,
-  findCategoryByName
-} from '../categories/categories.repository.js';
-import {
-  findBrandByName,
-  findBrandById
-} from '../brands/brand.repository.js';
-
+import { findCategoryById, findCategoryByName } from '../categories/categories.repository.js';
+import { findBrandByName, findBrandById } from '../brands/brand.repository.js';
 import { applyActiveOfferPricing } from '../../utils/offerPricing.js';
 import pool from '../../config/db.js';
 import AppError from '../../utils/AppError.js';
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary
-} from '../../utils/cloudinaryUpload.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
 /* =========================================================
    CLOUDINARY HELPERS
@@ -324,9 +314,9 @@ export const filterProducts = async (categoryId, body) => {
 
   const attributeFilters = Array.isArray(body.attributeFilters)
     ? body.attributeFilters.map(f => ({
-        attributeId: Number(f.attributeId),
-        values: Array.isArray(f.values) ? f.values : [f.values]
-      }))
+      attributeId: Number(f.attributeId),
+      values: Array.isArray(f.values) ? f.values : [f.values]
+    }))
     : [];
 
   const products =
@@ -413,7 +403,7 @@ export const updateProductDetails = async (id, productData) => {
     await productRepository.deleteProductAttributes(id, client);
 
     if (Array.isArray(productData.attributes) &&
-        productData.attributes.length > 0) {
+      productData.attributes.length > 0) {
 
       const values = await Promise.all(
         productData.attributes.map(attr =>
@@ -539,7 +529,7 @@ export const removeProductImage = async (productId, imageId) => {
 
     if (image.product_image_id) {
       deleteFromCloudinary(image.product_image_id)
-        .catch(() => {});
+        .catch(() => { });
     }
 
     return { deleted: true, imageId };

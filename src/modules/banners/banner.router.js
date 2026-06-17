@@ -17,7 +17,7 @@ router.get('/admin',  authorize('super_admin', 'admin', 'manager'), getAllBanner
 router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, getBannerById);
 
 // POST
-router.post('/admin', authorize('super_admin', 'admin', 'manager'), upload.single('media'), createBanner);
+router.post('/admin', authorize('super_admin', 'admin'), upload.single('media'), createBanner);
 
 // PUT
 // router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('media'), validateIdParam, validateUpdateBanner, updateBanner);

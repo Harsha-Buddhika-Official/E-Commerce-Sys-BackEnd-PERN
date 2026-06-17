@@ -136,7 +136,7 @@ export const deleteCategory = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Category deleted successfully',
-            data: null,
+            data: { id },
         });
     } catch (error) {
         next(error);
@@ -153,7 +153,7 @@ export const softDeleteCategory = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Category soft deleted successfully',
-            data: null,
+            data: { id },
         });
     } catch (error) {
         next(error);
@@ -170,7 +170,7 @@ export const restoreCategory = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Category restored successfully',
-            data: null,
+            data: { id },
         });
     } catch (error) {
         next(error);

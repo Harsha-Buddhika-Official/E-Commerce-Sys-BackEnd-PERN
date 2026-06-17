@@ -32,6 +32,6 @@ router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.si
 router.put('/admin/:id/toggle', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus); // working
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/:id', authorize('super_admin', 'admin'), validateOfferIdParam, deleteOffer); //working //using
+router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //working //using
 
 export default router;

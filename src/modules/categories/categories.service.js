@@ -1,7 +1,7 @@
 import slugify from 'slugify';
 import * as categoryRepository from './categories.repository.js';
 import AppError from '../../utils/AppError.js';
-import { uploadToCloudinary } from '../../utils/cloudinaryUpload.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
 // Create category
 export const createCategory = async (categoryData, file) => {
@@ -119,6 +119,9 @@ export const updateCategory = async (id, categoryData) => {
 // Delete category
 export const deleteCategory = async (id) => {
     const existingCategory = await categoryRepository.findCategoryById(id);
+      await deleteFromCloudinary(
+        existingCategory.media_public_id
+      );
 
     if (!existingCategory) {
         throw new AppError('Category not found', 404);
