@@ -9,44 +9,15 @@ export const getCart = async (sessionId) => {
     if (!cart) {
         return { items: [], total: '0.00', item_count: 0 };
     }
-    // const items = await cartRepository.getCartWithItems(cart.cart_id);
-    // const offerProduct = await findOfferByProductId(items.productId);
-    // if (offerProduct) {
-    //     const offer = await findOfferByIdWhenItsActive(offerProduct.offer_id);
-    //     if (offer) {
-    //         const type = offer.discount_type;
-    //         const value = offer.discount_value;
-    //         if (type === 'percentage') {
-    //             product.discounted_price = (product.discounted_price * (100 - value)) / 100;
-    //         } else if (type === 'fixed') {
-    //             product.discounted_price = Math.max(0, product.discounted_price - value);
-    //         }
-    //     }
-    // }
+
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-export const addItem = async (params) => {
-    const { sessionId, isNewSession, productId, quantity, res } = params;
-
+export const addItem = async ({ sessionId, productId, quantity }) => {
     const product = await cartRepository.findProduct(productId);
+
     if (!product || !product.is_active) {
         throw new AppError('Product not found or is no longer available', 404);
-    }
-
-    // Check whether the product has an active offer and apply its price before adding to cart.
-    const offerProduct = await findOfferByProductId(productId);
-    if (offerProduct) {
-        const offer = await findOfferByIdWhenItsActive(offerProduct.offer_id);
-        if (offer) {
-            const type = offer.discount_type;
-            const value = offer.discount_value;
-            if (type === 'percentage') {
-                product.discounted_price = (product.discounted_price * (100 - value)) / 100;
-            } else if (type === 'fixed') {
-                product.discounted_price = Math.max(0, product.discounted_price - value);
-            }
-        }
     }
 
     if (quantity > product.stock_quantity) {
@@ -56,51 +27,74 @@ export const addItem = async (params) => {
         );
     }
 
-    let cart = await cartRepository.findCartBySession(sessionId);
-    if (!cart) {
-        cart = await cartRepository.createCart(sessionId);
-        if (isNewSession) setSessionCookie(res, sessionId);
+    // pricing logic (still inside service per your current architecture)
+    let finalPrice = product.discounted_price;
+
+    const offerProduct = await findOfferByProductId(productId);
+    if (offerProduct) {
+        const offer = await findOfferByIdWhenItsActive(offerProduct.offer_id);
+
+        if (offer) {
+            if (offer.discount_type === 'percentage') {
+                finalPrice = (finalPrice * (100 - offer.discount_value)) / 100;
+            } else if (offer.discount_type === 'fixed') {
+                finalPrice = Math.max(0, finalPrice - offer.discount_value);
+            }
+        }
     }
 
-    const existingItem = await cartRepository.findCartItem(cart.cart_id, productId);
+    let cart = await cartRepository.findCartBySession(sessionId);
+
+    if (!cart) {
+        cart = await cartRepository.createCart(sessionId);
+    }
+
+    const existingItem = await cartRepository.findCartItem(
+        cart.cart_id,
+        productId
+    );
 
     if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
+
         if (newQuantity > product.stock_quantity) {
             throw new AppError(
-                `Cannot add ${quantity} more. ` +
-                    `You already have ${existingItem.quantity} in your cart ` +
-                    `and only ${product.stock_quantity} are in stock.`,
+                `Cannot add ${quantity}. You already have ${existingItem.quantity}.`,
                 409
             );
         }
-        await cartRepository.updateItemQuantity(existingItem.cart_item_id, newQuantity);
+
+        await cartRepository.updateItemQuantity(
+            existingItem.cart_item_id,
+            newQuantity
+        );
     } else {
         await cartRepository.createCartItem({
             cart_id: cart.cart_id,
             product_id: productId,
             quantity,
-            price_at_add: product.discounted_price,
+            price_at_add: finalPrice,
         });
     }
 
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-export const updateQuantity = async (params) => {
-    const { sessionId, itemId, quantity } = params;
-
+export const updateQuantity = async ({ sessionId, itemId, quantity }) => {
     const cart = await cartRepository.findCartBySession(sessionId);
+
     if (!cart) {
         throw new AppError('Cart not found', 404);
     }
 
     const item = await cartRepository.findCartItemById(itemId);
+
     if (!item || item.cart_id !== cart.cart_id) {
         throw new AppError('Cart item not found', 404);
     }
 
     const product = await cartRepository.findProduct(item.product_id);
+
     if (product && quantity > product.stock_quantity) {
         throw new AppError(
             `Only ${product.stock_quantity} unit(s) available`,
@@ -109,29 +103,33 @@ export const updateQuantity = async (params) => {
     }
 
     await cartRepository.updateItemQuantity(itemId, quantity);
+
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-export const removeItem = async (params) => {
-    const { sessionId, itemId } = params;
-
+export const removeItem = async ({ sessionId, itemId }) => {
     const cart = await cartRepository.findCartBySession(sessionId);
+
     if (!cart) {
         throw new AppError('Cart not found', 404);
     }
 
     const item = await cartRepository.findCartItemById(itemId);
+
     if (!item || item.cart_id !== cart.cart_id) {
         throw new AppError('Cart item not found', 404);
     }
 
     await cartRepository.deleteCartItem(itemId);
+
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
 export const clearCart = async (sessionId) => {
     const cart = await cartRepository.findCartBySession(sessionId);
-    if (!cart) return;
+    if (!cart) {
+        throw new AppError('Cart not found', 404);
+    }
 
     await cartRepository.deleteAllCartItems(cart.cart_id);
 };

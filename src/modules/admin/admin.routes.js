@@ -13,7 +13,7 @@ router.post('/login', validateLogin, loginAdmin);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/', authorize('super_admin', 'admin'), getAllAdmins);
+router.get('/', authorize('super_admin'), getAllAdmins);
 
 // ==================== PROTECTED ROUTES - POST ====================
 router.post('/register', authorize('super_admin'), validateRegister, createAdmin);

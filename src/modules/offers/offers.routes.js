@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOfferProduct, createOffer, deleteOffer, getActiveOffers, getAllOffers, getOfferByIdAdmin, getOfferByIdUser, getOfferProducts, getUpcomingOffers, removeOfferProduct, updateOffer, updateOfferStatus, getOffers } from './offers.controller.js';
+import { addOfferProduct, createOffer, deleteOffer, getAllOffers, getOfferByIdAdmin, getOfferByIdUser, getOfferProducts, removeOfferProduct, updateOffer, updateOfferStatus, getOffers } from './offers.controller.js';
 import { validateCreateOffer, validateOfferIdParam, validateOfferProductBody, validateOfferStatusBody, validateProductIdParam, validateUpdateOffer } from './offers.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -12,8 +12,6 @@ const router = express.Router();
 // ==================== PUBLIC ROUTES - GET ====================
 router.get('/user', getAllOffers); //not using need to remove
 router.get("/", getOffers); //working //using
-// router.get('/active', getActiveOffers);
-// router.get('/upcoming', getUpcomingOffers);
 router.get('/user/:id', validateOfferIdParam, getOfferByIdUser);
 router.get('/user/:id/products', validateOfferIdParam, getOfferProducts);
 
@@ -34,6 +32,6 @@ router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.si
 router.put('/admin/:id/toggle', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus); // working
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/:id', authorize('super_admin', 'admin'), validateOfferIdParam, deleteOffer); //working //using
+router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //working //using
 
 export default router;

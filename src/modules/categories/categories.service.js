@@ -1,106 +1,153 @@
-import slugify from "slugify";
-import * as categoryRepository from "./categories.repository.js";
-import AppError from "../../utils/AppError.js";
-import { uploadToCloudinary } from "../../utils/cloudinaryUpload.js";
+import slugify from 'slugify';
+import * as categoryRepository from './categories.repository.js';
+import AppError from '../../utils/AppError.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-//create category
+// Create category
 export const createCategory = async (categoryData, file) => {
-    if (!categoryData.name) throw new AppError('Category name is required', 400);
-    if (!categoryData.category_type) throw new AppError('Category type is required', 400);
-    if (!file) throw new AppError('Category image is required', 400);
+    const { name, category_type } = categoryData;
+
+    if (!name?.trim()) {
+        throw new AppError('Category name is required', 400);
+    }
+
+    if (!category_type) {
+        throw new AppError('Category type is required', 400);
+    }
+
+    if (!file) {
+        throw new AppError('Category image is required', 400);
+    }
+
+    const existing = await categoryRepository.findCategoryByName(name.trim());
+
+    if (existing) {
+        throw new AppError('Category with this name already exists', 409);
+    }
 
     const uploadResult = await uploadToCloudinary(
         file.buffer,
         `category-${Date.now()}`,
         'ecommerce/categories'
     );
-    categoryData.img_url = uploadResult.secure_url;
-    categoryData.media_public_id = uploadResult.public_id;
-    console.log(" result:", categoryData);
 
-    const existing = await categoryRepository.findCategoryByName(categoryData.name);
-    if (existing) {
-        throw new AppError('Category with this name already exists', 409);
-    }
+    const payload = {
+        ...categoryData,
+        name: name.trim(),
+        slug: slugify(name, {
+            lower: true,
+            strict: true,
+        }),
+        img_url: uploadResult.secure_url,
+        media_public_id: uploadResult.public_id,
+    };
 
-    categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });
-
-    return await categoryRepository.createCategory(categoryData);
-}
-
-//get categories by category_type
-export const getCategories = async (type) => {
-    let categories;
-    if (type) {
-        categories = await categoryRepository.getCategoriesByType(type);
-    } else {
-       categories = await categoryRepository.getAllCategories();
-    }
-    return categories;
+    return await categoryRepository.createCategory(payload);
 };
 
-export const getAllCategories = async () => {
-    const categories = await categoryRepository.getAllCategories();
-    return categories;
-}
+// Get categories by type or all
+export const getCategories = async (type) => {
+    if (type) {
+        return await categoryRepository.getCategoriesByType(type);
+    }
 
-// get category names and ids only
+    return await categoryRepository.getAllCategories();
+};
+
+// Get all categories
+export const getAllCategories = async () => {
+    return await categoryRepository.getAllCategories();
+};
+
+// Get category names and ids
 export const getCategoryNames = async () => {
     const categories = await categoryRepository.getCategoryNames();
+
     if (!categories.length) {
         throw new AppError('No categories found', 404);
     }
+
     return categories;
 };
 
-//get category by id
+// Get category by id
 export const getCategoryById = async (id) => {
     const category = await categoryRepository.findCategoryById(id);
+
     if (!category) {
         throw new AppError('Category not found', 404);
     }
+
     return category;
-}
+};
 
-//update category
+// Update category
 export const updateCategory = async (id, categoryData) => {
-    const existing = await categoryRepository.findCategoryById(id);
-    if (!existing) {
+    const existingCategory = await categoryRepository.findCategoryById(id);
+
+    if (!existingCategory) {
         throw new AppError('Category not found', 404);
     }
-    if (categoryData.name && categoryData.name !== existing.name) {
-        const nameExists = await categoryRepository.findCategoryByName(categoryData.name);
-        if (nameExists) {
-            throw new AppError('Category with this name already exists', 409);
+
+    const payload = { ...categoryData };
+
+    if (payload.name?.trim()) {
+        const trimmedName = payload.name.trim();
+
+        if (trimmedName !== existingCategory.name) {
+            const nameExists = await categoryRepository.findCategoryByName(trimmedName);
+
+            if (nameExists) {
+                throw new AppError(
+                    'Category with this name already exists',
+                    409
+                );
+            }
         }
-    }
-    categoryData.slug = slugify(categoryData.name, { lower: true, strict: true });
-    return await categoryRepository.updateCategory(id, categoryData);
-}
 
-//delete category
+        payload.name = trimmedName;
+
+        payload.slug = slugify(trimmedName, {
+            lower: true,
+            strict: true,
+        });
+    }
+
+    return await categoryRepository.updateCategory(id, payload);
+};
+
+// Delete category
 export const deleteCategory = async (id) => {
-    const existing = await categoryRepository.findCategoryById(id);
-    if (!existing) {
+    const existingCategory = await categoryRepository.findCategoryById(id);
+      await deleteFromCloudinary(
+        existingCategory.media_public_id
+      );
+
+    if (!existingCategory) {
         throw new AppError('Category not found', 404);
     }
+
     return await categoryRepository.deleteCategory(id);
-}
+};
 
-//soft delete category
+// Soft delete category
 export const softDeleteCategory = async (id) => {
-    const existing = await categoryRepository.findCategoryById(id);
-    if (!existing) {
-        throw new AppError('Category not found', 404);
-    }
-    return await categoryRepository.softDeleteCategory(id);
-}
+    const existingCategory = await categoryRepository.findCategoryById(id);
 
-//restore category
-export const restoreCategory = async (id) => {
-    const existing = await categoryRepository.findCategoryById(id);
-    if (!existing) {
+    if (!existingCategory) {
         throw new AppError('Category not found', 404);
     }
+
+    return await categoryRepository.softDeleteCategory(id);
+};
+
+// Restore category
+export const restoreCategory = async (id) => {
+    const existingCategory = await categoryRepository.findCategoryById(id);
+
+    if (!existingCategory) {
+        throw new AppError('Category not found', 404);
+    }
+
     return await categoryRepository.restoreCategory(id);
-}
+};

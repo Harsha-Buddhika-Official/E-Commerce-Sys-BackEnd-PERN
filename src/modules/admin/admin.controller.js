@@ -1,11 +1,13 @@
 import * as adminService from './admin.service.js';
 
-export const createAdmin = async (req, res,next) => {
+export const createAdmin = async (req, res, next) => {
     try {
-        const adminData = req.body;
-        const newAdmin = await adminService.createAdmin(adminData);
-        const { password_hash, ...safeAdmin } = newAdmin;
-        res.status(201).json(safeAdmin);
+        const newAdmin = await adminService.createAdmin(req.body);
+        res.status(201).json({
+            success: true,
+            message: 'Admin created successfully',
+            data: newAdmin
+        });
     } catch (error) {
         next(error);
     }
@@ -13,57 +15,75 @@ export const createAdmin = async (req, res,next) => {
 
 export const loginAdmin = async (req, res, next) => {
     try {
-        const adminData = req.body;
-        const { token, admin } = await adminService.loginAdmin(adminData);
-        res.status(200).json({ token, admin: { ...admin, password_hash: undefined } });
+        const result = await adminService.loginAdmin(req.body);
+
+        res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            ...result
+        });
     } catch (error) {
         next(error);
     }
 };
 
-export const getAllAdmins = async (req, res,next) => {
+export const getAllAdmins = async (req, res, next) => {
     try {
         const admins = await adminService.getAllAdmins();
-        res.status(200).json(admins);
+
+        res.status(200).json({
+            success: true,
+            message: 'Admins retrieved successfully',
+            data: admins
+        });
     } catch (error) {
         next(error);
     }
 };
 
-export const updateAdminRole = async (req, res,next) => {
+export const updateAdminRole = async (req, res, next) => {
     try {
-        const adminData = req.body;
-        const adminId = req.params.id;
-        // console.log('Admin ID:', adminId); //debugging log
-        // console.log('Admin Data:', adminData); //debugging log
-        const updatedAdmin = await adminService.updateAdminRole(adminId, adminData);
-        const { password_hash, ...safeAdmin } = updatedAdmin;
-        res.status(200).json(safeAdmin);
+        const updated = await adminService.updateAdminRole(
+            req.params.id,
+            req.body
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Admin role updated successfully',
+            data: updated
+        });
     } catch (error) {
         next(error);
     }
 };
 
-export const deleteAdmin = async (req, res,next) => {
+export const deleteAdmin = async (req, res, next) => {
     try {
-        const { email } = req.body;
-        const deletedAdmin = await adminService.deleteAdmin(email);
-        const { password_hash, ...safeAdmin } = deletedAdmin;
-        res.status(200).json(safeAdmin);
+        const deleted = await adminService.deleteAdmin(req.body.email);
+
+        res.status(200).json({
+            success: true,
+            message: 'Admin deleted successfully',
+            data: deleted
+        });
     } catch (error) {
         next(error);
     }
 };
 
-export const updateAdminPassword = async (req, res,next) => {
+export const updateAdminPassword = async (req, res, next) => {
     try {
-        const adminId = req.params.id;
-        const adminData = req.body.passwordData;
-        // console.log('Admin ID:', adminId); //debugging log
-        // console.log('Admin Data:', adminData); //debugging log
-        const updatedAdmin = await adminService.updateAdminPassword(adminId, adminData);
-        const { password_hash, ...safeAdmin } = updatedAdmin;
-        res.status(200).json(safeAdmin);
+        const updated = await adminService.updateAdminPassword(
+            req.params.id,
+            req.body.passwordData
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Admin password updated successfully',
+            data: updated
+        });
     } catch (error) {
         next(error);
     }
