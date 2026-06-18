@@ -1,5 +1,6 @@
 import * as orderService from './order.service.js';
 
+//using
 export const createOrder = async (req, res, next) => {
     // console.log('Received request body in controller:', req.body);
     const sessionId = req.cookies.sid
@@ -20,9 +21,9 @@ export const createOrder = async (req, res, next) => {
     }
 };
 
+// using
 export const updatePaymentSlip = async (req, res, next) => {
     try {
-        // console.log('Received file in controller:', req.file); // Debug log to check received file
         const orderId = req.params.id;
         const slipUrl = await orderService.UpdatePaymentSlip(orderId, req.file);
         res.status(200).json({
@@ -127,6 +128,7 @@ export const getOrderById = async (req, res, next) => {
     }
 };
 
+//using
 export const getOrdersByTrackingCode = async (req, res, next) => {
     try {
         // console.log('Received request body in controller:', req.body); // Debug log to check request body

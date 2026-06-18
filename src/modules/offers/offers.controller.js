@@ -30,6 +30,7 @@ export const getAllOffers = async (req, res, next) => {
     }
 };
 
+//using
 export const getOffers = async (req, res, next) => {
   try {
     const { status } = req.query;
@@ -84,6 +85,7 @@ export const getOfferByIdAdmin = async (req, res, next) => {
     }
 };
 
+//using
 export const getOfferByIdUser = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -177,6 +179,7 @@ export const removeOfferProduct = async (req, res, next) => {
     }
 };
 
+//using
 export const getOfferProducts = async (req, res, next) => {
     try {
         const { id } = req.params;

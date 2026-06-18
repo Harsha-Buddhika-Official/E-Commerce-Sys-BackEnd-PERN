@@ -7,14 +7,14 @@ const router = express.Router();
 
 router.use(attachSession);
 
-router.get('/', getCart);
+router.get('/', getCart); //using
 
-router.post('/', validateAddItem, addItem);
+router.post('/', validateAddItem, addItem); //using
 
-router.patch('/:itemId', validateItemId, validateUpdateItem, updateQuantity);
+router.patch('/:itemId', validateItemId, validateUpdateItem, updateQuantity); //using
 
-router.delete('/:itemId', validateItemId, removeItem);
+router.delete('/:itemId', validateItemId, removeItem); //using
 
-router.delete('/', clearCart);
+router.delete('/', clearCart); //using
 
 export default router;

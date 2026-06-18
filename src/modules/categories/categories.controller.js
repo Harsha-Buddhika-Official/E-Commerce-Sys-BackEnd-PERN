@@ -17,6 +17,7 @@ export const createCategory = async (req, res, next) => {
 };
 
 // Get product categories
+//using
 export const getProductCategories = async (req, res, next) => {
     try {
         const categories = await categoryService.getCategories('product');
@@ -32,6 +33,7 @@ export const getProductCategories = async (req, res, next) => {
 };
 
 // Get accessory categories
+//using
 export const getAccessoryCategories = async (req, res, next) => {
     try {
         const categories = await categoryService.getCategories('accessory');

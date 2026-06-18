@@ -7,71 +7,7 @@ import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinary
 import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '../../services/mail.service.js';
 import pool from '../../config/db.js';
 
-
-// export const createOrder = async (orderData, sessionId) => {
-//     // console.log('Received order data in service:', orderData);
-//     let items = [];
-
-//     if (orderData.type === 'direct') {
-
-//         const product = await productRepository.findProductById(
-//             orderData.product_id
-//         );
-
-//         if (!product) {
-//             throw new AppError('Product not found', 404);
-//         }
-
-//         items.push({
-//             product_id: product.product_id,
-//             quantity: orderData.quantity,
-//             price_at_purchase: product.selling_price
-//         });
-
-//     } else if (orderData.type === 'cart') {
-
-//         if (!sessionId) {
-//             throw new AppError('Session not found', 401);
-//         }
-
-//         const cart = await cartRepository.findCartBySession(sessionId);
-//         if (!cart) {
-//             throw new AppError('Cart not found', 404);
-//         }
-//         // console.log('Cart found for session:', cart);
-
-//         const cartItems = await cartRepository.getCartWithItems(cart.cart_id);
-//         if (!cartItems.items.length) {
-//             throw new AppError('Cart is empty', 400);
-//         }
-//         // console.log('Cart items:', cartItems.items);
-
-//         items = cartItems.items.map(item => ({
-//             product_id: item.product_id,
-//             quantity: item.quantity,
-//             price_at_purchase: item.price_at_add
-//         }));
-
-//     } else {
-//         throw new AppError('Invalid order type', 400);
-//     }
-
-//     const total_amount = items.reduce(
-//         (sum, item) =>
-//             sum + item.quantity * item.price_at_purchase,
-//         0
-//     );
-
-//     return await orderRepository.createOrder({
-//         ...orderData,
-//         tracking_code: generateTrackingCode(),
-//         order_status: 'pending_payment',
-//         total_amount,
-//         items
-//     });
-// };
-
-
+//using
 export const createOrder = async (orderData, sessionId) => {
     const client = await pool.connect();
 
@@ -166,6 +102,7 @@ export const createOrder = async (orderData, sessionId) => {
     return order;
 };
 
+//using
 export const UpdatePaymentSlip = async (orderId, file) => {
     try{
         let media_url, media_public_id;
@@ -254,6 +191,7 @@ export const findOrderImageById = async (orderId, client) => {
     return await orderRepository.findOrderImageById(orderId, client);
 }
 
+//using
 export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     const emailCheck = await orderRepository.getOrdersByEmail(email, client);
     if (!emailCheck || emailCheck.length === 0) {

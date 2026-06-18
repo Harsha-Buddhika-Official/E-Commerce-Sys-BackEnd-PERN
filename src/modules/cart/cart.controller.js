@@ -1,6 +1,7 @@
 import * as cartService from './cart.service.js';
 import { setSessionCookie } from '../../middlewares/session.middleware.js';
 
+// using 
 export const getCart = async (req, res, next) => {
     try {
         const cart = await cartService.getCart(req.sessionId);
@@ -15,6 +16,7 @@ export const getCart = async (req, res, next) => {
     }
 };
 
+//using
 export const addItem = async (req, res, next) => {
     try {
         const { product_id, quantity } = req.body;
@@ -40,6 +42,7 @@ export const addItem = async (req, res, next) => {
     }
 };
 
+//using
 export const updateQuantity = async (req, res, next) => {
     try {
         const { itemId } = req.params;
@@ -61,6 +64,7 @@ export const updateQuantity = async (req, res, next) => {
     }
 };
 
+//using
 export const removeItem = async (req, res, next) => {
     try {
         const { itemId } = req.params;
@@ -80,6 +84,7 @@ export const removeItem = async (req, res, next) => {
     }
 };
 
+//using
 export const clearCart = async (req, res, next) => {
     try {
         await cartService.clearCart(req.sessionId);

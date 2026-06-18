@@ -99,6 +99,7 @@ export const getAllOffers = async () => {
 };
 
 // Get offers with optional status filter
+//using
 export const getOffers = async ({ status }) => {
   let query = `
     SELECT 
@@ -207,6 +208,7 @@ export const findOfferByIdBasic = async (id) => {
     return rows[0];
 }
 
+//using
 export const findOfferByIdUser = async (id) => {
     const query = `SELECT
         o.id,
@@ -363,6 +365,7 @@ GROUP BY
 };
 
 //for cart service to check if the product have offer or not
+//using
 export const findOfferByProductId = async (id) => {
     const query = `
         SELECT *
@@ -373,6 +376,7 @@ export const findOfferByProductId = async (id) => {
     return rows[0];
 };
 
+//using
 export const findOfferByIdWhenItsActive = async (id) => {
     const query = `
         SELECT *
@@ -474,6 +478,7 @@ export const removeOfferProduct = async (offerId, productId) => {
     return rows[0];
 };
 
+//using
 export const getOfferProducts = async (offerId) => {
     const query = `
         SELECT

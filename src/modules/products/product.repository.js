@@ -151,6 +151,7 @@ export const getAllProductsDetailsSimple = async () => {
   return rows;
 };
 
+//using
 export const getAllProducts = async () => {
   const query = `
     SELECT
@@ -343,7 +344,7 @@ export const getAllDetialsProductById = async (id) => {
   return rows[0];
 };
 
-
+//using
 export const getProductsByCategory = async (categoryId) => {
   const query = `SELECT
         p.*,
@@ -393,6 +394,7 @@ export const getProductsByCategory = async (categoryId) => {
   return rows;
 };
 
+//using
 export const getBestSellingProducts = async () => {
   const query = `
     SELECT
@@ -443,6 +445,7 @@ export const getBestSellingProducts = async () => {
   return rows;
 };
 
+//using
 export const getLatestProducts = async () => {
   const query = `SELECT
         p.*,
@@ -560,6 +563,7 @@ export const findProductByName = async (name, client = pool) => {
   return rows[0];
 }
 
+//using
 export const findProductByNameForSearch = async (name, client = pool) => {
   const query = `SELECT
       p.*,
@@ -733,6 +737,7 @@ export const restoreProduct = async (id) => {
   return rows[0];
 };
 
+//using
 export const getAttributesByCategory = async (categoryId) => {
   const query = `
             SELECT
@@ -753,7 +758,7 @@ export const getAttributesByCategory = async (categoryId) => {
   return rows;
 };
 
-
+//using
 export const getFilteredProducts = async ({ categoryId, attributeFilters = [], priceMin, priceMax }) => {
   const conditions = [`p.category_id = $1`, `p.is_active = true`];
   const params = [categoryId];

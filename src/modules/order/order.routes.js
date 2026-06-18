@@ -11,9 +11,9 @@ const router = express.Router();
 router.use(attachSession);
 
 // ==================== PUBLIC ROUTES - POST ====================
-router.post('/create',  createOrder); //validateCreateOrder, 
-router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode); 
-router.post('/upload-receipt/:id', upload.single('media'), updatePaymentSlip); 
+router.post('/create',  createOrder); //validateCreateOrder,  //using
+router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode);  //using
+router.post('/upload-receipt/:id', upload.single('media'), updatePaymentSlip); //using
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);

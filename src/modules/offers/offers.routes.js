@@ -10,10 +10,10 @@ const router = express.Router();
 
 // USER ROUTES
 // ==================== PUBLIC ROUTES - GET ====================
-router.get('/user', getAllOffers); //not using need to remove
-router.get("/", getOffers); 
-router.get('/user/:id', validateOfferIdParam, getOfferByIdUser);
-router.get('/user/:id/products', validateOfferIdParam, getOfferProducts);
+router.get('/user', getAllOffers); //using
+router.get("/", getOffers);  //using
+router.get('/user/:id', validateOfferIdParam, getOfferByIdUser); //using
+router.get('/user/:id/products', validateOfferIdParam, getOfferProducts); //using
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);

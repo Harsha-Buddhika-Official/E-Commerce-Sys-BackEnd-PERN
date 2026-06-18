@@ -1,5 +1,6 @@
 import pool from '../../config/db.js';
 
+//using
 export const createOrder = async (orderData, client = pool) => {
 
     const { tracking_code, customer_email, phone_number, total_amount, order_status, shipping_address, city, postal_code, items, full_name } = orderData;
@@ -60,6 +61,7 @@ export const createOrder = async (orderData, client = pool) => {
     return order;
 };
 
+//using
 export const importPaymentSlipData = async (data) => {
     const query = `INSERT INTO order_receipts (
         order_id,
@@ -441,6 +443,7 @@ export const findOrderImageById = async (orderId, client = pool) => {
     }
 };
 
+//using
 export const getOrdersByEmail = async (email, client = pool) => {
     const query = `SELECT 
     o.order_id, 
@@ -470,6 +473,7 @@ export const getOrdersByEmail = async (email, client = pool) => {
     }
 };
 
+// using
 export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
     const query = `
         SELECT 
@@ -547,6 +551,7 @@ export const deleteOrder = async (orderId, client = pool) => {
     }
 };
 
+//using
 export const changeOrderStatus = async (orderId, newStatus, client = pool) => {
     const query = `UPDATE orders
     SET

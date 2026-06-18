@@ -163,6 +163,7 @@ export const createProductWithoutAttributes = async ({ body, files }) => {
    GET PRODUCTS
 ========================================================= */
 
+//using
 export const getAllProducts = async () => {
   const products = await productRepository.getAllProducts();
   if (!products.length) throw new AppError('No products found', 404);
@@ -190,12 +191,14 @@ export const getAllDetialsProductById = async (id) => {
   return applyActiveOfferPricing(product);
 };
 
+//using
 export const getProductById = async (id) => {
   const product = await productRepository.findProductById(id);
   if (!product) throw new AppError('Product not found', 404);
   return applyActiveOfferPricing(product);
 };
 
+//using
 export const getProductByName = async (name) => {
   if (!name) throw new AppError('Product name is required', 400);
 
@@ -211,6 +214,7 @@ export const getProductByName = async (name) => {
    FILTER / CATEGORY / SPECIAL LISTS
 ========================================================= */
 
+//using
 export const getProductsByCategory = async (categoryId) => {
   const products = await productRepository.getProductsByCategory(categoryId);
   if (!products.length) throw new AppError('No products found', 404);
@@ -220,6 +224,7 @@ export const getProductsByCategory = async (categoryId) => {
   );
 };
 
+//using
 export const getBestSellingProducts = async () => {
   const products = await productRepository.getBestSellingProducts();
   if (!products.length) throw new AppError('No products found', 404);
@@ -227,6 +232,7 @@ export const getBestSellingProducts = async () => {
   return Promise.all(products.map(applyActiveOfferPricing));
 };
 
+//using
 export const getLatestProducts = async () => {
   const products = await productRepository.getLatestProducts();
   if (!products.length) throw new AppError('No products found', 404);
@@ -286,6 +292,7 @@ export const getAttributesByCategory = async (categoryId) => {
   return rows;
 };
 
+//using
 export const getFilterOptions = async (categoryId) => {
   const rows =
     await productRepository.getAttributesByCategory(categoryId);
@@ -313,6 +320,7 @@ export const getFilterOptions = async (categoryId) => {
   return Array.from(map.values());
 };
 
+//using
 export const filterProducts = async (categoryId, body) => {
   const priceMin = body.priceMin ? parseFloat(body.priceMin) : undefined;
   const priceMax = body.priceMax ? parseFloat(body.priceMax) : undefined;

@@ -38,6 +38,7 @@ export const findCartItem = async (cartId, productId) => {
     return rows[0] ?? null;
 };
 
+// using
 export const findCartItemById = async (itemId) => {
     const query = `
         SELECT *

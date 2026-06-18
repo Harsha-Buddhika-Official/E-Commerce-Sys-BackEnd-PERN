@@ -49,6 +49,7 @@ export const getAllProductsDetailsSimple = async (req, res, next) => {
   }
 };
 
+//using
 export const getAllProducts = async (req, res, next) => {
   try {
     const products = await productService.getAllProducts();
@@ -92,6 +93,7 @@ export const getAllDetialsProductById = async (req, res, next) => {
   }
 };
 
+//using
 export const getProductsByCategory = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
@@ -107,6 +109,7 @@ export const getProductsByCategory = async (req, res, next) => {
   }
 };
 
+//using
 export const getBestSellingProducts = async (req, res, next) => {
   try {
     const products = await productService.getBestSellingProducts();
@@ -121,6 +124,7 @@ export const getBestSellingProducts = async (req, res, next) => {
   }
 };
 
+//using
 export const getLatestProducts = async (req, res, next) => {
   try {
     const products = await productService.getLatestProducts();
@@ -135,7 +139,7 @@ export const getLatestProducts = async (req, res, next) => {
   }
 };
 
-// ✅ FIXED NAME: getProductById
+//using
 export const getProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -151,6 +155,7 @@ export const getProductById = async (req, res, next) => {
   }
 };
 
+//using
 export const getProductByName = async (req, res, next) => {
   try {
     const { name } = req.params;
@@ -261,6 +266,7 @@ export const getAttributesByCategory = async (req, res, next) => {
   }
 };
 
+//using
 export const getFilterOptions = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
@@ -272,6 +278,7 @@ export const getFilterOptions = async (req, res, next) => {
   }
 };
 
+//using
 export const getFilteredProducts = async (req, res, next) => {
   try {
     const { categoryId } = req.params;

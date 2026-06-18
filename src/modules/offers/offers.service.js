@@ -58,6 +58,7 @@ export const getAllOffers = async () => {
     return offersRepository.getAllOffers();
 };
 
+//using
 export const getOffers = async (status) => {
     const validStatuses = ['active', 'upcoming', undefined];
 
@@ -114,6 +115,7 @@ export const getOfferByIdAdmin = async (id) => {
     return offer;
 };
 
+//using
 export const getOfferByIdUser = async (id) => {
     const offer = await offersRepository.findOfferByIdUser(id);
     if (!offer) {
@@ -148,7 +150,6 @@ export const getOfferByIdUser = async (id) => {
             };
         })
         : [];
-    // console.log("offer in service: ", offer.products);
     return offer;
 };
 
@@ -254,6 +255,7 @@ export const removeOfferProduct = async (offerId, productId) => {
     return offersRepository.removeOfferProduct(offerId, productId);
 };
 
+//using
 export const getOfferProducts = async (offerId) => {
     const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {

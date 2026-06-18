@@ -8,8 +8,8 @@ import upload from '../../middlewares/multer.js';
 const router = express.Router();
 
 // ==================== PUBLIC ROUTES - GET ====================
-router.get('/products', validateGetCategorySchema, getProductCategories);
-router.get('/accessories', validateGetCategorySchema, getAccessoryCategories);
+router.get('/products', validateGetCategorySchema, getProductCategories); //using
+router.get('/accessories', validateGetCategorySchema, getAccessoryCategories); //using
 // router.get('/:id', validateCategoryIdParam, getCategoryById);
 
 // ==================== PROTECTED ROUTES ====================

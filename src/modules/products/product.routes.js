@@ -8,18 +8,18 @@ import upload from '../../middlewares/multer.js';
 const router = express.Router();
 
 // ==================== PUBLIC ROUTES - GET ====================
-router.get('/', getAllProducts);
-router.get('/best-selling', getBestSellingProducts);
-router.get('/latest', getLatestProducts);
-router.get('/search/:name', getProductByName);
-router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory);
+router.get('/', getAllProducts); //using
+router.get('/best-selling', getBestSellingProducts); //using
+router.get('/latest', getLatestProducts); //using
+router.get('/search/:name', getProductByName); //using
+router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory); //using
 router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
-router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions);
-router.get('/:id', validateProductId, getProductById);
+router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions); //using
+router.get('/:id', validateProductId, getProductById); //using
 
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/', upload.array('images', 3), validateProduct, createProduct);
-router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts);
+router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); //using
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
