@@ -13,6 +13,7 @@ export const createAttribute = async ({ name, category_id }) => {
     return rows[0];
 }
 
+//using
 export const createProductAttribute = async (productId, attributeData) => {
     const query = `
         INSERT INTO product_attributes (
@@ -36,6 +37,7 @@ export const createProductAttribute = async (productId, attributeData) => {
     return rows[0];
 };
 
+//using
 export const getAttributeValueById = async (attributeValueId) => {
     const query = `
         SELECT

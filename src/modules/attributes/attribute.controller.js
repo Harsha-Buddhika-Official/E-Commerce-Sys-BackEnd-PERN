@@ -61,6 +61,7 @@ export const getAttributes = async (req, res, next) => {
     }
 };
 
+//using
 export const getAttributeById = async (req, res, next) => {
     try {
         const attribute = await attributeService.getAttributeById(req.params.id);

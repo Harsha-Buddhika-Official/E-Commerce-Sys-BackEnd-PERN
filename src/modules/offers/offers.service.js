@@ -3,6 +3,7 @@ import * as offersRepository from './offers.repository.js';
 import * as productRepository from '../products/product.repository.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
+//using
 export const createOffer = async (offerData, file) => {
     if (!offerData.title?.trim()) {
         throw new AppError('Offer title is required', 400);
@@ -52,6 +53,7 @@ export const createOffer = async (offerData, file) => {
     return await offersRepository.createOffer(payload);
 };
 
+//using
 export const getAllOffers = async () => {
     return offersRepository.getAllOffers();
 };
@@ -74,6 +76,7 @@ export const getUpcomingOffers = async () => {
     return offersRepository.getUpcomingOffers();
 };
 
+//using
 export const getOfferByIdAdmin = async (id) => {
     const offer = await offersRepository.findOfferByIdAdmin(id);
     if (!offer) {
@@ -149,51 +152,7 @@ export const getOfferByIdUser = async (id) => {
     return offer;
 };
 
-// export const updateOffer = async (id, offerData, file) => {
-
-//     if(file){
-//         const uploadResult = await uploadToCloudinary(
-//             file.buffer,
-//             `offer-banner-${Date.now()}`,
-//             'ecommerce/offers'
-//         );
-//         offerData.banner_image_url = uploadResult.secure_url;
-//         offerData.banner_image_public_id = uploadResult.public_id;
-//     }
-
-//     const existing = await offersRepository.findOfferByIdBasic(id);
-//     if (!existing) {
-//         throw new AppError('Offer not found', 404);
-//     }
-
-//     const updated = {
-//         title: offerData.title ?? existing.title,
-//         description: offerData.description,
-//         discount_type: offerData.discount_type ?? existing.discount_type,
-//         discount_value: offerData.discount_value ?? existing.discount_value,
-//         start_date: offerData.start_date ?? existing.start_date,
-//         end_date: offerData.end_date ?? existing.end_date,
-//         is_active: offerData.is_active ?? existing.is_active,
-//         banner_image: offerData.banner_image ?? existing.banner_image,
-//         banner_image_public_id: offerData.banner_image_public_id ?? existing.banner_image_public_id,
-//     };
-
-//     const startDate = new Date(updated.start_date);
-//     const endDate = new Date(updated.end_date);
-//     if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-//         throw new AppError('Invalid start or end date', 400);
-//     }
-//     if (endDate < startDate) {
-//         throw new AppError('End date must be after start date', 400);
-//     }
-
-//     if (updated.discount_type === 'percentage' && updated.discount_value > 100) {
-//         throw new AppError('Percentage discount cannot exceed 100', 400);
-//     }
-
-//     return offersRepository.updateOffer(id, updated);
-// };
-
+//using
 export const updateOffer = async (id, offerData, file) => {
     const existing =
         await offersRepository.findOfferByIdBasic(id);
@@ -240,16 +199,19 @@ export const updateOffer = async (id, offerData, file) => {
     return await offersRepository.updateOffer(id, updated);
 };
 
+
+//using
 export const toggleOffer = async (id, isActive) => {
-    if (!id) throw new Error("Offer ID is required", 400);
+    if (!id) throw new AppError("Offer ID is required", 400);
+
     const existing = await offersRepository.findOfferByIdBasic(id);
-    if (!existing) {
-        throw new AppError('Offer not found', 404);
-    }
+    
+    if (!existing) throw new AppError('Offer not found', 404);
 
     return offersRepository.toggleOffer(id, isActive);
 };
 
+//using
 export const deleteOffer = async (id) => {
     const existing = await offersRepository.findOfferByIdBasic(id);
     if (!existing) {
@@ -259,12 +221,12 @@ export const deleteOffer = async (id) => {
     return offersRepository.deleteOffer(id);
 };
 
+//using
 export const addOfferProduct = async (offerId, productId) => {
     const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {
         throw new AppError('Offer not found', 404);
     }
-    // need to get findProductbyid funciton from the product repo level not createing the product funciton in the offer repo level
     const product = await productRepository.findProductByIdBasic(productId);
     if (!product) {
         throw new AppError('Product not found', 404);

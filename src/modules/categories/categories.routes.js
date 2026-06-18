@@ -16,11 +16,11 @@ router.get('/accessories', validateGetCategorySchema, getAccessoryCategories);
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/', authorize('super_admin', 'admin'), getCategories); //using //working
-router.get('/names', authorize('super_admin', 'admin'), getCategoryNames); //using //working
+router.get('/admin', authorize('super_admin', 'admin'), getCategories); //using
+router.get('/admin/names', authorize('super_admin', 'admin'), getCategoryNames); //using
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/', authorize('super_admin', 'admin'), upload.single('media'), createCategory);
+router.post('/', authorize('super_admin', 'admin'), upload.single('media'), createCategory); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
 // router.put('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory);
@@ -28,6 +28,6 @@ router.post('/', authorize('super_admin', 'admin'), upload.single('media'), crea
 // router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreCategory);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
+router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); //using
 
 export default router;

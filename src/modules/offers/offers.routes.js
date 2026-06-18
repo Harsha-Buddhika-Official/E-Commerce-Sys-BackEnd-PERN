@@ -11,7 +11,7 @@ const router = express.Router();
 // USER ROUTES
 // ==================== PUBLIC ROUTES - GET ====================
 router.get('/user', getAllOffers); //not using need to remove
-router.get("/", getOffers); //working //using
+router.get("/", getOffers); 
 router.get('/user/:id', validateOfferIdParam, getOfferByIdUser);
 router.get('/user/:id/products', validateOfferIdParam, getOfferProducts);
 
@@ -20,18 +20,18 @@ router.use(authMiddleware);
 
 //ADMIN ROUTES
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin', authorize('super_admin', 'admin', 'manager'),getAllOffers); //working //using
-router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, getOfferByIdAdmin); //working //using
+router.get('/admin', authorize('super_admin', 'admin', 'manager'),getAllOffers); //using
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, getOfferByIdAdmin); //using
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/admin/', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateCreateOffer, createOffer); //working // using
-router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferProductBody, addOfferProduct); //working //using
+router.post('/admin/', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateCreateOffer, createOffer); //using
+router.post('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferProductBody, addOfferProduct); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer); //working //using
-router.put('/admin/:id/toggle', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus); // working
+router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('banner_image'), validateOfferIdParam, validateUpdateOffer, updateOffer); //using
+router.put('/admin/:id/toggle', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, validateOfferStatusBody, updateOfferStatus); //using
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //working //using
+router.delete('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateOfferIdParam, deleteOffer); //using
 
 export default router;

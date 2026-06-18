@@ -1,5 +1,6 @@
 import pool from "../../config/db.js";
 
+//using
 export const createProduct = async (productData, client = pool) => {
 
   const {
@@ -41,6 +42,7 @@ export const createProduct = async (productData, client = pool) => {
   return rows[0];
 };
 
+//using
 export const getAttributeValueById = async (attributeValueId, client = pool) => {
   const query = `
     SELECT
@@ -93,12 +95,14 @@ export const insertProductImages = async (productId, images, client = pool) => {
 
 };
 
+//using
 export const deleteProductAttributes = async (productId, client = pool) => {
   const query = `DELETE FROM product_attributes WHERE product_id = $1`;
   const values = [productId];
   await client.query(query, values);
 };
 
+//using
 export const insertProductAttributes = async (productId, attributes, client = pool) => {
   if (!attributes || attributes.length === 0) return;
 
@@ -137,6 +141,7 @@ export const removeProductAttribute = async (productId, attributeId, client = po
   return rows[0];
 };
 
+//using
 export const getAllProductsDetailsSimple = async () => {
   const query = `
     SELECT p.product_id,p.name,p.discounted_price,p.is_active,c.name AS category_name FROM products p
@@ -209,6 +214,7 @@ export const getAllProducts = async () => {
   return rows;
 };
 
+//using
 export const getAllProductLimitedDetilas = async () => {
   const query = `
     SELECT
@@ -256,39 +262,40 @@ export const getAllProductLimitedDetilas = async () => {
   return rows;
 };
 
-  export const getAllDetialsProductById = async (id) => {
-    const query = `SELECT
-        p.product_id,
-        p.name,
-        p.slug,
-        p.description,
-        p.base_price,
-        p.selling_price,
-        p.discounted_price,
-        p.stock_quantity,
-        CASE
-          WHEN p.stock_quantity <= 0 THEN 'OUT_OF_STOCK'
-          WHEN p.stock_quantity <= 3 THEN 'LOW_STOCK'
-          ELSE 'IN_STOCK'
-        END AS stock_status,
-        p.warranty_months,
-        p.product_tag,
-        p.is_active,
-        p.created_at,
-        p.updated_at,
-        c.category_id,
-        c.name AS category_name,
-        c.slug AS category_slug,
-        c.category_type,
-        c.img_url AS category_image,
-        c.is_active AS category_active,
-        b.brand_id,
-        b.name AS brand_name,
-        b.slug AS brand_slug,
-        b.logo_url,
-        b.is_active AS brand_active,
-        COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
-        COALESCE(img_agg.images, '[]'::json) AS images
+//using
+export const getAllDetialsProductById = async (id) => {
+  const query = `SELECT
+    p.product_id,
+    p.name,
+    p.slug,
+    p.description,
+    p.base_price,
+    p.selling_price,
+    p.discounted_price,
+    p.stock_quantity,
+    CASE
+      WHEN p.stock_quantity <= 0 THEN 'OUT_OF_STOCK'
+      WHEN p.stock_quantity <= 3 THEN 'LOW_STOCK'
+      ELSE 'IN_STOCK'
+    END AS stock_status,
+    p.warranty_months,
+    p.product_tag,
+    p.is_active,
+    p.created_at,
+    p.updated_at,
+    c.category_id,
+    c.name AS category_name,
+    c.slug AS category_slug,
+    c.category_type,
+    c.img_url AS category_image,
+    c.is_active AS category_active,
+    b.brand_id,
+    b.name AS brand_name,
+    b.slug AS brand_slug,
+    b.logo_url,
+    b.is_active AS brand_active,
+    COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
+    COALESCE(img_agg.images, '[]'::json) AS images
   FROM products p
   LEFT JOIN categories c
         ON c.category_id = p.category_id
@@ -332,9 +339,9 @@ export const getAllProductLimitedDetilas = async () => {
         ON img_agg.product_id = p.product_id
   WHERE p.product_id = $1
     `;
-    const { rows } = await pool.query(query, [id]);
-    return rows[0];
-  };
+  const { rows } = await pool.query(query, [id]);
+  return rows[0];
+};
 
 
 export const getProductsByCategory = async (categoryId) => {
@@ -532,16 +539,18 @@ export const findProductById = async (id, client = pool) => {
   return rows[0];
 };
 
+//using
 export const findProductByIdBasic = async (productId) => {
-    const query = `
+  const query = `
         SELECT product_id, name, selling_price, stock_quantity, is_active
         FROM products
         WHERE product_id = $1
     `;
-    const { rows } = await pool.query(query, [productId]);
-    return rows[0];
+  const { rows } = await pool.query(query, [productId]);
+  return rows[0];
 };
 
+//using
 export const findProductByName = async (name, client = pool) => {
   const query = `
     SELECT * FROM products WHERE name = $1 AND is_active = true
@@ -645,17 +654,17 @@ export const updateProduct = async (id, productData, client = pool) => {
 
   const productValues = [
     name,
-    brand_id           || null,
+    brand_id || null,
     category_id,
     slug,
-    description        || null,
-    base_price         || null,
-    selling_price      || null,
+    description || null,
+    base_price || null,
+    selling_price || null,
     discounted_price,
-    stock_quantity     || 0,
-    warranty_months    || null,
-    product_tag        || null,
-    is_active          ?? true,
+    stock_quantity || 0,
+    warranty_months || null,
+    product_tag || null,
+    is_active ?? true,
     id
   ];
 
@@ -684,10 +693,10 @@ export const updateProduct = async (id, productData, client = pool) => {
         [
           id,
           img.image_url,
-          img.product_image_id  || null,
-          img.is_primary        ?? (index === 0),
-          img.alt_text          || null,
-          img.sort_order        ?? index
+          img.product_image_id || null,
+          img.is_primary ?? (index === 0),
+          img.alt_text || null,
+          img.sort_order ?? index
         ]
       );
     }
@@ -835,20 +844,22 @@ export const getFilteredProducts = async ({ categoryId, attributeFilters = [], p
   return rows;
 };
 
-export const getImagesById = async(id) => {
+//using
+export const getImagesById = async (id) => {
   const quary = `SELECT * FROM product_images WHERE product_id = $1`;
   const { rows } = await pool.query(quary, [id]);
   return rows;
 }
 
-export const deleteImagesById = async(id) => {
+export const deleteImagesById = async (id) => {
   // console.log("Deleting image with ID:", id);
   const quary = `DELETE FROM product_images WHERE image_id = $1 RETURNING *`;
-  const{ rows } = await pool.query(quary,[id]);
+  const { rows } = await pool.query(quary, [id]);
   // console.log("rows",rows)
   return rows;
 }
 
+//using
 export const updateProductFieldsOnly = async (id, productData, client = pool) => {
   const {
     name,
@@ -887,17 +898,17 @@ export const updateProductFieldsOnly = async (id, productData, client = pool) =>
 
   const values = [
     name,
-    brand_id        || null,
+    brand_id || null,
     category_id,
     slug,
-    description     || null,
-    base_price      || null,
-    selling_price   || null,
+    description || null,
+    base_price || null,
+    selling_price || null,
     discounted_price,
-    stock_quantity  || 0,
+    stock_quantity || 0,
     warranty_months || null,
-    product_tag     || null,
-    is_active       ?? true,
+    product_tag || null,
+    is_active ?? true,
     id,
   ];
 
@@ -905,6 +916,7 @@ export const updateProductFieldsOnly = async (id, productData, client = pool) =>
   return rows[0];
 };
 
+//using
 export const insertSingleImage = async (productId, image, client = pool) => {
   const query = `
     INSERT INTO product_images
@@ -924,18 +936,21 @@ export const insertSingleImage = async (productId, image, client = pool) => {
   return rows[0];
 };
 
+//using
 export const getImageById = async (imageId, client = pool) => {
   const query = `SELECT * FROM product_images WHERE image_id = $1`;
   const { rows } = await client.query(query, [imageId]);
   return rows[0];
 };
 
+// using 
 export const deleteImageById = async (imageId, client = pool) => {
   const query = `DELETE FROM product_images WHERE image_id = $1 RETURNING *`;
   const { rows } = await client.query(query, [imageId]);
   return rows[0];
 };
 
+//using
 export const updateImagesOrder = async (productId, orderedImageIds, primaryImageId, client = pool) => {
   for (const [index, imageId] of orderedImageIds.entries()) {
     await client.query(

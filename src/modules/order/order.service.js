@@ -185,6 +185,7 @@ export const UpdatePaymentSlip = async (orderId, file) => {
 }
 
 //status bar data for admin dashboard
+//using
 export const getStatusData = async (client) => {
     const {
         totalRevenueThisMonth,
@@ -218,31 +219,37 @@ export const getStatusData = async (client) => {
 };
 
 //low stock alert for admin dashboard
+//using
 export const lowStockAlert = async (client) => {
     const lowStockProducts = await orderRepository.lowStockAlert(client);
     return lowStockProducts;
 }
 
 //recent orders for admin dashboard
+//using
 export const getRecentOrders = async (client) => {
     return await orderRepository.findRecentOrders(client);
 }
 
 //order status count for order page
+//using
 export const getOrderStatusCount = async (client) =>{
     const OrderStatus = await orderRepository.getOrderStatusCount(client);
     return OrderStatus;
 }
 
 //orders for order page
+//using
 export const getAllOrders = async (client) => {
     return await orderRepository.findAllOrders(client);
 };
 
+//using
 export const getOrderById = async (orderId, client) => {
     return await orderRepository.getOrderById(orderId, client);
 };
 
+//using
 export const findOrderImageById = async (orderId, client) => {
     return await orderRepository.findOrderImageById(orderId, client);
 }
@@ -265,9 +272,9 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     return TrackingCodeCheck;
 };
 
+//using
 export const updateOrderStatus = async (orderId, newStatus, client) => {
     const order = await orderRepository.getOrderById(orderId, client);
-    // console.log('Current order:', order);
     await sendOrderStatusUpdateEmail({
         full_name: order.full_name,
         email: order.customer_email,
@@ -279,6 +286,7 @@ export const updateOrderStatus = async (orderId, newStatus, client) => {
     return await orderRepository.updateOrderStatus(orderId, newStatus, client);
 };
 
+//waiting list
 export const deleteOrder = async (orderId, client) => {
     const ImageData = await orderRepository.findOrderImageById(orderId, client);
     await deleteFromCloudinary(ImageData.media_public_id);

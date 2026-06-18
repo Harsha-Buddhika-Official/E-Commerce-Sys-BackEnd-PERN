@@ -8,6 +8,8 @@ import AppError from './AppError.js';
  * @param {String} folder - Folder path on Cloudinary (e.g., 'ecommerce/products')
  * @returns {Promise<Object>} - Cloudinary response with public_id and secure_url
  */
+
+//using
 export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommerce') => {
     try {
         return new Promise((resolve, reject) => {

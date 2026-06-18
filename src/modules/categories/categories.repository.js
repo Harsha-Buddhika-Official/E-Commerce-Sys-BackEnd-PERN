@@ -1,6 +1,6 @@
 import pool from "../../config/db.js";
 
-// using
+//using
 export const createCategory = async ({ name, slug, category_type, img_url, media_public_id }) => {
     const query = `
         INSERT INTO categories (
@@ -26,7 +26,7 @@ export const createCategory = async ({ name, slug, category_type, img_url, media
     return rows[0];
 };
 
-// using
+//using
 export const getAllCategories = async () => {
     const query = `
         SELECT *
@@ -39,7 +39,7 @@ export const getAllCategories = async () => {
     return rows;
 };
 
-// using
+//using
 export const getCategoriesByType = async (type) => {
     const query = `
         SELECT *
@@ -53,7 +53,7 @@ export const getCategoriesByType = async (type) => {
     return rows;
 };
 
-// using
+//using
 export const getCategoryNames = async () => {
     const query = `
         SELECT
@@ -68,6 +68,7 @@ export const getCategoryNames = async () => {
     return rows;
 };
 
+//using
 export const findCategoryById = async (id) => {
     const query = `
         SELECT *
@@ -81,6 +82,7 @@ export const findCategoryById = async (id) => {
     return rows[0];
 };
 
+//using
 export const findCategoryByName = async (name) => {
     const query = `
         SELECT *
@@ -123,7 +125,7 @@ export const updateCategory = async (id, {
     return rows[0];
 };
 
-// using
+//using
 export const deleteCategory = async (id) => {
     const query = `
         DELETE FROM categories
@@ -137,7 +139,6 @@ export const deleteCategory = async (id) => {
     return rows[0];
 };
 
-// using
 export const softDeleteCategory = async (id) => {
     const query = `
         UPDATE categories
@@ -153,7 +154,6 @@ export const softDeleteCategory = async (id) => {
     return rows[0];
 };
 
-// using
 export const restoreCategory = async (id) => {
     const query = `
         UPDATE categories

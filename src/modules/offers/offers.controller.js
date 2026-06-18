@@ -1,6 +1,7 @@
 import * as offersService from './offers.service.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
+//using
 export const createOffer = async (req, res, next) => {
     try {
         const offer = await offersService.createOffer(req.body, req.file);
@@ -15,9 +16,11 @@ export const createOffer = async (req, res, next) => {
     }
 };
 
+//using
 export const getAllOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getAllOffers();
+
         res.status(200).json({
             success: true,
             data: offers
@@ -65,10 +68,13 @@ export const getUpcomingOffers = async (req, res, next) => {
     }
 };
 
+//using
 export const getOfferByIdAdmin = async (req, res, next) => {
     try {
         const { id } = req.params;
+
         const offer = await offersService.getOfferByIdAdmin(id);
+
         res.status(200).json({
             success: true,
             data: offer
@@ -91,10 +97,13 @@ export const getOfferByIdUser = async (req, res, next) => {
     }
 };
 
+//using
 export const updateOffer = async (req, res, next) => {
     try {
         const { id } = req.params;
+
         const updatedOffer = await offersService.updateOffer(id, req.body, req.file);
+
         res.status(200).json({
             success: true,
             message: 'Offer updated successfully',
@@ -105,11 +114,14 @@ export const updateOffer = async (req, res, next) => {
     }
 };
 
+//using
 export const updateOfferStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { is_active } = req.body;
+
         const updated = await offersService.toggleOffer(id, is_active);
+
         res.status(200).json({
             success: true,
             data: updated,
@@ -120,10 +132,13 @@ export const updateOfferStatus = async (req, res, next) => {
     }
 };
 
+//using
 export const deleteOffer = async (req, res, next) => {
     try {
         const { id } = req.params;
+
         await offersService.deleteOffer(id);
+        
         res.status(200).json({
             success: true,
             message: 'Offer deleted successfully'
@@ -133,6 +148,7 @@ export const deleteOffer = async (req, res, next) => {
     }
 };
 
+//using
 export const addOfferProduct = async (req, res, next) => {
     try {
         const { id } = req.params;

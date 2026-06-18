@@ -8,9 +8,13 @@ const router = express.Router();
 router.use(attachSession);
 
 router.get('/', getCart);
+
 router.post('/', validateAddItem, addItem);
+
 router.patch('/:itemId', validateItemId, validateUpdateItem, updateQuantity);
+
 router.delete('/:itemId', validateItemId, removeItem);
+
 router.delete('/', clearCart);
 
 export default router;

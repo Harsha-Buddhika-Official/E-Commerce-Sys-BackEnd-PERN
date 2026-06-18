@@ -11,6 +11,7 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary
    CLOUDINARY HELPERS
 ========================================================= */
 
+//using
 const uploadProductImages = async (files = []) => {
   const uploadedImages = [];
   const uploadedCloudinaryIds = [];
@@ -104,6 +105,7 @@ export const createProduct = async ({ body, files }) => {
    CREATE PRODUCT (WITHOUT ATTRIBUTES)
 ========================================================= */
 
+//using
 export const createProductWithoutAttributes = async ({ body, files }) => {
   const client = await pool.connect();
   let uploadedCloudinaryIds = [];
@@ -167,18 +169,21 @@ export const getAllProducts = async () => {
   return products;
 };
 
+//using
 export const getAllProductsDetailsSimple = async () => {
   const products = await productRepository.getAllProductsDetailsSimple();
   if (!products.length) throw new AppError('No products found', 404);
   return products;
 };
 
+//using
 export const getAllProductLimitedDetilas = async () => {
   const products = await productRepository.getAllProductLimitedDetilas();
   if (!products.length) throw new AppError('No products found', 404);
   return products;
 };
 
+//using
 export const getAllDetialsProductById = async (id) => {
   const product = await productRepository.getAllDetialsProductById(id);
   if (!product) throw new AppError('Product not found', 404);
@@ -337,6 +342,7 @@ export const filterProducts = async (categoryId, body) => {
    UPDATE PRODUCT (CORE FIXED VERSION)
 ========================================================= */
 
+//using
 export const updateProductDetails = async (id, productData) => {
   const client = await pool.connect();
 
@@ -435,7 +441,7 @@ export const updateProductDetails = async (id, productData) => {
 /* =========================================================
    IMAGE MANAGEMENT
 ========================================================= */
-
+//using
 export const addProductImage = async (productId, files) => {
   const client = await pool.connect();
   const uploaded = [];
@@ -499,6 +505,7 @@ export const addProductImage = async (productId, files) => {
   }
 };
 
+// using 
 export const removeProductImage = async (productId, imageId) => {
   const client = await pool.connect();
 
@@ -542,6 +549,7 @@ export const removeProductImage = async (productId, imageId) => {
   }
 };
 
+// using 
 export const reorderProductImages = async (
   productId,
   primaryImageId,

@@ -7,22 +7,22 @@ import upload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
-router.get('/public/images', getBannerImages);
-router.get('/public/video', getBannerVideo);
+router.get('/public/images', getBannerImages); //using
+router.get('/public/video', getBannerVideo); //using
 
 router.use(authMiddleware);
 
 // GET
-router.get('/admin',  authorize('super_admin', 'admin', 'manager'), getAllBanners);
-router.get('/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, getBannerById);
+router.get('/admin',  authorize('super_admin', 'admin', 'manager'), getAllBanners); //using
+router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateIdParam, getBannerById); //using
 
 // POST
-router.post('/admin', authorize('super_admin', 'admin'), upload.single('media'), createBanner);
+router.post('/admin', authorize('super_admin', 'admin'), upload.single('media'), createBanner); //using
 
 // PUT
 // router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('media'), validateIdParam, validateUpdateBanner, updateBanner);
 
 // DELETE
-router.delete('/admin/:id', authorize('super_admin', 'admin'), validateIdParam, deleteBanner);
+router.delete('/admin/:id', authorize('super_admin', 'admin'), validateIdParam, deleteBanner); //using
 
 export default router;

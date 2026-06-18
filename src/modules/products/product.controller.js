@@ -1,5 +1,6 @@
 import * as productService from './product.service.js';
 
+//using
 export const createProductWithoutAttributes = async (req, res, next) => {
   try {
     const product = await productService.createProductWithoutAttributes({
@@ -34,6 +35,7 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
+//using
 export const getAllProductsDetailsSimple = async (req, res, next) => {
   try {
     const products = await productService.getAllProductsDetailsSimple();
@@ -60,6 +62,7 @@ export const getAllProducts = async (req, res, next) => {
   }
 };
 
+//using
 export const getAllProductLimitedDetilas = async (req, res, next) => {
   try {
     const products = await productService.getAllProductLimitedDetilas();
@@ -73,6 +76,7 @@ export const getAllProductLimitedDetilas = async (req, res, next) => {
   }
 };
 
+//using
 export const getAllDetialsProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -279,6 +283,7 @@ export const getFilteredProducts = async (req, res, next) => {
   }
 };
 
+//using
 export const updateProductDetails = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -294,6 +299,7 @@ export const updateProductDetails = async (req, res, next) => {
   }
 };
 
+//using
 export const addProductImage = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -311,6 +317,7 @@ export const addProductImage = async (req, res, next) => {
   }
 };
 
+//using
 export const removeProductImage = async (req, res, next) => {
   try {
     const { id, imageId } = req.params;
@@ -326,6 +333,7 @@ export const removeProductImage = async (req, res, next) => {
   }
 };
 
+// using 
 export const reorderProductImages = async (req, res, next) => {
   try {
     const { id } = req.params;

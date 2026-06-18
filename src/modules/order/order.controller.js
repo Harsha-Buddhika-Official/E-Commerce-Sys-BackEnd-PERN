@@ -36,6 +36,7 @@ export const updatePaymentSlip = async (req, res, next) => {
 }
 
 //status data for admin dashboard
+//using
 export const getStatusData = async (req, res, next) => {
     try {
         const statusData = await orderService.getStatusData();
@@ -50,6 +51,7 @@ export const getStatusData = async (req, res, next) => {
 };
 
 //low stock alert for admin dashboard
+//using
 export const lowStockAlert = async (req, res, next) => {
     try {
         const lowStockProducts = await orderService.lowStockAlert();
@@ -64,6 +66,7 @@ export const lowStockAlert = async (req, res, next) => {
 };
 
 //recent orders for admin dashboard
+//using
 export const getRecentOrders = async (req, res, next) => {
     try {
         const orders = await orderService.getRecentOrders();
@@ -80,6 +83,7 @@ export const getRecentOrders = async (req, res, next) => {
 };
 
 //order status count for order page
+//using
 export const OrderStatusCount = async (req, res, next) => {
     try {
         const OrderStatus = await orderService.getOrderStatusCount();
@@ -94,6 +98,7 @@ export const OrderStatusCount = async (req, res, next) => {
 };
 
 //orders for order page
+//using
 export const getAllOrders = async (req, res, next) => {
     try {
         const orders = await orderService.getAllOrders();
@@ -107,6 +112,7 @@ export const getAllOrders = async (req, res, next) => {
     }
 };
 
+//using
 export const getOrderById = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -136,11 +142,11 @@ export const getOrdersByTrackingCode = async (req, res, next) => {
     }
 };
 
+//using
 export const updateOrderStatus = async (req, res, next) => {
     try {
         const orderId = req.params.id;
         const { newStatus } = req.body;
-        // console.log(newStatus)
         const updatedOrder = await orderService.updateOrderStatus(orderId, newStatus);
         res.status(200).json({
             success: true,
@@ -153,6 +159,7 @@ export const updateOrderStatus = async (req, res, next) => {
     }
 };
 
+//waiting list
 export const deleteOrder = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -167,6 +174,7 @@ export const deleteOrder = async (req, res, next) => {
     }
 };
 
+//using
 export const findOrderImageById = async (req, res, next) => {
     try {
         const orderId = req.params.id;

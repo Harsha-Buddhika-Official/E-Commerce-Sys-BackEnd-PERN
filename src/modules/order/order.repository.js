@@ -80,6 +80,7 @@ export const importPaymentSlipData = async (data) => {
     return rows[0];
 }
 
+//using
 export const getDashboardMetrics = async (client = pool) => {
     const query = `
         SELECT
@@ -137,6 +138,7 @@ export const getDashboardMetrics = async (client = pool) => {
     return rows[0];
 };
 
+//using
 export const lowStockAlert = async (threshold = 5, client = pool) => {
     const query = `
         SELECT product_id, name, stock_quantity
@@ -154,6 +156,7 @@ export const lowStockAlert = async (threshold = 5, client = pool) => {
     }
 };
 
+//using
 export const getOrderStatusCount = async (client = pool) => {
     const query = `
         SELECT
@@ -181,6 +184,7 @@ export const getOrderStatusCount = async (client = pool) => {
     }
 }
 
+//using
 export const findRecentOrders = async (client = pool) => {
     const query = `SELECT
         o.order_id,
@@ -208,6 +212,7 @@ export const findRecentOrders = async (client = pool) => {
     }
 }
 
+//using
 export const findAllOrders = async (client = pool) => {
     const query = `SELECT
         o.order_id,
@@ -361,6 +366,7 @@ export const updateOrder = async (orderId, orderData, client = pool) => {
     }
 };
 
+//using
 export const getOrderById = async (orderId, client = pool) => {
     const query = `SELECT 
         o.order_id,
@@ -422,6 +428,7 @@ export const getOrderById = async (orderId, client = pool) => {
     }
 };
 
+//using
 export const findOrderImageById = async (orderId, client = pool) => {
     const query = `SELECT media_url, media_public_id FROM order_receipts WHERE order_id = $1`;
     try {
@@ -508,6 +515,7 @@ export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
     }
 };
 
+//using
 export const updateOrderStatus = async (orderId, newStatus, client = pool) => {
     const query = `UPDATE orders
     SET 
@@ -526,6 +534,7 @@ export const updateOrderStatus = async (orderId, newStatus, client = pool) => {
     }
 };
 
+//waiting list
 export const deleteOrder = async (orderId, client = pool) => {
     const query = `DELETE FROM orders WHERE order_id = $1 RETURNING *`;
     const values = [orderId];

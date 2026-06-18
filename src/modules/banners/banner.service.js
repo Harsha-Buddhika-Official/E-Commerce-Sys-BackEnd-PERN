@@ -2,6 +2,7 @@ import AppError from "../../utils/AppError.js";
 import * as repo from "./banner.repository.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
 
+//using
 export const createBanner = async (data, file) => {
   let media_type = null;
 
@@ -30,18 +31,22 @@ export const createBanner = async (data, file) => {
   return await repo.createBanner(data);
 };
 
+//using
 export const getAllBanners = async () => {
   return await repo.getAllBanners();
 };
 
+//using
 export const getBannerImages = async () => {
   return await repo.getBannerImages();
 };
 
+//using
 export const getBannerVideo = async () => {
   return await repo.getBannerVideo();
 };
 
+//using
 export const getBannerById = async (id) => {
   const banner = await repo.getBannerById(id);
 
@@ -80,6 +85,7 @@ export const updateBanner = async (id, data) => {
   );
 };
 
+//using
 export const deleteBanner = async (id) => {
   const existing = await repo.getBannerById(id);
 

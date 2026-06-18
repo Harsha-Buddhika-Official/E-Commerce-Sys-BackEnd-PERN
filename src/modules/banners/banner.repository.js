@@ -1,5 +1,6 @@
 import pool from "../../config/db.js";
 
+//using
 export const createBanner = async (data) => {
     const query = `
         INSERT INTO banners (
@@ -23,6 +24,7 @@ export const createBanner = async (data) => {
     return rows[0];
 };
 
+//using
 export const getAllBanners = async () => {
     const query = `
         SELECT *
@@ -33,6 +35,7 @@ export const getAllBanners = async () => {
     return rows;
 };
 
+//using
 export const getBannerImages = async () => {
     const query = `
         SELECT media_url
@@ -45,6 +48,7 @@ export const getBannerImages = async () => {
     return rows;
 }
 
+//using
 export const getBannerVideo = async () => {
     const query = `
         SELECT media_url
@@ -55,6 +59,7 @@ export const getBannerVideo = async () => {
     return rows;
 }
 
+//using
 export const getBannerById = async (bannerId) => {
     const query = `
         SELECT *
@@ -93,6 +98,7 @@ export const updateBanner = async (bannerId, data) => {
     return rows[0];
 };
 
+//using
 export const deleteBanner = async (bannerId) => {
     const query = `
         DELETE FROM banners
