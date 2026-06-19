@@ -101,7 +101,7 @@ export const getAllOffers = async () => {
 // Get offers with optional status filter
 //using
 export const getOffers = async ({ status }) => {
-  let query = `
+    let query = `
     SELECT 
       o.*,
       COALESCE(
@@ -122,24 +122,24 @@ export const getOffers = async ({ status }) => {
     WHERE o.is_active = true
   `;
 
-  const values = [];
+    const values = [];
 
-  // ACTIVE OFFERS
-  if (status === "active") {
-    query += `
+    // ACTIVE OFFERS
+    if (status === "active") {
+        query += `
       AND o.start_date <= NOW()
       AND o.end_date >= NOW()
     `;
-  }
+    }
 
-  // UPCOMING OFFERS
-  if (status === "upcoming") {
-    query += `
+    // UPCOMING OFFERS
+    if (status === "upcoming") {
+        query += `
       AND o.start_date > NOW()
     `;
-  }
+    }
 
-  query += `
+    query += `
     GROUP BY o.id
     ORDER BY o.created_at DESC
   `;
@@ -468,15 +468,15 @@ export const findOfferProduct = async (offerId, productId) => {
     return rows[0];
 };
 
-export const removeOfferProduct = async (offerId, productId) => {
-    const query = `
-        DELETE FROM offer_products
-        WHERE offer_id = $1 AND product_id = $2
-        RETURNING *
-    `;
-    const { rows } = await pool.query(query, [offerId, productId]);
-    return rows[0];
-};
+// export const removeOfferProduct = async (offerId, productId) => {
+//     const query = `
+//         DELETE FROM offer_products
+//         WHERE offer_id = $1 AND product_id = $2
+//         RETURNING *
+//     `;
+//     const { rows } = await pool.query(query, [offerId, productId]);
+//     return rows[0];
+// };
 
 //using
 export const getOfferProducts = async (offerId) => {
@@ -499,6 +499,7 @@ export const getOfferProducts = async (offerId) => {
     return rows;
 };
 
+//using
 export const findOfferByProductIdFullOfferData = async (productId) => {
     const query = `
         SELECT o.* 

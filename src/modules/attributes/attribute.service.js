@@ -44,23 +44,23 @@ export const getAttributeCatalog = async () => {
     return await attributeRepository.getAttributeCatalog();
 }
 
-export const getAttributeById = async (id) => {
-    if(!id){
-        const error = new Error("Attribute ID is required");
-        error.statusCode = 400;
-        throw error;
-    }
-    return await attributeRepository.getAttributeById(id);
-}
+// export const getAttributeById = async (id) => {
+//     if(!id){
+//         const error = new Error("Attribute ID is required");
+//         error.statusCode = 400;
+//         throw error;
+//     }
+//     return await attributeRepository.getAttributeById(id);
+// }
 
-export const getAttributesByCategoryId = async (categoryId) => {
-    if(!categoryId){
-        const error = new Error("Category ID is required");
-        error.statusCode = 400;
-        throw error;
-    }
-    return await attributeRepository.getAttributesByCategoryId(categoryId);
-}
+// export const getAttributesByCategoryId = async (categoryId) => {
+//     if(!categoryId){
+//         const error = new Error("Category ID is required");
+//         error.statusCode = 400;
+//         throw error;
+//     }
+//     return await attributeRepository.getAttributesByCategoryId(categoryId);
+// }
 
 //using
 export const getAttributesGroupedByCategory = async (categoryId = null) => {

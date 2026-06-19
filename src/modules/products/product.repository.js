@@ -58,42 +58,42 @@ export const getAttributeValueById = async (attributeValueId, client = pool) => 
   return rows[0];
 };
 
-export const deleteProductImages = async (productId, client = pool) => {
-  const query = `DELETE FROM product_images WHERE product_id = $1`;
-  const values = [productId];
-  await client.query(query, values);
-};
+// export const deleteProductImages = async (productId, client = pool) => {
+//   const query = `DELETE FROM product_images WHERE product_id = $1`;
+//   const values = [productId];
+//   await client.query(query, values);
+// };
 
-export const insertProductImages = async (productId, images, client = pool) => {
-  if (!images || images.length === 0) return;
+// export const insertProductImages = async (productId, images, client = pool) => {
+//   if (!images || images.length === 0) return;
 
-  const values = [];
-  const placeholders = [];
+//   const values = [];
+//   const placeholders = [];
 
-  images.forEach((img, index) => {
-    const baseIndex = index * 5;
-    placeholders.push(
-      `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5})`
-    );
+//   images.forEach((img, index) => {
+//     const baseIndex = index * 5;
+//     placeholders.push(
+//       `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5})`
+//     );
 
-    values.push(
-      productId,
-      img.image_url,
-      img.is_primary ?? false,
-      img.alt_text ?? "",
-      img.sort_order ?? index
-    );
-  });
+//     values.push(
+//       productId,
+//       img.image_url,
+//       img.is_primary ?? false,
+//       img.alt_text ?? "",
+//       img.sort_order ?? index
+//     );
+//   });
 
-  const query = `
-    INSERT INTO product_images
-    (product_id, image_url, is_primary, alt_text, sort_order)
-    VALUES ${placeholders.join(",")}
-  `;
+//   const query = `
+//     INSERT INTO product_images
+//     (product_id, image_url, is_primary, alt_text, sort_order)
+//     VALUES ${placeholders.join(",")}
+//   `;
 
-  await client.query(query, values);
+//   await client.query(query, values);
 
-};
+// };
 
 //using
 export const deleteProductAttributes = async (productId, client = pool) => {
@@ -130,16 +130,16 @@ export const insertProductAttributes = async (productId, attributes, client = po
   await client.query(query, values);
 };
 
-export const removeProductAttribute = async (productId, attributeId, client = pool) => {
-  const query = `
-    DELETE FROM product_attributes
-    WHERE product_id = $1 AND attribute_id = $2
-    RETURNING *
-  `;
-  const values = [productId, attributeId];
-  const { rows } = await client.query(query, values);
-  return rows[0];
-};
+// export const removeProductAttribute = async (productId, attributeId, client = pool) => {
+//   const query = `
+//     DELETE FROM product_attributes
+//     WHERE product_id = $1 AND attribute_id = $2
+//     RETURNING *
+//   `;
+//   const values = [productId, attributeId];
+//   const { rows } = await client.query(query, values);
+//   return rows[0];
+// };
 
 //using
 export const getAllProductsDetailsSimple = async () => {
@@ -616,126 +616,126 @@ export const findProductByNameAdvanced = async (name, client = pool) => {
   return rows;
 };
 
-export const updateProduct = async (id, productData, client = pool) => {
-  const {
-    name,
-    brand_id,
-    category_id,
-    slug,
-    description,
-    base_price,
-    selling_price,
-    discounted_price,
-    stock_quantity,
-    warranty_months,
-    product_tag,
-    is_active,
-    images
-  } = productData;
+// export const updateProduct = async (id, productData, client = pool) => {
+//   const {
+//     name,
+//     brand_id,
+//     category_id,
+//     slug,
+//     description,
+//     base_price,
+//     selling_price,
+//     discounted_price,
+//     stock_quantity,
+//     warranty_months,
+//     product_tag,
+//     is_active,
+//     images
+//   } = productData;
 
-  // -----------------------------------
-  // 1. UPDATE PRODUCT FIELDS
-  // -----------------------------------
-  const productQuery = `
-    UPDATE products
-    SET
-      name               = $1,
-      brand_id           = $2,
-      category_id        = $3,
-      slug               = $4,
-      description        = $5,
-      base_price         = $6,
-      selling_price      = $7,
-      discounted_price   = $8,
-      stock_quantity     = $9,
-      warranty_months    = $10,
-      product_tag        = $11,
-      is_active          = $12,
-      updated_at         = CURRENT_TIMESTAMP
-    WHERE product_id = $13
-    RETURNING *
-  `;
+//   // -----------------------------------
+//   // 1. UPDATE PRODUCT FIELDS
+//   // -----------------------------------
+//   const productQuery = `
+//     UPDATE products
+//     SET
+//       name               = $1,
+//       brand_id           = $2,
+//       category_id        = $3,
+//       slug               = $4,
+//       description        = $5,
+//       base_price         = $6,
+//       selling_price      = $7,
+//       discounted_price   = $8,
+//       stock_quantity     = $9,
+//       warranty_months    = $10,
+//       product_tag        = $11,
+//       is_active          = $12,
+//       updated_at         = CURRENT_TIMESTAMP
+//     WHERE product_id = $13
+//     RETURNING *
+//   `;
 
-  const productValues = [
-    name,
-    brand_id || null,
-    category_id,
-    slug,
-    description || null,
-    base_price || null,
-    selling_price || null,
-    discounted_price,
-    stock_quantity || 0,
-    warranty_months || null,
-    product_tag || null,
-    is_active ?? true,
-    id
-  ];
+//   const productValues = [
+//     name,
+//     brand_id || null,
+//     category_id,
+//     slug,
+//     description || null,
+//     base_price || null,
+//     selling_price || null,
+//     discounted_price,
+//     stock_quantity || 0,
+//     warranty_months || null,
+//     product_tag || null,
+//     is_active ?? true,
+//     id
+//   ];
 
-  const { rows } = await client.query(productQuery, productValues);
-  const updatedProduct = rows[0];
+//   const { rows } = await client.query(productQuery, productValues);
+//   const updatedProduct = rows[0];
 
-  // -----------------------------------
-  // 2. REPLACE IMAGE ROWS WITH FINAL MERGED SET
-  //    (service layer already merged old + new,
-  //     so we just wipe and reinsert the full final state)
-  // -----------------------------------
-  if (images && images.length > 0) {
+//   // -----------------------------------
+//   // 2. REPLACE IMAGE ROWS WITH FINAL MERGED SET
+//   //    (service layer already merged old + new,
+//   //     so we just wipe and reinsert the full final state)
+//   // -----------------------------------
+//   if (images && images.length > 0) {
 
-    // Wipe existing rows for clean reinsert
-    await client.query(
-      `DELETE FROM product_images WHERE product_id = $1`,
-      [id]
-    );
+//     // Wipe existing rows for clean reinsert
+//     await client.query(
+//       `DELETE FROM product_images WHERE product_id = $1`,
+//       [id]
+//     );
 
-    // Reinsert full final image set
-    for (const [index, img] of images.entries()) {
-      await client.query(
-        `INSERT INTO product_images
-           (product_id, image_url, product_image_id, is_primary, alt_text, sort_order)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          id,
-          img.image_url,
-          img.product_image_id || null,
-          img.is_primary ?? (index === 0),
-          img.alt_text || null,
-          img.sort_order ?? index
-        ]
-      );
-    }
-  }
+//     // Reinsert full final image set
+//     for (const [index, img] of images.entries()) {
+//       await client.query(
+//         `INSERT INTO product_images
+//            (product_id, image_url, product_image_id, is_primary, alt_text, sort_order)
+//          VALUES ($1, $2, $3, $4, $5, $6)`,
+//         [
+//           id,
+//           img.image_url,
+//           img.product_image_id || null,
+//           img.is_primary ?? (index === 0),
+//           img.alt_text || null,
+//           img.sort_order ?? index
+//         ]
+//       );
+//     }
+//   }
 
-  return updatedProduct;
-};
+//   return updatedProduct;
+// };
 
-export const deleteProduct = async (id) => {
-  const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
-  const values = [id];
-  const { rows } = await pool.query(query, values);
-  return rows[0];
-};
+// export const deleteProduct = async (id) => {
+//   const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
+//   const values = [id];
+//   const { rows } = await pool.query(query, values);
+//   return rows[0];
+// };
 
-export const softDeleteProduct = async (id) => {
-  const query = `UPDATE products SET is_active = false,
-  updated_at = CURRENT_TIMESTAMP
-  WHERE product_id = $1
-  RETURNING *`;
-  const values = [id];
-  const { rows } = await pool.query(query, values);
-  return rows[0];
-};
+// export const softDeleteProduct = async (id) => {
+//   const query = `UPDATE products SET is_active = false,
+//   updated_at = CURRENT_TIMESTAMP
+//   WHERE product_id = $1
+//   RETURNING *`;
+//   const values = [id];
+//   const { rows } = await pool.query(query, values);
+//   return rows[0];
+// };
 
-export const restoreProduct = async (id) => {
-  const query = `UPDATE products
-  SET is_active = true,
-  updated_at = CURRENT_TIMESTAMP
-  WHERE product_id = $1
-  RETURNING *`;
-  const values = [id];
-  const { rows } = await pool.query(query, values);
-  return rows[0];
-};
+// export const restoreProduct = async (id) => {
+//   const query = `UPDATE products
+//   SET is_active = true,
+//   updated_at = CURRENT_TIMESTAMP
+//   WHERE product_id = $1
+//   RETURNING *`;
+//   const values = [id];
+//   const { rows } = await pool.query(query, values);
+//   return rows[0];
+// };
 
 //using
 export const getAttributesByCategory = async (categoryId) => {
@@ -856,13 +856,13 @@ export const getImagesById = async (id) => {
   return rows;
 }
 
-export const deleteImagesById = async (id) => {
-  // console.log("Deleting image with ID:", id);
-  const quary = `DELETE FROM product_images WHERE image_id = $1 RETURNING *`;
-  const { rows } = await pool.query(quary, [id]);
-  // console.log("rows",rows)
-  return rows;
-}
+// export const deleteImagesById = async (id) => {
+//   // console.log("Deleting image with ID:", id);
+//   const quary = `DELETE FROM product_images WHERE image_id = $1 RETURNING *`;
+//   const { rows } = await pool.query(quary, [id]);
+//   // console.log("rows",rows)
+//   return rows;
+// }
 
 //using
 export const updateProductFieldsOnly = async (id, productData, client = pool) => {

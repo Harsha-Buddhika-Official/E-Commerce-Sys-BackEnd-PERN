@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategory, getCategories, getCategoryById, softDeleteCategory, deleteCategory, restoreCategory, updateCategory, getProductCategories, getAccessoryCategories, getCategoryNames } from './categories.controller.js';
+import { createCategory, getCategories,deleteCategory, getProductCategories, getAccessoryCategories, getCategoryNames } from './categories.controller.js';
 import { validateCreateCategory, validateGetCategorySchema, validateUpdateCategory, validateCategoryIdParam } from './categories.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';

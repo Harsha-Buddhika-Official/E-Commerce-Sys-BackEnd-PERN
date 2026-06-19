@@ -1,7 +1,7 @@
 import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
 import { findCategoryById, findCategoryByName } from '../categories/categories.repository.js';
-import { findBrandByName, findBrandById } from '../brands/brand.repository.js';
+import { findBrandByName } from '../brands/brand.repository.js';
 import { applyActiveOfferPricing } from '../../utils/offerPricing.js';
 import pool from '../../config/db.js';
 import AppError from '../../utils/AppError.js';

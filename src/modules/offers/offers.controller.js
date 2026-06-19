@@ -20,7 +20,6 @@ export const createOffer = async (req, res, next) => {
 export const getAllOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getAllOffers();
-
         res.status(200).json({
             success: true,
             data: offers
@@ -138,12 +137,12 @@ export const updateOfferStatus = async (req, res, next) => {
 export const deleteOffer = async (req, res, next) => {
     try {
         const { id } = req.params;
-
         await offersService.deleteOffer(id);
         
         res.status(200).json({
             success: true,
-            message: 'Offer deleted successfully'
+            message: 'Offer deleted successfully',
+            data: { id }
         });
     } catch (error) {
         next(error);
@@ -166,18 +165,18 @@ export const addOfferProduct = async (req, res, next) => {
     }
 };
 
-export const removeOfferProduct = async (req, res, next) => {
-    try {
-        const { id, productId } = req.params;
-        await offersService.removeOfferProduct(id, productId);
-        res.status(200).json({
-            success: true,
-            message: 'Product removed from offer successfully'
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+// export const removeOfferProduct = async (req, res, next) => {
+//     try {
+//         const { id, productId } = req.params;
+//         await offersService.removeOfferProduct(id, productId);
+//         res.status(200).json({
+//             success: true,
+//             message: 'Product removed from offer successfully'
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 //using
 export const getOfferProducts = async (req, res, next) => {

@@ -38,6 +38,7 @@ export const createOffer = async (offerData, file) => {
         ...offerData,
         title: offerData.title.trim(),
     };
+    let banner_image_url, banner_image_id;
 
     if (file) {
         const uploadResult = await uploadToCloudinary(
@@ -45,12 +46,11 @@ export const createOffer = async (offerData, file) => {
             `offer-banner-${Date.now()}`,
             'ecommerce/offers'
         );
-
-        payload.banner_image_url = uploadResult.secure_url;
-        payload.banner_image_id = uploadResult.public_id;
+        // console.log('Cloudinary upload result:', uploadResult); // Debugging line
+        banner_image_url = uploadResult.secure_url;
+        banner_image_id = uploadResult.public_id;
     }
-
-    return await offersRepository.createOffer(payload);
+    return await offersRepository.createOffer({ ...payload, banner_image_url, banner_image_id });
 };
 
 //using
@@ -66,7 +66,8 @@ export const getOffers = async (status) => {
         throw new AppError('Invalid status filter', 400);
     }
 
-    return await offersRepository.getOffers({ status });
+    const offers = await offersRepository.getOffers({ status });
+    return offers;
 };
 
 export const getActiveOffers = async () => {
@@ -215,6 +216,7 @@ export const toggleOffer = async (id, isActive) => {
 //using
 export const deleteOffer = async (id) => {
     const existing = await offersRepository.findOfferByIdBasic(id);
+    console.log('Existing offer to delete:', existing); // Debugging line
     if (!existing) {
         throw new AppError('Offer not found', 404);
     }
@@ -241,19 +243,19 @@ export const addOfferProduct = async (offerId, productId) => {
     return offersRepository.addOfferProduct(offerId, productId);
 };
 
-export const removeOfferProduct = async (offerId, productId) => {
-    const offer = await offersRepository.findOfferByIdBasic(offerId);
-    if (!offer) {
-        throw new AppError('Offer not found', 404);
-    }
+// export const removeOfferProduct = async (offerId, productId) => {
+//     const offer = await offersRepository.findOfferByIdBasic(offerId);
+//     if (!offer) {
+//         throw new AppError('Offer not found', 404);
+//     }
 
-    const existing = await offersRepository.findOfferProduct(offerId, productId);
-    if (!existing) {
-        throw new AppError('Offer product not found', 404);
-    }
+//     const existing = await offersRepository.findOfferProduct(offerId, productId);
+//     if (!existing) {
+//         throw new AppError('Offer product not found', 404);
+//     }
 
-    return offersRepository.removeOfferProduct(offerId, productId);
-};
+//     return offersRepository.removeOfferProduct(offerId, productId);
+// };
 
 //using
 export const getOfferProducts = async (offerId) => {

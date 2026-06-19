@@ -4,6 +4,7 @@ import AppError from '../../utils/AppError.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
 //create brand
+//using
 export const createBrand = async (brandData, file) => {
     let logoUrl = null;
     let logoPublicId = null;
@@ -33,18 +34,21 @@ export const createBrand = async (brandData, file) => {
 }
 
 //get all brands
+//using
 export const getAllBrands = async() => {
     const brands = await brandRepository.getAllBrands();
     return brands;
 }
 
 //get all brand names and ids
+//using
 export const getAllBrandNames = async() => {
     const brandNames = await brandRepository.getAllBrandNames();
     return brandNames;
 }
 
 //get brand by id
+//using
 export const getBrandById = async (id) => {
     const brand = await brandRepository.findBrandById(id);
     if(!brand){

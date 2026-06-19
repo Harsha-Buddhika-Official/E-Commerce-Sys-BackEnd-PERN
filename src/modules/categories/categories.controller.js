@@ -67,19 +67,19 @@ export const getCategories = async (req, res, next) => {
 };
 
 // Get all categories
-export const getAllCategories = async (req, res, next) => {
-    try {
-        const categories = await categoryService.getAllCategories();
+// export const getAllCategories = async (req, res, next) => {
+//     try {
+//         const categories = await categoryService.getAllCategories();
 
-        res.status(200).json({
-            success: true,
-            message: 'Categories retrieved successfully',
-            data: categories,
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'Categories retrieved successfully',
+//             data: categories,
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 // Get category names and ids only
 //using
@@ -98,38 +98,38 @@ export const getCategoryNames = async (req, res, next) => {
 };
 
 // Get category by id
-export const getCategoryById = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+// export const getCategoryById = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
 
-        const category = await categoryService.getCategoryById(id);
+//         const category = await categoryService.getCategoryById(id);
 
-        res.status(200).json({
-            success: true,
-            message: 'Category retrieved successfully',
-            data: category,
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'Category retrieved successfully',
+//             data: category,
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 // Update category
-export const updateCategory = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+// export const updateCategory = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
 
-        const updatedCategory = await categoryService.updateCategory(id, req.body);
+//         const updatedCategory = await categoryService.updateCategory(id, req.body);
 
-        res.status(200).json({
-            success: true,
-            message: 'Category updated successfully',
-            data: updatedCategory,
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'Category updated successfully',
+//             data: updatedCategory,
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 // Delete category
 //using
@@ -150,35 +150,35 @@ export const deleteCategory = async (req, res, next) => {
 };
 
 // Soft delete category
-export const softDeleteCategory = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+// export const softDeleteCategory = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
 
-        await categoryService.softDeleteCategory(id);
+//         await categoryService.softDeleteCategory(id);
 
-        res.status(200).json({
-            success: true,
-            message: 'Category soft deleted successfully',
-            data: { id },
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'Category soft deleted successfully',
+//             data: { id },
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 // Restore category
-export const restoreCategory = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+// export const restoreCategory = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
 
-        await categoryService.restoreCategory(id);
+//         await categoryService.restoreCategory(id);
 
-        res.status(200).json({
-            success: true,
-            message: 'Category restored successfully',
-            data: { id },
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'Category restored successfully',
+//             data: { id },
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };

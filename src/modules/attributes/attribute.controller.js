@@ -75,19 +75,19 @@ export const getAttributeById = async (req, res, next) => {
     }
 };
 
-export const getAttributesByCategoryId = async (req, res, next) => {
-    try {
-        const Data = req.body;
-        const attributes = await attributeService.getAttributesByCategoryId(Data);
-        res.status(200).json({
-            success: true,
-            message: 'Attributes retrieved successfully',
-            data: attributes
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+// export const getAttributesByCategoryId = async (req, res, next) => {
+//     try {
+//         const Data = req.body;
+//         const attributes = await attributeService.getAttributesByCategoryId(Data);
+//         res.status(200).json({
+//             success: true,
+//             message: 'Attributes retrieved successfully',
+//             data: attributes
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 //using
 export const getAttributesGroupedByCategory = async (req, res, next) => {
@@ -104,19 +104,19 @@ export const getAttributesGroupedByCategory = async (req, res, next) => {
     }
 };
 
-export const updateAttribute = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const updated = await attributeService.updateAttribute(id, req.body);
-        res.status(200).json({ 
-            success: true,
-            message: 'Attribute updated successfully',
-            data: updated
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+// export const updateAttribute = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
+//         const updated = await attributeService.updateAttribute(id, req.body);
+//         res.status(200).json({ 
+//             success: true,
+//             message: 'Attribute updated successfully',
+//             data: updated
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 //using
 export const deleteAttribute = async (req, res, next) => {

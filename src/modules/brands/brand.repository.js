@@ -33,6 +33,7 @@ export const findBrandByName = async (name) => {
     return rows[0];
 };
 
+//using
 export const findBrandById = async (id) => {
     const query = `SELECT * FROM brands WHERE brand_id = $1`;
     const { rows } = await pool.query(query, [id]);
@@ -52,6 +53,7 @@ export const findBrandById = async (id) => {
 //     return rows[0];
 // };
 
+//using
 export const deleteBrand = async (id) => {
     const query = `DELETE FROM brands WHERE brand_id =$1 RETURNING *`;
     const { rows } = await pool.query(query, [id]);

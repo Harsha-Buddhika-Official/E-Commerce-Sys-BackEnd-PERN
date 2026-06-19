@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, createProductWithoutAttributes, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductById, getProductByName, removeProductAttribute, restoreProduct, softDeleteProduct, updateProduct, updateProductDetails, getAttributesByCategory, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple, addProductImage, removeProductImage, reorderProductImages, } from './product.controller.js';
+import { createProduct, createProductWithoutAttributes, deleteProduct, getAllProducts, getAllProductLimitedDetilas, getAllDetialsProductById, getProductById, getProductByName, updateProduct, updateProductDetails, getBestSellingProducts, getLatestProducts, getProductsByCategory, getFilterOptions, getFilteredProducts, getAllProductsDetailsSimple, addProductImage, removeProductImage, reorderProductImages, } from './product.controller.js';
 import { validateProduct, validateFullProductUpdate, validateCategoryIdParam, validateProductAttributeParams, validateFilterProducts, validateProductId, validateProductIdAndImageId } from './product.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
@@ -13,7 +13,7 @@ router.get('/best-selling', getBestSellingProducts); //using
 router.get('/latest', getLatestProducts); //using
 router.get('/search/:name', getProductByName); //using
 router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory); //using
-router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
+// router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
 router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions); //using
 router.get('/:id', validateProductId, getProductById); //using
 
@@ -33,13 +33,13 @@ router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), 
 router.post('/admin/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
-router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
-router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
+// router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
+// router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
+// router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); 
-router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
+// router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); 
+// router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
 
 
 // ==================== PROTECTED ROUTES - UPDATE PRODUCT DETAILS / IMAGES ====================

@@ -247,126 +247,126 @@ export const findAllOrders = async (client = pool) => {
     }
 };
 
-export const updateOrder = async (orderId, orderData, client = pool) => {
-    const {
-        tracking_code,
-        customer_email,
-        phone_number,
-        total_amount,
-        order_status,
-        shipping_address,
-        city,
-        postal_code,
-        items = [],
-        delete_item_ids = []
-    } = orderData;
+// export const updateOrder = async (orderId, orderData, client = pool) => {
+//     const {
+//         tracking_code,
+//         customer_email,
+//         phone_number,
+//         total_amount,
+//         order_status,
+//         shipping_address,
+//         city,
+//         postal_code,
+//         items = [],
+//         delete_item_ids = []
+//     } = orderData;
 
-    const query = `UPDATE orders SET
-    tracking_code = $1,
-    customer_email = $2,
-    phone_number = $3,
-    total_amount = $4,
-    order_status = $5,
-    shipping_address = $6,
-    city = $7,
-    postal_code = $8,
-    updated_at = NOW()
-    WHERE order_id = $9 RETURNING *`;
+//     const query = `UPDATE orders SET
+//     tracking_code = $1,
+//     customer_email = $2,
+//     phone_number = $3,
+//     total_amount = $4,
+//     order_status = $5,
+//     shipping_address = $6,
+//     city = $7,
+//     postal_code = $8,
+//     updated_at = NOW()
+//     WHERE order_id = $9 RETURNING *`;
 
-    const values = [
-        tracking_code,
-        customer_email,
-        phone_number,
-        total_amount,
-        order_status,
-        shipping_address,
-        city,
-        postal_code,
-        orderId
-    ];
+//     const values = [
+//         tracking_code,
+//         customer_email,
+//         phone_number,
+//         total_amount,
+//         order_status,
+//         shipping_address,
+//         city,
+//         postal_code,
+//         orderId
+//     ];
 
-    const shouldManageItems = Array.isArray(items) || Array.isArray(delete_item_ids);
-    const useManagedClient = client === pool;
-    const db = useManagedClient ? await pool.connect() : client;
+//     const shouldManageItems = Array.isArray(items) || Array.isArray(delete_item_ids);
+//     const useManagedClient = client === pool;
+//     const db = useManagedClient ? await pool.connect() : client;
 
-    try {
-        if (useManagedClient) {
-            await db.query('BEGIN');
-        }
+//     try {
+//         if (useManagedClient) {
+//             await db.query('BEGIN');
+//         }
 
-        const result = await db.query(query, values);
-        const updatedOrder = result.rows[0];
+//         const result = await db.query(query, values);
+//         const updatedOrder = result.rows[0];
 
-        if (!updatedOrder) {
-            throw new Error('Order not found');
-        }
+//         if (!updatedOrder) {
+//             throw new Error('Order not found');
+//         }
 
-        if (shouldManageItems) {
-            const itemIdsToDelete = new Set(
-                (Array.isArray(delete_item_ids) ? delete_item_ids : []).map(Number).filter(Boolean)
-            );
+//         if (shouldManageItems) {
+//             const itemIdsToDelete = new Set(
+//                 (Array.isArray(delete_item_ids) ? delete_item_ids : []).map(Number).filter(Boolean)
+//             );
 
-            for (const item of Array.isArray(items) ? items : []) {
-                // If action=delete or delete=true is provided in items array, remove it.
-                if ((item?.action === 'delete' || item?.delete === true) && item?.order_item_id) {
-                    itemIdsToDelete.add(Number(item.order_item_id));
-                    continue;
-                }
+//             for (const item of Array.isArray(items) ? items : []) {
+//                 // If action=delete or delete=true is provided in items array, remove it.
+//                 if ((item?.action === 'delete' || item?.delete === true) && item?.order_item_id) {
+//                     itemIdsToDelete.add(Number(item.order_item_id));
+//                     continue;
+//                 }
 
-                if (item?.order_item_id) {
-                    await db.query(
-                        `UPDATE order_items
-                         SET product_id = $1,
-                             quantity = $2,
-                             price_at_purchase = $3
-                         WHERE order_item_id = $4 AND order_id = $5`,
-                        [
-                            item.product_id,
-                            item.quantity,
-                            item.price_at_purchase,
-                            item.order_item_id,
-                            orderId
-                        ]
-                    );
-                    continue;
-                }
+//                 if (item?.order_item_id) {
+//                     await db.query(
+//                         `UPDATE order_items
+//                          SET product_id = $1,
+//                              quantity = $2,
+//                              price_at_purchase = $3
+//                          WHERE order_item_id = $4 AND order_id = $5`,
+//                         [
+//                             item.product_id,
+//                             item.quantity,
+//                             item.price_at_purchase,
+//                             item.order_item_id,
+//                             orderId
+//                         ]
+//                     );
+//                     continue;
+//                 }
 
-                await db.query(
-                    `INSERT INTO order_items
-                     (order_id, product_id, quantity, price_at_purchase)
-                     VALUES ($1, $2, $3, $4)`,
-                    [orderId, item.product_id, item.quantity, item.price_at_purchase]
-                );
-            }
+//                 await db.query(
+//                     `INSERT INTO order_items
+//                      (order_id, product_id, quantity, price_at_purchase)
+//                      VALUES ($1, $2, $3, $4)`,
+//                     [orderId, item.product_id, item.quantity, item.price_at_purchase]
+//                 );
+//             }
 
-            if (itemIdsToDelete.size > 0) {
-                const ids = Array.from(itemIdsToDelete);
-                await db.query(
-                    `DELETE FROM order_items
-                     WHERE order_id = $1
-                     AND order_item_id = ANY($2::int[])`,
-                    [orderId, ids]
-                );
-            }
-        }
+//             if (itemIdsToDelete.size > 0) {
+//                 const ids = Array.from(itemIdsToDelete);
+//                 await db.query(
+//                     `DELETE FROM order_items
+//                      WHERE order_id = $1
+//                      AND order_item_id = ANY($2::int[])`,
+//                     [orderId, ids]
+//                 );
+//             }
+//         }
 
-        if (useManagedClient) {
-            await db.query('COMMIT');
-        }
+//         if (useManagedClient) {
+//             await db.query('COMMIT');
+//         }
 
-        return updatedOrder;
-    } catch (error) {
-        if (useManagedClient) {
-            await db.query('ROLLBACK');
-        }
-        console.error('Error updating order:', error);
-        throw error;
-    } finally {
-        if (useManagedClient) {
-            db.release();
-        }
-    }
-};
+//         return updatedOrder;
+//     } catch (error) {
+//         if (useManagedClient) {
+//             await db.query('ROLLBACK');
+//         }
+//         console.error('Error updating order:', error);
+//         throw error;
+//     } finally {
+//         if (useManagedClient) {
+//             db.release();
+//         }
+//     }
+// };
 
 //using
 export const getOrderById = async (orderId, client = pool) => {

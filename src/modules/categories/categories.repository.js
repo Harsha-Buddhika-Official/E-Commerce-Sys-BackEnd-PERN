@@ -96,34 +96,34 @@ export const findCategoryByName = async (name) => {
     return rows[0];
 };
 
-export const updateCategory = async (id, {
-    name,
-    slug,
-    img_url,
-    media_public_id
-}) => {
-    const query = `
-        UPDATE categories
-        SET name = $1,
-            slug = $2,
-            img_url = $3,
-            media_public_id = $4,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE category_id = $5
-        RETURNING *
-    `;
+// export const updateCategory = async (id, {
+//     name,
+//     slug,
+//     img_url,
+//     media_public_id
+// }) => {
+//     const query = `
+//         UPDATE categories
+//         SET name = $1,
+//             slug = $2,
+//             img_url = $3,
+//             media_public_id = $4,
+//             updated_at = CURRENT_TIMESTAMP
+//         WHERE category_id = $5
+//         RETURNING *
+//     `;
 
-    const values = [
-        name,
-        slug,
-        img_url,
-        media_public_id,
-        id
-    ];
+//     const values = [
+//         name,
+//         slug,
+//         img_url,
+//         media_public_id,
+//         id
+//     ];
 
-    const { rows } = await pool.query(query, values);
-    return rows[0];
-};
+//     const { rows } = await pool.query(query, values);
+//     return rows[0];
+// };
 
 //using
 export const deleteCategory = async (id) => {
@@ -139,32 +139,32 @@ export const deleteCategory = async (id) => {
     return rows[0];
 };
 
-export const softDeleteCategory = async (id) => {
-    const query = `
-        UPDATE categories
-        SET is_active = false,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE category_id = $1
-        RETURNING *
-    `;
+// export const softDeleteCategory = async (id) => {
+//     const query = `
+//         UPDATE categories
+//         SET is_active = false,
+//             updated_at = CURRENT_TIMESTAMP
+//         WHERE category_id = $1
+//         RETURNING *
+//     `;
 
-    const values = [id];
+//     const values = [id];
 
-    const { rows } = await pool.query(query, values);
-    return rows[0];
-};
+//     const { rows } = await pool.query(query, values);
+//     return rows[0];
+// };
 
-export const restoreCategory = async (id) => {
-    const query = `
-        UPDATE categories
-        SET is_active = true,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE category_id = $1
-        RETURNING *
-    `;
+// export const restoreCategory = async (id) => {
+//     const query = `
+//         UPDATE categories
+//         SET is_active = true,
+//             updated_at = CURRENT_TIMESTAMP
+//         WHERE category_id = $1
+//         RETURNING *
+//     `;
 
-    const values = [id];
+//     const values = [id];
 
-    const { rows } = await pool.query(query, values);
-    return rows[0];
-};
+//     const { rows } = await pool.query(query, values);
+//     return rows[0];
+// };
