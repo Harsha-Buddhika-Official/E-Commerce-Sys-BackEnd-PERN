@@ -244,6 +244,7 @@ export const getLatestProducts = async () => {
    PRODUCT DELETE / RESTORE
 ========================================================= */
 
+//using
 export const deleteProduct = async (id) => {
   const existing = await productRepository.findProductById(id);
   if (!existing) throw new AppError('Product not found', 404);

@@ -17,11 +17,6 @@ router.get('/admin/names', authorize('super_admin', 'admin'),  getAllBrandnames)
 // ==================== PROTECTED ROUTES - POST ====================
 router.post('/admin', authorize('super_admin', 'admin'), upload.single('logo'), validateCreateBrand, createBrand); //using
 
-// ==================== PROTECTED ROUTES - PUT ====================
-// router.put('/:id', authorize('super_admin', 'admin', 'manager'), upload.single('logo'), validateIdParam, validateUpdateBrand, updateBrand);
-// router.put('/:id/soft-delete', authorize('super_admin', 'admin', 'manager'), validateIdParam, softDeleteBrand);
-// router.put('/:id/restore', authorize('super_admin', 'admin', 'manager'), validateIdParam, restoreBrand);
-
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/:id', authorize('super_admin', 'admin'), validateIdParam, deleteBrand); //using
 

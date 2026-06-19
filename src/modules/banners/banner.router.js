@@ -19,9 +19,6 @@ router.get('/admin/:id', authorize('super_admin', 'admin', 'manager'), validateI
 // POST
 router.post('/admin', authorize('super_admin', 'admin'), upload.single('media'), createBanner); //using
 
-// PUT
-// router.put('/admin/:id', authorize('super_admin', 'admin', 'manager'), upload.single('media'), validateIdParam, validateUpdateBanner, updateBanner);
-
 // DELETE
 router.delete('/admin/:id', authorize('super_admin', 'admin'), validateIdParam, deleteBanner); //using
 

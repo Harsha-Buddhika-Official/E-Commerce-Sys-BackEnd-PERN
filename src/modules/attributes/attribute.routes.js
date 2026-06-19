@@ -6,10 +6,6 @@ import { validateProductAttributeMapping } from './attribute.validator.js';
 
 const router = express.Router();
 
-// ==================== PUBLIC ROUTES - GET ====================
-// router.get('/category', getAttributesByCategoryId);
-// router.get('/:id', getAttributeById);
-
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 

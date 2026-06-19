@@ -55,18 +55,6 @@ export const loginAdmin = async (adminData) => {
     return { token, admin: safeAdmin };
 };
 
-// export const getAdminByEmail = async (email) => {
-//     if (!email) {
-//         throw new AppError('Email is required', 400);
-//     }
-
-//     const admin = await adminRepository.getAdminByEmail(email);
-//     if (!admin) throw new AppError('Admin not found', 404);
-
-//     const { password_hash, ...safe } = admin;
-//     return safe;
-// };
-
 //using
 export const getAllAdmins = async () => {
     const admins = await adminRepository.getAllAdmins();

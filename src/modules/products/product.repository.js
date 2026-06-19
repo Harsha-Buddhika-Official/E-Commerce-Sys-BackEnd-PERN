@@ -709,12 +709,12 @@ export const findProductByNameAdvanced = async (name, client = pool) => {
 //   return updatedProduct;
 // };
 
-// export const deleteProduct = async (id) => {
-//   const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
-//   const values = [id];
-//   const { rows } = await pool.query(query, values);
-//   return rows[0];
-// };
+export const deleteProduct = async (id) => {
+  const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
+  const values = [id];
+  const { rows } = await pool.query(query, values);
+  return rows[0];
+};
 
 // export const softDeleteProduct = async (id) => {
 //   const query = `UPDATE products SET is_active = false,

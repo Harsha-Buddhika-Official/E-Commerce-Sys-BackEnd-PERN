@@ -103,23 +103,6 @@ export const getAttributeCatalog = async () => {
     };
 }
 
-// export const getAttributeById = async (id) => {
-//     const query = `SELECT * FROM attributes WHERE attribute_id = $1`;
-//     const { rows } = await pool.query(query, [id]);
-//     return rows[0];
-// }
-
-// export const getAttributesByCategoryId = async (categoryId) => {
-//     const query = `
-//         SELECT *
-//         FROM attributes
-//         WHERE category_id = $1
-//         ORDER BY attribute_id ASC
-//     `;
-//     const { rows } = await pool.query(query, [categoryId]);
-//     return rows;
-// }
-
 //using
 export const getAttributesByCategory = async (categoryId) => {
     const query = `
@@ -147,17 +130,6 @@ export const getAttributesByCategory = async (categoryId) => {
     const { rows } = await pool.query(query, [categoryId]);
     return rows;
 };
-
-// export const updateAttributeById = async (id, {name, category_id}) => {
-//     const query = `
-//         UPDATE attributes
-//         SET name = $1, category_id = $2
-//         WHERE attribute_id = $3 
-//         RETURNING *
-//     `;
-//     const { rows } = await pool.query(query, [name, category_id, id]);
-//     return rows[0];
-// }
 
 //using
 export const deleteAttributeById = async (id) => {

@@ -38,7 +38,7 @@ router.post('/admin/without-attributes', upload.array('images', 3), validateProd
 // router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-// router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); 
+router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); 
 // router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
 
 

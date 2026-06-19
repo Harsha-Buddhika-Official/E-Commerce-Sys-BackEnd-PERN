@@ -60,31 +60,6 @@ export const getBannerById = async (id) => {
   return banner;
 };
 
-// export const updateBanner = async (id, data) => {
-//   const existing = await repo.getBannerById(id);
-
-//   if (!existing) {
-//     throw new AppError(
-//       "Banner not found",
-//       404
-//     );
-//   }
-
-//   const updatedData = {
-//     title: data.title ?? existing.title,
-//     is_active: data.is_active ?? existing.is_active,
-//     media_url: data.media_url ?? existing.media_url,
-//     media_type: data.media_type ?? existing.media_type,
-//     media_public_id: data.media_public_id ?? existing.media_public_id,
-//     sort_order: data.sort_order ?? existing.sort_order,
-//   };
-
-//   return await repo.updateBanner(
-//     id,
-//     updatedData
-//   );
-// };
-
 //using
 export const deleteBanner = async (id) => {
   const existing = await repo.getBannerById(id);

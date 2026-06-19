@@ -195,6 +195,7 @@ export const updateProduct = async (req, res, next) => {
   }
 };
 
+//using
 export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;

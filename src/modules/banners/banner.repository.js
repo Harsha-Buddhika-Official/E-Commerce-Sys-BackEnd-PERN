@@ -71,33 +71,6 @@ export const getBannerById = async (bannerId) => {
     return rows[0];
 };
 
-// export const updateBanner = async (bannerId, data) => {
-//     const query = `
-//         UPDATE banners
-//         SET
-//             media_type = COALESCE($2, media_type),
-//             media_url = COALESCE($3, media_url),
-//             title = COALESCE($4, title),
-//             is_active = COALESCE($5, is_active),
-//             sort_order = COALESCE($6, sort_order),
-//             updated_at = NOW()
-//         WHERE banner_id = $1
-//         RETURNING *;
-//     `;
-
-//     const values = [
-//         bannerId,
-//         data.media_type,
-//         data.media_url,
-//         data.title,
-//         data.is_active,
-//         data.sort_order
-//     ];
-
-//     const { rows } = await pool.query(query, values);
-//     return rows[0];
-// };
-
 //using
 export const deleteBanner = async (bannerId) => {
     const query = `
