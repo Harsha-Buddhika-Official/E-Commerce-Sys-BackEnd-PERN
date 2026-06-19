@@ -148,6 +148,7 @@ export const getOffers = async ({ status }) => {
     return rows;
 };
 
+// using
 export const getActiveOffers = async () => {
     const query = `
         SELECT
@@ -173,6 +174,7 @@ export const getActiveOffers = async () => {
     return rows;
 };
 
+//using
 export const getUpcomingOffers = async () => {
     const query = `
         SELECT
@@ -467,16 +469,6 @@ export const findOfferProduct = async (offerId, productId) => {
     const { rows } = await pool.query(query, [offerId, productId]);
     return rows[0];
 };
-
-// export const removeOfferProduct = async (offerId, productId) => {
-//     const query = `
-//         DELETE FROM offer_products
-//         WHERE offer_id = $1 AND product_id = $2
-//         RETURNING *
-//     `;
-//     const { rows } = await pool.query(query, [offerId, productId]);
-//     return rows[0];
-// };
 
 //using
 export const getOfferProducts = async (offerId) => {

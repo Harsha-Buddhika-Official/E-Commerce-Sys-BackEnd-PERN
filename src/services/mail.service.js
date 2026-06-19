@@ -14,7 +14,6 @@ export const sendOrderConfirmationEmail = async (order) => {
 };
 
 export const sendOrderStatusUpdateEmail = async (order) => {
-  // console.log('sendOrderStatusUpdateEmail called with order:', order);
   if (!order.email) {
     throw new Error('sendOrderStatusUpdateEmail: order.email is required');
   }

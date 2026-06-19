@@ -1,5 +1,5 @@
 import express from 'express';
-import { getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, deleteOrder, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder, updatePaymentSlip, findOrderImageById } from './order.controller.js';
+import { getOrderById, getOrdersByTrackingCode, getAllOrders, updateOrderStatus, getStatusData, lowStockAlert, OrderStatusCount, getRecentOrders, createOrder, updatePaymentSlip, findOrderImageById } from './order.controller.js';
 import { validateCreateCartOrder, validateCreateDirectOrder, validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus, validateCreateOrder } from './order.validator.js';
 import { attachSession } from '../../middlewares/session.middleware.js';
 import { authorize } from '../../middlewares/authorize.js';

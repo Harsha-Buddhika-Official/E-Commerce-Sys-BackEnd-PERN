@@ -5,7 +5,6 @@ import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import upload from '../../middlewares/multer.js';
 
-
 const router = express.Router();
 
 // USER ROUTES

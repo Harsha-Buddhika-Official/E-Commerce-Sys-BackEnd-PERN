@@ -247,6 +247,7 @@ export const findAllOrders = async (client = pool) => {
     }
 };
 
+// for later implementation of updateOrder function
 // export const updateOrder = async (orderId, orderData, client = pool) => {
 //     const {
 //         tracking_code,
@@ -539,17 +540,17 @@ export const updateOrderStatus = async (orderId, newStatus, client = pool) => {
 };
 
 //waiting list
-export const deleteOrder = async (orderId, client = pool) => {
-    const query = `DELETE FROM orders WHERE order_id = $1 RETURNING *`;
-    const values = [orderId];
-    try {
-        const result = await client.query(query, values);
-        return result.rows[0];
-    } catch (error) {
-        console.error('Error deleting order:', error);
-        throw error;
-    }
-};
+// export const deleteOrder = async (orderId, client = pool) => {
+//     const query = `DELETE FROM orders WHERE order_id = $1 RETURNING *`;
+//     const values = [orderId];
+//     try {
+//         const result = await client.query(query, values);
+//         return result.rows[0];
+//     } catch (error) {
+//         console.error('Error deleting order:', error);
+//         throw error;
+//     }
+// };
 
 //using
 export const changeOrderStatus = async (orderId, newStatus, client = pool) => {

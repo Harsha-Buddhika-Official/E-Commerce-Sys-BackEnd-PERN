@@ -22,11 +22,6 @@ router.get('/admin/names', authorize('super_admin', 'admin'), getCategoryNames);
 // ==================== PROTECTED ROUTES - POST ====================
 router.post('/', authorize('super_admin', 'admin'), upload.single('media'), createCategory); //using
 
-// ==================== PROTECTED ROUTES - PUT ====================
-// router.put('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, validateUpdateCategory, updateCategory);
-// router.put('/:id/deactivate', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteCategory);
-// router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreCategory);
-
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); //using
 

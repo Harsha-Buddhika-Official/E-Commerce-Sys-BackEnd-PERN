@@ -225,12 +225,12 @@ export const updateOrderStatus = async (orderId, newStatus, client) => {
 };
 
 //waiting list
-export const deleteOrder = async (orderId, client) => {
-    const ImageData = await orderRepository.findOrderImageById(orderId, client);
-    await deleteFromCloudinary(ImageData.media_public_id);
-    const deletedOrder = await orderRepository.deleteOrder(orderId, client);
-    return deletedOrder;
-};
+// export const deleteOrder = async (orderId, client) => {
+//     const ImageData = await orderRepository.findOrderImageById(orderId, client);
+//     await deleteFromCloudinary(ImageData.media_public_id);
+//     const deletedOrder = await orderRepository.deleteOrder(orderId, client);
+//     return deletedOrder;
+// };
 
 
 

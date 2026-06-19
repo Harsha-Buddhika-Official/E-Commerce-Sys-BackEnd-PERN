@@ -165,19 +165,6 @@ export const addOfferProduct = async (req, res, next) => {
     }
 };
 
-// export const removeOfferProduct = async (req, res, next) => {
-//     try {
-//         const { id, productId } = req.params;
-//         await offersService.removeOfferProduct(id, productId);
-//         res.status(200).json({
-//             success: true,
-//             message: 'Product removed from offer successfully'
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
 //using
 export const getOfferProducts = async (req, res, next) => {
     try {

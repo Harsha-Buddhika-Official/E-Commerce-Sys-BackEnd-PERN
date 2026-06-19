@@ -13,7 +13,6 @@ router.get('/best-selling', getBestSellingProducts); //using
 router.get('/latest', getLatestProducts); //using
 router.get('/search/:name', getProductByName); //using
 router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory); //using
-// router.get('/attributes/by-category/:categoryId', validateCategoryIdParam, getAttributesByCategory);
 router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions); //using
 router.get('/:id', validateProductId, getProductById); //using
 
@@ -33,14 +32,11 @@ router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), 
 router.post('/admin/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
-// router.put('/:id', authorize('super_admin', 'admin'), validateProduct, updateProduct);
-// router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct);
-// router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct);
+// router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct); //waiting list
+// router.put('/:id/restore', authorize('super_admin', 'admin'), validateCategoryIdParam, restoreProduct); //waiting list
 
 // ==================== PROTECTED ROUTES - DELETE ====================
 router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validateProductId, deleteProduct); 
-// router.delete('/:id/attributes/:attributeId', authorize('super_admin', 'admin'), validateProductAttributeParams, removeProductAttribute);
-
 
 // ==================== PROTECTED ROUTES - UPDATE PRODUCT DETAILS / IMAGES ====================
 // 1. Product data update — pure JSON, no images

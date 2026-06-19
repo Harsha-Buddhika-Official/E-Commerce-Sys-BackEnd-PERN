@@ -162,19 +162,19 @@ export const updateOrderStatus = async (req, res, next) => {
 };
 
 //waiting list
-export const deleteOrder = async (req, res, next) => {
-    try {
-        const orderId = req.params.id;
-        await orderService.deleteOrder(orderId);
-        res.status(200).json({
-            success: true,
-            message: 'Order deleted successfully'
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-};
+// export const deleteOrder = async (req, res, next) => {
+//     try {
+//         const orderId = req.params.id;
+//         await orderService.deleteOrder(orderId);
+//         res.status(200).json({
+//             success: true,
+//             message: 'Order deleted successfully'
+//         });
+//     }
+//     catch (error) {
+//         next(error);
+//     }
+// };
 
 //using
 export const findOrderImageById = async (req, res, next) => {

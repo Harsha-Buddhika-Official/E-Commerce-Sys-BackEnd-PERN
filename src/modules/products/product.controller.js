@@ -210,63 +210,6 @@ export const deleteProduct = async (req, res, next) => {
   }
 };
 
-// export const softDeleteProduct = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     await productService.softDeleteProduct(id);
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'Product soft deleted successfully'
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const restoreProduct = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     await productService.restoreProduct(id);
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'Product restored successfully'
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const removeProductAttribute = async (req, res, next) => {
-//   try {
-//     const { id, attributeId } = req.params;
-//     await productService.removeProductAttribute(id, attributeId);
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'Product attribute removed successfully'
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const getAttributesByCategory = async (req, res, next) => {
-//   try {
-//     const { categoryId } = req.params;
-//     const attributes = await productService.getAttributesByCategory(categoryId);
-
-//     res.status(200).json({
-//       success: true,
-//       data: attributes,
-//       message: 'Attributes retrieved successfully'
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 //using
 export const getFilterOptions = async (req, res, next) => {
   try {
