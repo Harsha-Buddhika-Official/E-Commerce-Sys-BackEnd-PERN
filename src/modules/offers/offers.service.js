@@ -70,10 +70,12 @@ export const getOffers = async (status) => {
     return offers;
 };
 
+//using
 export const getActiveOffers = async () => {
     return offersRepository.getActiveOffers();
 };
 
+//using
 export const getUpcomingOffers = async () => {
     return offersRepository.getUpcomingOffers();
 };

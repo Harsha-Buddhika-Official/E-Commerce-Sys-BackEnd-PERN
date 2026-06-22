@@ -58,6 +58,7 @@ export const getBrandById = async (id) => {
 }
 
 //delete brand
+//using
 export const deleteBrand = async (id) => {
     const selectedBrand = await brandRepository.findBrandById(id);
     if (selectedBrand.logo_public_id) {

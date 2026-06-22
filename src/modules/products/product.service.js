@@ -252,20 +252,6 @@ export const deleteProduct = async (id) => {
   return productRepository.deleteProduct(id);
 };
 
-export const softDeleteProduct = async (id) => {
-  const existing = await productRepository.findProductById(id);
-  if (!existing) throw new AppError('Product not found', 404);
-
-  return productRepository.softDeleteProduct(id);
-};
-
-export const restoreProduct = async (id) => {
-  const existing = await productRepository.findProductById(id);
-  if (!existing) throw new AppError('Product not found', 404);
-
-  return productRepository.restoreProduct(id);
-};
-
 /* =========================================================
    ATTRIBUTES
 ========================================================= */

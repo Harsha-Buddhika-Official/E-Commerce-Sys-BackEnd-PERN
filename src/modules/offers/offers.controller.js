@@ -44,6 +44,7 @@ export const getOffers = async (req, res, next) => {
   }
 };
 
+//using
 export const getActiveOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getActiveOffers();
@@ -56,6 +57,7 @@ export const getActiveOffers = async (req, res, next) => {
     }
 };
 
+//using
 export const getUpcomingOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getUpcomingOffers();

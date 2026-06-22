@@ -530,44 +530,45 @@ export const findProductByNameForSearch = async (name, client = pool) => {
   return rows;
 };
 
-export const findProductByNameAdvanced = async (name, client = pool) => {
-  const query = `SELECT
-      p.*,
-      c.name AS category_name,
-      b.name AS brand_name,
-      CASE
-        WHEN active_offer.id IS NULL THEN p.discounted_price
-        WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
-        ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
-      END AS discounted_price
+// export const findProductByNameAdvanced = async (name, client = pool) => {
+//   const query = `SELECT
+//       p.*,
+//       c.name AS category_name,
+//       b.name AS brand_name,
+//       CASE
+//         WHEN active_offer.id IS NULL THEN p.discounted_price
+//         WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
+//         ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
+//       END AS discounted_price
 
-  FROM products p
+//   FROM products p
 
-  LEFT JOIN categories c
-      ON c.category_id = p.category_id
+//   LEFT JOIN categories c
+//       ON c.category_id = p.category_id
 
-  LEFT JOIN brands b
-      ON b.brand_id = p.brand_id
+//   LEFT JOIN brands b
+//       ON b.brand_id = p.brand_id
 
-  LEFT JOIN LATERAL (
-      SELECT o.id, o.discount_type, o.discount_value
-      FROM offer_products op
-      JOIN offers o ON o.id = op.offer_id
-      WHERE op.product_id = p.product_id
-        AND o.is_active = true
-        AND NOW() BETWEEN o.start_date AND o.end_date
-      ORDER BY o.start_date DESC
-      LIMIT 1
-  ) active_offer ON true
+//   LEFT JOIN LATERAL (
+//       SELECT o.id, o.discount_type, o.discount_value
+//       FROM offer_products op
+//       JOIN offers o ON o.id = op.offer_id
+//       WHERE op.product_id = p.product_id
+//         AND o.is_active = true
+//         AND NOW() BETWEEN o.start_date AND o.end_date
+//       ORDER BY o.start_date DESC
+//       LIMIT 1
+//   ) active_offer ON true
 
-  WHERE p.name ILIKE '%' || $1 || '%'
+//   WHERE p.name ILIKE '%' || $1 || '%'
 
-  LIMIT 20;`;
-  const values = [name];
-  const { rows } = await client.query(query, values);
-  return rows;
-};
+//   LIMIT 20;`;
+//   const values = [name];
+//   const { rows } = await client.query(query, values);
+//   return rows;
+// };
 
+//using
 export const deleteProduct = async (id) => {
   const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
   const values = [id];

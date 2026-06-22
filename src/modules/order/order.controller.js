@@ -2,7 +2,6 @@ import * as orderService from './order.service.js';
 
 //using
 export const createOrder = async (req, res, next) => {
-    // console.log('Received request body in controller:', req.body);
     const sessionId = req.cookies.sid
     
     try {
@@ -25,7 +24,7 @@ export const createOrder = async (req, res, next) => {
 export const updatePaymentSlip = async (req, res, next) => {
     try {
         const orderId = req.params.id;
-        const slipUrl = await orderService.UpdatePaymentSlip(orderId, req.file);
+        const slipUrl = await orderService.updatePaymentSlip(orderId, req.file);
         res.status(200).json({
             success: true,
             data: { slipUrl },
@@ -181,6 +180,7 @@ export const findOrderImageById = async (req, res, next) => {
     try {
         const orderId = req.params.id;
         const imageData = await orderService.findOrderImageById(orderId);
+        console.log('Image data retrieved:', imageData); // Debug log to check retrieved image data
         res.status(200).json({
             success: true,
             data: imageData,

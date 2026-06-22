@@ -3,7 +3,7 @@ import * as cartRepository from '../cart/cart.repository.js';
 import * as productRepository from '../products/product.repository.js';
 import { generateTrackingCode } from '../../utils/generateTrackingCode.js';
 import AppError from '../../utils/AppError.js';
-import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
+import { uploadToCloudinary, deleteFromCloudinary, getDownloadUrl } from "../../utils/cloudinaryUpload.js";
 import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '../../services/mail.service.js';
 import pool from '../../config/db.js';
 
@@ -12,50 +12,64 @@ export const createOrder = async (orderData, sessionId) => {
     const client = await pool.connect();
 
     let order;
+    let items = [];
 
     try {
         await client.query('BEGIN');
 
-        let items = [];
-
-        // ---------------------------
-        // DIRECT ORDER
-        // ---------------------------
+        // ── DIRECT ORDER ──────────────────────────────────────────
         if (orderData.type === 'direct') {
-
-            const product = await productRepository.findProductById(
-                orderData.product_id,
-                client
-            );
-
+            const product = await productRepository.findProductById(orderData.product_id, client);
             if (!product) throw new AppError('Product not found', 404);
 
-            items.push({
-                product_id: product.product_id,
-                quantity: orderData.quantity,
-                price_at_purchase: product.selling_price
-            });
+            if (product.stock_quantity < orderData.quantity) {
+                throw new AppError(
+                    `Insufficient stock. Available: ${product.stock_quantity}, requested: ${orderData.quantity}`,
+                    409
+                );
+            }
 
+            items.push({
+                product_id:        product.product_id,
+                product_name:      product.name,
+                brand_name:        product.brand_name  ?? null,
+                category_name:     product.category_name ?? null,
+                image_url:         product.images?.[0]?.image_url ?? null,
+                quantity:          orderData.quantity,
+                price_at_purchase: product.selling_price,
+            });
         }
 
-        // ---------------------------
-        // CART ORDER
-        // ---------------------------
+        // ── CART ORDER ────────────────────────────────────────────
         else if (orderData.type === 'cart') {
-
             if (!sessionId) throw new AppError('Session not found', 401);
 
             const cart = await cartRepository.findCartBySession(sessionId, client);
             if (!cart) throw new AppError('Cart not found', 404);
 
-            const cartItems = await cartRepository.getCartWithItems(cart.cart_id, client);
-            if (!cartItems.items.length) throw new AppError('Cart is empty', 400);
+            const cartData = await cartRepository.getCartWithItems(cart.cart_id, client);
+            if (!cartData.items.length) throw new AppError('Cart is empty', 400);
 
-            items = cartItems.items.map(item => ({
-                product_id: item.product_id,
-                quantity: item.quantity,
-                price_at_purchase: item.price_at_add
-            }));
+            for (const item of cartData.items) {
+                const product = await productRepository.findProductById(item.product_id, client);
+
+                if (!product || product.stock_quantity < item.quantity) {
+                    throw new AppError(
+                        `Insufficient stock for "${item.product_name ?? item.product_id}". Available: ${product?.stock_quantity ?? 0}, requested: ${item.quantity}`,
+                        409
+                    );
+                }
+
+                items.push({
+                    product_id:        item.product_id,
+                    product_name:      product.name,
+                    brand_name:        product.brand_name  ?? null,
+                    category_name:     product.category_name ?? null,
+                    image_url:         product.images?.[0]?.image_url ?? null,
+                    quantity:          item.quantity,
+                    price_at_purchase: item.price_at_add,
+                });
+            }
         }
 
         else {
@@ -67,15 +81,12 @@ export const createOrder = async (orderData, sessionId) => {
             0
         );
 
-        // ---------------------------
-        // CREATE ORDER
-        // ---------------------------
         order = await orderRepository.createOrder({
             ...orderData,
             tracking_code: generateTrackingCode(),
-            order_status: 'pending_payment',
+            order_status:  'pending_payment',
             total_amount,
-            items
+            items,
         }, client);
 
         await client.query('COMMIT');
@@ -87,23 +98,29 @@ export const createOrder = async (orderData, sessionId) => {
         client.release();
     }
 
-    // ---------------------------
-    // EMAIL AFTER COMMIT
-    // ---------------------------
-
-    await sendOrderConfirmationEmail({
-        full_name: orderData.full_name,
-        email: orderData.customer_email,
-        order_id: order.order_id,
-        tracking_code: order.tracking_code,
-        total_amount: order.total_amount,
-    });
+    // ── EMAIL (outside transaction) ───────────────────────────────
+    // try {
+    //     await sendOrderConfirmationEmail({
+    //         full_name:        orderData.full_name,
+    //         email:            orderData.customer_email,
+    //         order_id:         order.order_id,
+    //         tracking_code:    order.tracking_code,
+    //         total_amount:     order.total_amount,
+    //         shipping_address: orderData.shipping_address,
+    //         city:             orderData.city,
+    //         postal_code:      orderData.postal_code,
+    //         phone_number:     orderData.phone_number,
+    //         items,
+    //     });
+    // } catch (emailError) {
+    //     console.error('Order confirmation email failed (non-fatal):', emailError);
+    // }
 
     return order;
 };
 
 //using
-export const UpdatePaymentSlip = async (orderId, file) => {
+export const updatePaymentSlip = async (orderId, file) => {
     try{
         let media_url, media_public_id;
         const uploadResult = await uploadToCloudinary(
@@ -191,6 +208,37 @@ export const findOrderImageById = async (orderId, client) => {
     return await orderRepository.findOrderImageById(orderId, client);
 }
 
+// export const findOrderImageById = async (orderId, client) => {
+//     const result = await orderRepository.findOrderImageById(orderId, client);
+//     if (!result) return null;
+
+//     return {
+//         ...result,
+//         media_url: result.media_url?.endsWith('.pdf') && result.media_url?.includes('/image/upload/')
+//             ? result.media_url.replace('/image/upload/', '/raw/upload/')
+//             : result.media_url,
+//     };
+// };
+
+// export const findOrderImageById = async (orderId, client) => {
+//     const result = await orderRepository.findOrderImageById(orderId, client);
+//     if (!result) return null;
+
+//     const isPdf = result.media_url?.endsWith('.pdf');
+
+//     return {
+//         ...result,
+//         // corrected view URL
+//         media_url: isPdf
+//             ? result.media_url.replace('/image/upload/', '/raw/upload/')
+//             : result.media_url,
+//         // direct download URL built from public_id — bypasses the broken stored URL entirely
+//         download_url: isPdf
+//             ? `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/fl_attachment/${result.media_public_id}.pdf`
+//             : null,
+//     };
+// };
+
 //using
 export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     const emailCheck = await orderRepository.getOrdersByEmail(email, client);
@@ -213,15 +261,23 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
 //using
 export const updateOrderStatus = async (orderId, newStatus, client) => {
     const order = await orderRepository.getOrderById(orderId, client);
-    await sendOrderStatusUpdateEmail({
-        full_name: order.full_name,
-        email: order.customer_email,
-        order_status: newStatus,
-        order_id: order.order_id,
-        tracking_code: order.tracking_code,
-        total_amount: order.total_amount,
-    });
-    return await orderRepository.updateOrderStatus(orderId, newStatus, client);
+    if (!order) throw new AppError('Order not found', 404);
+
+    const updated = await orderRepository.updateOrderStatus(orderId, newStatus, client);
+    try {
+        await sendOrderStatusUpdateEmail({
+            full_name:     order.full_name,
+            email:         order.customer_email,
+            order_status:  newStatus,
+            order_id:      order.order_id,
+            tracking_code: order.tracking_code,
+            total_amount:  order.total_amount,
+        });
+    } catch (emailError) {
+        console.error('Order status update email failed (non-fatal):', emailError);
+    }
+
+    return updated;
 };
 
 //waiting list
