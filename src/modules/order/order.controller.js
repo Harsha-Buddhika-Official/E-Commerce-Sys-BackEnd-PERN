@@ -180,7 +180,7 @@ export const findOrderImageById = async (req, res, next) => {
     try {
         const orderId = req.params.id;
         const imageData = await orderService.findOrderImageById(orderId);
-        console.log('Image data retrieved:', imageData); // Debug log to check retrieved image data
+        // console.log('Image data retrieved:', imageData); // Debug log to check retrieved image data
         res.status(200).json({
             success: true,
             data: imageData,

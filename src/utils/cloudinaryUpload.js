@@ -53,13 +53,13 @@ const isPdfBuffer = (buffer) =>
 export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommerce', options = {}) => {
     const isPdf = isPdfBuffer(fileBuffer);
 
-    console.log('[Cloudinary Upload] Starting:', {
-        fileName,
-        folder,
-        isPdf,
-        bufferSize: fileBuffer?.length,
-        magicBytes: fileBuffer ? [...fileBuffer.slice(0, 4)].map(b => b.toString(16)).join(' ') : 'no buffer',
-    });
+    // console.log('[Cloudinary Upload] Starting:', {
+    //     fileName,
+    //     folder,
+    //     isPdf,
+    //     bufferSize: fileBuffer?.length,
+    //     magicBytes: fileBuffer ? [...fileBuffer.slice(0, 4)].map(b => b.toString(16)).join(' ') : 'no buffer',
+    // });
 
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -80,11 +80,11 @@ export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommer
                     console.error('[Cloudinary Upload] Failed:', error);
                     reject(new AppError(`Cloudinary upload failed: ${error.message}`, 500));
                 } else {
-                    console.log('[Cloudinary Upload] Success:', {
-                        resource_type: result.resource_type,
-                        format:        result.format,
-                        secure_url:    result.secure_url,
-                    });
+                    // console.log('[Cloudinary Upload] Success:', {
+                    //     resource_type: result.resource_type,
+                    //     format:        result.format,
+                    //     secure_url:    result.secure_url,
+                    // });
                     resolve({
                         public_id:     result.public_id,
                         secure_url:    result.secure_url,
