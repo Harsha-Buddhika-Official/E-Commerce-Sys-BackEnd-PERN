@@ -14,7 +14,9 @@ import offerRoutes from './modules/offers/offers.routes.js';
 import bannerRoutes from './modules/banners/banner.router.js';
 
 const app = express();
-app.use(express.json());
+app.use(express.json({
+    limit:'1mb'
+}));
 app.use(cors());
 app.use(cookieParser());
 
