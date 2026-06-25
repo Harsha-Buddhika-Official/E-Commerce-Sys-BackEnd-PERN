@@ -7,6 +7,7 @@ const port = config.port;
 const startServer = async () => {
     try {
         await pool.query('SELECT 1'); // testing database connection
+        await pool.query('SET search_path TO public'); //this is only for neon database becasue tables name change like table_name -> public.table_name
         console.log('Database connection successful');
         
         app.listen(port,() => {
