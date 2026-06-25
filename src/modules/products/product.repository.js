@@ -1,4 +1,4 @@
-import pool from "../../config/db.js";
+ import pool from "../../config/db.js";
 
 //using
 export const createProduct = async (productData, client = pool) => {
@@ -798,4 +798,35 @@ export const updateImagesOrder = async (productId, orderedImageIds, primaryImage
       [index, imageId === primaryImageId, imageId, productId]
     );
   }
+};
+
+export const insertProductImages = async (productId, images, client = pool) => {
+  if (!images || images.length === 0) return;
+
+  const values = [];
+  const placeholders = [];
+
+  images.forEach((img, index) => {
+    const baseIndex = index * 5;
+    placeholders.push(
+      `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5})`
+    );
+
+    values.push(
+      productId,
+      img.image_url,
+      img.is_primary ?? false,
+      img.alt_text ?? "",
+      img.sort_order ?? index
+    );
+  });
+
+  const query = `
+    INSERT INTO product_images
+    (product_id, image_url, is_primary, alt_text, sort_order)
+    VALUES ${placeholders.join(",")}
+  `;
+
+  await client.query(query, values);
+
 };
