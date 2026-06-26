@@ -2,7 +2,6 @@ import { Pool } from 'pg';
 import config from './env.js';
 
 //for local development
-
 // const pool = new Pool({
 //     user: config.db.user,
 //     host: config.db.host,
@@ -11,6 +10,7 @@ import config from './env.js';
 //     port: config.db.port
 // });
 
+//for neon database
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 
@@ -32,30 +32,3 @@ pool.on('error', (err) => {
 });
 
 export default pool;
-
-//for neon
-
-// import { Pool } from 'pg';
-// import './env.js';
-
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-
-//   ssl: {
-//     rejectUnauthorized: false,
-//   },
-
-//   max: 10,
-//   idleTimeoutMillis: 30000,
-//   connectionTimeoutMillis: 10000,
-// });
-
-// pool.on('connect', () => {
-//   console.log('✅ Neon connected');
-// });
-
-// pool.on('error', (err) => {
-//   console.error('DB error:', err);
-// });
-
-// export default pool;

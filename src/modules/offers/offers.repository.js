@@ -494,7 +494,7 @@ export const getOfferProducts = async (offerId) => {
 //using
 export const findOfferByProductIdFullOfferData = async (productId) => {
     const query = `
-        SELECT o.* 
+        SELECT o.discount_type, o.discount_value, o.start_date, o.end_date 
         FROM offers o
         JOIN offer_products op ON op.offer_id = o.id
         WHERE op.product_id = $1

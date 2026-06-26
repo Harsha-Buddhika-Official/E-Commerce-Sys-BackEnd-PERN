@@ -2,29 +2,29 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredEnvVars = [
-    'PORT',
-    'JWT_SECRET',
+// const requiredEnvVars = [
+//     'PORT',
+//     'JWT_SECRET',
 
-    'DB_USER',
-    'DB_PASSWORD',
-    'DB_HOST',
-    'DB_NAME',
-    'DB_PORT',
+//     // 'DB_USER',
+//     // 'DB_PASSWORD',
+//     // 'DB_HOST',
+//     // 'DB_NAME',
+//     // 'DB_PORT',
 
-    'CLOUDINARY_CLOUD_NAME',
-    'CLOUDINARY_API_KEY',
-    'CLOUDINARY_API_SECRET'
-];
+//     'CLOUDINARY_CLOUD_NAME',
+//     'CLOUDINARY_API_KEY',
+//     'CLOUDINARY_API_SECRET'
+// ];
 
-// validate env variables
-requiredEnvVars.forEach((key) => {
+// // validate env variables
+// requiredEnvVars.forEach((key) => {
 
-    if (!process.env[key]) {
-        throw new Error(`${key} is required in .env`);
-    }
+//     if (!process.env[key]) {
+//         throw new Error(`${key} is required in .env`);
+//     }
 
-});
+// });
 
 const config = {
 
