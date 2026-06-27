@@ -1,14 +1,13 @@
 import app from './app.js';
-import pool from './config/db.js';
+import connectDB from './config/connectDB.js';
 import config from './config/env.js';
 
 const port = config.port;
 
 const startServer = async () => {
     try {
-        await pool.query('SELECT 1'); // testing database connection
-        await pool.query('SET search_path TO public'); //this is only for neon database becasue tables name change like table_name -> public.table_name
-        console.log('Database connection successful');
+        await connectDB();
+        
         app.listen(port,() => {
             console.log(`Server is running on port ${port}`);
             console.log(`http://localhost:${port}`);
