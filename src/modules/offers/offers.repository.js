@@ -98,6 +98,7 @@ export const getAllOffers = async () => {
     return rows;
 };
 
+//using
 export const getAllOfferProducts = async () => {
     const query = `
         SELECT
