@@ -98,6 +98,29 @@ export const getAllOffers = async () => {
     return rows;
 };
 
+export const getAllOfferProducts = async () => {
+    const query = `
+        SELECT
+            op.id AS offer_product_id,
+            op.product_id,
+            o.discount_type,
+            o.discount_value,
+            o.start_date,
+            o.end_date
+        FROM offer_products op
+        JOIN offers o
+            ON o.id = op.offer_id
+        JOIN products p
+            ON p.product_id = op.product_id
+        WHERE
+            o.is_active = true
+            AND NOW() BETWEEN o.start_date AND o.end_date
+        ORDER BY op.created_at DESC;
+    `;
+    const { rows } = await pool.query(query);
+    return rows;
+}
+
 // Get offers with optional status filter
 //using
 export const getOffers = async ({ status }) => {
