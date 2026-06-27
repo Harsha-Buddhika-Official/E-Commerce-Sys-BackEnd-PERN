@@ -2,7 +2,7 @@ import slugify from 'slugify';
 import * as productRepository from './product.repository.js';
 import { findCategoryById, findCategoryByName } from '../categories/categories.repository.js';
 import { findBrandByName } from '../brands/brand.repository.js';
-import { applyActiveOfferPricing } from '../../utils/offerPricing.js';
+import { applyOfferToProduct, applyOffersToProducts } from '../../utils/offerPricing.js';
 import pool from '../../config/db.js';
 import AppError from '../../utils/AppError.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
@@ -188,14 +188,14 @@ export const getAllProductLimitedDetilas = async () => {
 export const getAllDetialsProductById = async (id) => {
   const product = await productRepository.getAllDetialsProductById(id);
   if (!product) throw new AppError('Product not found', 404);
-  return applyActiveOfferPricing(product);
+  return applyOfferToProduct(product);
 };
 
 //using
 export const getProductById = async (id) => {
   const product = await productRepository.findProductById(id);
   if (!product) throw new AppError('Product not found', 404);
-  return applyActiveOfferPricing(product);
+  return applyOfferToProduct(product);
 };
 
 //using
@@ -219,9 +219,7 @@ export const getProductsByCategory = async (categoryId) => {
   const products = await productRepository.getProductsByCategory(categoryId);
   if (!products.length) throw new AppError('No products found', 404);
 
-  return Promise.all(
-    products.map(p => applyActiveOfferPricing(p))
-  );
+  return applyOffersToProducts(products);
 };
 
 //using
@@ -229,7 +227,7 @@ export const getBestSellingProducts = async () => {
   const products = await productRepository.getBestSellingProducts();
   if (!products.length) throw new AppError('No products found', 404);
 
-  return Promise.all(products.map(applyActiveOfferPricing));
+  return applyOffersToProducts(products);
 };
 
 //using
@@ -237,7 +235,7 @@ export const getLatestProducts = async () => {
   const products = await productRepository.getLatestProducts();
   if (!products.length) throw new AppError('No products found', 404);
 
-  return Promise.all(products.map(applyActiveOfferPricing));
+  return applyOffersToProducts(products);
 };
 
 /* =========================================================
