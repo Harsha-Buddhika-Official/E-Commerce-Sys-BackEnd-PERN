@@ -27,7 +27,6 @@ export const addItem = async (req, res, next) => {
             quantity,
         });
 
-        // HTTP responsibility ONLY
         if (req.isNewSession) {
             setSessionCookie(res, req.sessionId);
         }
