@@ -18,7 +18,7 @@ app.use(express.json({
     limit:'1mb'
 }));
 app.use(cors({
-    origin: 'http://localhost:3000', // frontend port
+    origin: 'http://localhost:80', // frontend port
     credentials: true,               // allows cookies cross-origin
 }));
 app.use(cookieParser());
