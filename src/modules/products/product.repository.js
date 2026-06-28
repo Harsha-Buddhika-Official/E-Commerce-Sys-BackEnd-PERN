@@ -398,7 +398,6 @@ export const getProductsByCategory = async (categoryId) => {
 // };
 
 export const getBestSellingProducts = async () => {
-  const start = Date.now();
   const query = `
     SELECT
       p.product_id,
@@ -484,7 +483,6 @@ export const getBestSellingProducts = async () => {
   `;
 
   const { rows } = await pool.query(query);
-  console.log(`Query took ${Date.now() - start} ms`);
   return rows;
 };
 
