@@ -18,7 +18,11 @@ app.use(express.json({
     limit:'1mb'
 }));
 app.use(cors({
-    origin: 'http://localhost:80', // frontend port
+    origin: [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://e-commerce-sys-frontend-pern-production.up.railway.app"
+    ],
     credentials: true,               // allows cookies cross-origin
 }));
 app.use(cookieParser());
