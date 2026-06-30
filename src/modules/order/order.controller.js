@@ -17,6 +17,7 @@ export const createOrder = async (req, res, next) => {
             message: 'Order created successfully'
         });
     } catch (error) {
+        console.error(error);
         next(error);
     }
 };
@@ -32,6 +33,7 @@ export const updatePaymentSlip = async (req, res, next) => {
             message: 'Payment slip URL retrieved successfully'
         });
     } catch (error) {
+        console.error(error);
         next(error);
     }
 }
