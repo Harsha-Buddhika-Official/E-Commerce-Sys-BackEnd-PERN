@@ -18,10 +18,17 @@ export const attachSession = (req, _res, next) => {
 
 // Called by service layer when cart is created for the first time
 export const setSessionCookie = (res, sessionId) => {
+  // res.cookie(COOKIE_NAME, sessionId, {
+  //   httpOnly: true,
+  //   sameSite: 'lax',
+  //   secure: process.env.NODE_ENV === 'production',
+  //   maxAge: COOKIE_MAX_AGE,
+  // });
   res.cookie(COOKIE_NAME, sessionId, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
+    sameSite: "none",
     maxAge: COOKIE_MAX_AGE,
+    path: "/",
   });
 };
