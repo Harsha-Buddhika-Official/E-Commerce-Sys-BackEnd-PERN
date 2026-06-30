@@ -3,7 +3,8 @@ import * as orderService from './order.service.js';
 //using
 export const createOrder = async (req, res, next) => {
     const sessionId = req.cookies.sid
-    
+    console.log('Received request body in controller:', req.body); // Debug log to check request body
+    console.log('Received session ID in controller:', sessionId); // Debug log to check session ID
     try {
         const order = await orderService.createOrder(
             req.body,
