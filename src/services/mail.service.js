@@ -17,7 +17,7 @@ export const sendOrderStatusUpdateEmail = async (order) => {
   if (!order.email) {
     throw new Error('sendOrderStatusUpdateEmail: order.email is required');
   }
-
+  console.log(`Sending order status update email to ${order.email} for order #${order.order_id}`);
   const html = orderStatusUpdateTemplate(order);
 
   await transporter.sendMail({
