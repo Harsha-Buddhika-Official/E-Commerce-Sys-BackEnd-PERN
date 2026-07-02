@@ -98,23 +98,24 @@ export const createOrder = async (orderData, sessionId) => {
         client.release();
     }
 
+    //temparary dissable
     // ── EMAIL (outside transaction) ───────────────────────────────
-    try {
-        await sendOrderConfirmationEmail({
-            full_name:        orderData.full_name,
-            email:            orderData.customer_email,
-            order_id:         order.order_id,
-            tracking_code:    order.tracking_code,
-            total_amount:     order.total_amount,
-            shipping_address: orderData.shipping_address,
-            city:             orderData.city,
-            postal_code:      orderData.postal_code,
-            phone_number:     orderData.phone_number,
-            items,
-        });
-    } catch (emailError) {
-        console.error('Order confirmation email failed (non-fatal):', emailError);
-    }
+    // try {
+    //     await sendOrderConfirmationEmail({
+    //         full_name:        orderData.full_name,
+    //         email:            orderData.customer_email,
+    //         order_id:         order.order_id,
+    //         tracking_code:    order.tracking_code,
+    //         total_amount:     order.total_amount,
+    //         shipping_address: orderData.shipping_address,
+    //         city:             orderData.city,
+    //         postal_code:      orderData.postal_code,
+    //         phone_number:     orderData.phone_number,
+    //         items,
+    //     });
+    // } catch (emailError) {
+    //     console.error('Order confirmation email failed (non-fatal):', emailError);
+    // }
 
     return order;
 };
@@ -264,18 +265,19 @@ export const updateOrderStatus = async (orderId, newStatus, client) => {
     if (!order) throw new AppError('Order not found', 404);
 
     const updated = await orderRepository.updateOrderStatus(orderId, newStatus, client);
-    try {
-        await sendOrderStatusUpdateEmail({
-            full_name:     order.full_name,
-            email:         order.customer_email,
-            order_status:  newStatus,
-            order_id:      order.order_id,
-            tracking_code: order.tracking_code,
-            total_amount:  order.total_amount,
-        });
-    } catch (emailError) {
-        console.error('Order status update email failed (non-fatal):', emailError);
-    }
+    //temparary dissable
+    // try {
+    //     await sendOrderStatusUpdateEmail({
+    //         full_name:     order.full_name,
+    //         email:         order.customer_email,
+    //         order_status:  newStatus,
+    //         order_id:      order.order_id,
+    //         tracking_code: order.tracking_code,
+    //         total_amount:  order.total_amount,
+    //     });
+    // } catch (emailError) {
+    //     console.error('Order status update email failed (non-fatal):', emailError);
+    // }
 
     return updated;
 };
