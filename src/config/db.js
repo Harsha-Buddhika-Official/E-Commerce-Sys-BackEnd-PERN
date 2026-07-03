@@ -24,7 +24,7 @@ const pool = new Pool({
 });
 
 pool.on('connect', () => {
-  console.log('✅ Neon connected');
+  console.log('✅ Database connected');
 });
 
 pool.on('error', (err) => {

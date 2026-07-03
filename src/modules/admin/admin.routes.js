@@ -1,6 +1,6 @@
 import { createAdmin, loginAdmin, getAllAdmins, updateAdminRole, deleteAdmin, updateAdminPassword } from './admin.controller.js';
 import express from 'express';
-import { validateRegister, validateLogin } from './admin.validator.js';
+import { validateRegister, validateLogin, validateUpdateAdminRole, validateUpdatePassword, validateDeleteAdmin } from './admin.validator.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
@@ -19,10 +19,10 @@ router.get('/', authorize('super_admin'), getAllAdmins); //using
 router.post('/register', authorize('super_admin'), validateRegister, createAdmin); //using
 
 // ==================== PROTECTED ROUTES - PUT ====================
-router.put('/updateRole/:id', authorize('super_admin'), updateAdminRole); //using
-router.put('/settings/updatePassword/:id', authorize('super_admin', 'admin', 'manager'), updateAdminPassword); //using
+router.put('/updateRole/:id', authorize('super_admin'), validateUpdateAdminRole, updateAdminRole); //using
+router.put('/settings/updatePassword/:id', authorize('super_admin', 'admin', 'manager'), validateUpdatePassword, updateAdminPassword); //using
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/delete', authorize('super_admin'), deleteAdmin); //using
+router.delete('/delete/:id', authorize('super_admin'), deleteAdmin); //using
 
 export default router;
