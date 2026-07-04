@@ -77,17 +77,17 @@ export const updateAdminRole = async (adminId, adminData) => {
 };
 
 //using
-export const deleteAdmin = async (adminEmail) => {
-    if (!adminEmail) {
-        throw new AppError('Admin email is required', 400);
+export const deleteAdmin = async (adminId) => {
+    if (!adminId) {
+        throw new AppError('Admin ID is required', 400);
     }
 
-    const admin = await adminRepository.getAdminByEmail(adminEmail);
+    const admin = await adminRepository.getAdminById(adminId);
     if (!admin) {
         throw new AppError('Admin not found', 404);
     }
 
-    await adminRepository.deleteAdmin(admin.admin_id);
+    await adminRepository.deleteAdmin(adminId);
 
     const { password_hash, ...safe } = admin;
     return safe;

@@ -65,7 +65,8 @@ export const updateAdminRole = async (req, res, next) => {
 //using
 export const deleteAdmin = async (req, res, next) => {
     try {
-        const deleted = await adminService.deleteAdmin(req.body.email);
+        console.log('req.body.id:', req.params);
+        const deleted = await adminService.deleteAdmin(req.params.id);
 
         res.status(200).json({
             success: true,
