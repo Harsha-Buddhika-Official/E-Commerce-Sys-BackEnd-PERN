@@ -30,7 +30,7 @@ export const createProductAttribute = async (req, res, next) => {
 };
 
 //using
-export const createAttributeValue = async (req, res, next) => {
+export const createAttributeValue = async (req, res, next) => { 
     try {
         const attributeValueData = await attributeService.createAttributeValue ({
             ...req.body,
