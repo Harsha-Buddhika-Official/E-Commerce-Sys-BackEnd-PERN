@@ -23,6 +23,6 @@ router.put('/updateRole/:id', authorize('super_admin'), validateUpdateAdminRole,
 router.put('/settings/updatePassword/:id', authorize('super_admin', 'admin', 'manager'), validateUpdatePassword, updateAdminPassword); //using
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/delete/:id', authorize('super_admin'), deleteAdmin); //using
+router.delete('/delete/:id', authorize('super_admin'), validateDeleteAdmin, deleteAdmin); //using
 
 export default router;
