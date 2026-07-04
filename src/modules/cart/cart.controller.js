@@ -18,6 +18,8 @@ export const getCart = async (req, res, next) => {
 
 //using
 export const addItem = async (req, res, next) => {
+    console.log('body:', req.body); 
+    console.log('params:', req.params);
     try {
         const { product_id, quantity } = req.body;
 

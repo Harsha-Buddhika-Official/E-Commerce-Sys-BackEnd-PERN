@@ -1,93 +1,138 @@
 import Joi from 'joi';
-import AppError from '../../utils/AppError.js';
 
-// ─── Schemas ───────────────────────────────────────────────────────────────────
-
-const addItemSchema = Joi.object({
-    product_id: Joi.number()
-        .integer()
-        .positive()
-        .required()
-        .messages({
-            'number.base': 'product_id must be a number',
-            'number.integer': 'product_id must be an integer',
-            'number.positive': 'product_id must be positive',
-            'any.required': 'product_id is required',
+const AddItem = Joi.object({
+    product_id: Joi.number().
+        integer().
+        positive().
+        required().
+        messages({
+            "number.base": "Product ID must be a number",
+            "number.integer": "Product ID must be an integer",
+            "number.positive": "Product ID must be a positive number",
+            "any.required": "Product ID is required"
         }),
 
-    quantity: Joi.number()
-        .integer()
-        .min(1)
-        .max(100)
-        .required()
-        .messages({
-            'number.base': 'quantity must be a number',
-            'number.integer': 'quantity must be an integer',
-            'number.min': 'quantity must be at least 1',
-            'number.max': 'quantity cannot exceed 100',
-            'any.required': 'quantity is required',
-        }),
+    quantity: Joi.number().
+        integer().
+        min(1).
+        max(100).
+        required().
+        messages({
+            "number.base": "Quantity must be a number",
+            "number.integer": "Quantity must be an integer",
+            "number.min": "Quantity must be at least 1",
+            "number.max": "Quantity cannot exceed 100",
+            "any.required": "Quantity is required"
+        })
 });
 
-const updateItemSchema = Joi.object({
-    quantity: Joi.number()
-        .integer()
-        .min(1)
-        .max(100)
-        .required()
-        .messages({
-            'number.base': 'quantity must be a number',
-            'number.integer': 'quantity must be an integer',
-            'number.min': 'quantity must be at least 1',
-            'number.max': 'quantity cannot exceed 100',
-            'any.required': 'quantity is required',
-        }),
+const UpdateItem = Joi.object({
+    body: Joi.object({
+        quantity: Joi.number().
+            integer().
+            min(1).
+            max(100).
+            required().
+            messages({
+                "number.base": "Quantity must be a number",
+                "number.integer": "Quantity must be an integer",
+                "number.min": "Quantity must be at least 1",
+                "number.max": "Quantity cannot exceed 100",
+                "any.required": "Quantity is required"
+            })
+    }),
+
+    params: Joi.object({
+        itemId: Joi.number().
+            integer().
+            positive().
+            required().
+            messages({
+                "number.base": "Item ID must be a number",
+                "number.integer": "Item ID must be an integer",
+                "number.positive": "Item ID must be a positive number",
+                "any.required": "Item ID is required"
+            })
+    })
 });
 
-const itemIdParamSchema = Joi.object({
-    itemId: Joi.number()
-        .integer()
-        .positive()
-        .required()
-        .messages({
-            'number.base': 'itemId must be a number',
-            'number.positive': 'itemId must be a positive integer',
-        }),
+const ItemId = Joi.object({
+    params: Joi.object({
+        itemId: Joi.number().
+            integer().
+            positive().
+            required().
+            messages({
+                "number.base": "Item ID must be a number",
+                "number.integer": "Item ID must be an integer",
+                "number.positive": "Item ID must be a positive number",
+                "any.required": "Item ID is required"
+            })
+    })
 });
 
-// ─── Middleware factory ────────────────────────────────────────────────────────
+export const validateAddItem = (req, res, next) => {
+    const { error, value } = AddItem.validate(req.body, {
+        abortEarly: false
+    });
 
-const validate = (schema, target = 'body') => {
-    return (req, _res, next) => {
-        const data = target === 'params'
-            ? { itemId: Number(req.params.itemId) }
-            : req[target];
-
-        const { error, value } = schema.validate(data, {
-            abortEarly: false,
-            stripUnknown: true,
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            errors: error.details.map(err => ({
+                field: err.path[0],
+                message: err.message
+            }))
         });
+    }
 
-        if (error) {
-            const messages = error.details.map((detail) => ({
-                field: detail.path.join('.'),
-                message: detail.message,
-            }));
-            return next(new AppError(JSON.stringify(messages), 400));
-        }
+    req.body = value;
 
-        if (target === 'params') {
-            req.params = { ...req.params, ...value };
-        } else {
-            req[target] = value;
-        }
-
-        next();
-    };
+    next();
 };
 
-// ─── Named exports used in routes ─────────────────────────────────────────────
+export const validateUpdateItem = (req, res, next) => {
+    const { error, value } = UpdateItem.validate({
+        body: req.body,
+        params: req.params
+    }, {
+        abortEarly: false
+    });
 
-export const validateAddItem = validate(addItemSchema, 'body');
-export const validateUpdateItem = validate(updateItemSchema, 'body');
-export const validateItemId = validate(itemIdParamSchema, 'params');
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            errors: error.details.map(err => ({
+                field: err.path.join('.'),
+                message: err.message
+            }))
+        });
+    }
+
+    req.body = value.body;
+    req.params = value.params;
+
+    next();
+};
+
+export const validateItemId = (req, res, next) => {
+    const { error, value } = ItemId.validate({
+        params: req.params
+    }, {
+        abortEarly: false
+    });
+
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            errors: error.details.map(err => ({
+                field: err.path.join('.'),
+                message: err.message
+            }))
+        });
+    }
+
+    req.params = value.params;
+
+    next();
+};
