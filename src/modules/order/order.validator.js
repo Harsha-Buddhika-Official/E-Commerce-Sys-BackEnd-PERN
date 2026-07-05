@@ -33,13 +33,12 @@ export const CreateOrder = Joi.object({
 
     phone_number: Joi.string()
         .trim()
-        .min(7)
-        .max(20)
+        .pattern(/^0\d{9}$/)
         .required()
         .messages({
             "string.empty": "Phone number is required",
-            "string.min": "Phone number must be at least 7 characters long",
-            "string.max": "Phone number cannot exceed 20 characters"
+            "any.required": "Phone number is required",
+            "string.pattern.base": "Phone number must contain exactly 10 digits and start with 0"
         }),
 
     shipping_address: Joi.string()
@@ -64,12 +63,12 @@ export const CreateOrder = Joi.object({
 
     postal_code: Joi.string()
         .trim()
-        .min(3)
-        .max(20)
+        .pattern(/^\d{5}$/)
         .required()
         .messages({
             "string.empty": "Postal code is required",
-            "string.min": "Postal code must be at least 3 characters long"
+            "any.required": "Postal code is required",
+            "string.pattern.base": "Postal code must contain exactly 5 digits"
         }),
 
     order_status: Joi.string()
@@ -122,12 +121,12 @@ const TrackingLookup = Joi.object({
 
     trackingCode: Joi.string()
         .trim()
-        .min(6)
-        .max(100)
+        .uppercase()
+        .pattern(/^TRK-\d{8}-[A-Z0-9]{6}$/)
         .required()
         .messages({
             "string.empty": "Tracking code is required",
-            "string.min": "Tracking code must be at least 6 characters long"
+            "string.pattern.base": "Tracking code must be in the format (e.g. TRK-20260705-11A3A2)"
         })
 });
 
@@ -172,10 +171,11 @@ const UploadPaymentSlip = Joi.object({
 });
 
 const buildValidationError = (error) => {
-    return error.details.map((err) => ({
+    const errors = error.details.map((err) => ({
         field: err.path.join('.'),
         message: err.message
     }));
+    return errors;
 };
 
 export const validateCreateOrder = (req, res, next) => {
@@ -185,7 +185,6 @@ export const validateCreateOrder = (req, res, next) => {
     });
 
     if (error) {
-		console.error('Validation error:', error); // Debug log to check validation error
         return res.status(400).json({
             success: false,
             errors: buildValidationError(error)
