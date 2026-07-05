@@ -1,6 +1,5 @@
 import joi from 'joi';
 
-// Validation schema for creating a brand
 const createBrandSchema = joi.object({
     name: joi.string()
         .trim()
@@ -46,7 +45,6 @@ const idParamSchema = joi.object({
         })
 });
 
-//middleware to validate create brand request
 export const validateCreateBrand = (req, res, next) => {
     const { error, value } = createBrandSchema.validate(req.body, { abortEarly: false });
     if (error) {
@@ -62,7 +60,6 @@ export const validateCreateBrand = (req, res, next) => {
     next();
 };
 
-//middleware to validate update brand request
 export const validateUpdateBrand = (req, res, next) => {
     const { error, value } = updateBrandSchema.validate(req.body, { abortEarly: false });
     if (error) {
@@ -78,7 +75,6 @@ export const validateUpdateBrand = (req, res, next) => {
     next();
 };
 
-//middleware to validate id param
 export const validateIdParam = (req, res, next) => {
     const { error, value } = idParamSchema.validate(req.params, { abortEarly: false });
     if (error) {
