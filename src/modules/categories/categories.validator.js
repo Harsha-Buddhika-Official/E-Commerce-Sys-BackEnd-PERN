@@ -1,7 +1,5 @@
 import Joi from 'joi';
 
-// ─── Schemas ───────────────────────────────────────────────────────────────────
-
 const CreateCategory = Joi.object({
     name: Joi.string().
         trim().
@@ -45,7 +43,6 @@ const CategoryId = Joi.object({
         })
 });
 
-// ─── Validation Middleware ─────────────────────────────────────────────────────
 
 export const validateCreateCategory = (req, res, next) => {
     const { error, value } = CreateCategory.validate(req.body, {
