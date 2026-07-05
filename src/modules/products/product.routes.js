@@ -8,28 +8,28 @@ import upload from '../../middlewares/multer.js';
 const router = express.Router();
 
 // ==================== PUBLIC ROUTES - GET ====================
-router.get('/', getAllProducts); //using
-router.get('/best-selling', getBestSellingProducts); //using
-router.get('/latest', getLatestProducts); //using
-router.get('/search/:name', getProductByName); //using
-router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory); //using
-router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions); //using
-router.get('/:id', validateProductId, getProductById); //using
+router.get('/', getAllProducts); 
+router.get('/best-selling', getBestSellingProducts); 
+router.get('/latest', getLatestProducts); 
+router.get('/search/:name', getProductByName); 
+router.get('/category/:categoryId', validateCategoryIdParam, getProductsByCategory); 
+router.get('/filter/options/:categoryId', validateCategoryIdParam, getFilterOptions); 
+router.get('/:id', validateProductId, getProductById); 
 
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/', upload.array('images', 3), validateProduct, createProduct);
-router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); //using
+router.post('/filter/:categoryId', validateCategoryIdParam, getFilteredProducts); 
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin/limited-details', authorize('super_admin', 'admin', 'manager'), getAllProductLimitedDetilas); //using
-router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager'), getAllProductsDetailsSimple); //using
-router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById); //using
+router.get('/admin/limited-details', authorize('super_admin', 'admin', 'manager'), getAllProductLimitedDetilas); 
+router.get('/admin/simple-details', authorize('super_admin', 'admin', 'manager'), getAllProductsDetailsSimple); 
+router.get('/admin/products/:id', authorize('super_admin', 'admin', 'manager'), validateProductId, getAllDetialsProductById); 
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/admin/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes); //using
+router.post('/admin/without-attributes', upload.array('images', 3), validateProduct, createProductWithoutAttributes); 
 
 // ==================== PROTECTED ROUTES - PUT ====================
 // router.put('/:id/soft-delete', authorize('super_admin', 'admin'), validateCategoryIdParam, softDeleteProduct); //waiting list
@@ -40,15 +40,15 @@ router.delete('/admin/delete/:id', authorize('super_admin', 'admin'), validatePr
 
 // ==================== PROTECTED ROUTES - UPDATE PRODUCT DETAILS / IMAGES ====================
 // 1. Product data update — pure JSON, no images
-router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'), validateProductId, updateProductDetails); //using
+router.put('/admin/products/:id/full-update', authorize('super_admin', 'admin'), validateProductId, updateProductDetails); 
 
 // 2. Add images — multipart, 0 to 3 files
-router.post('/admin/products/:id/images', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, addProductImage); //using
+router.post('/admin/products/:id/images', upload.array('images', 3), authorize('super_admin', 'admin'), validateProductId, addProductImage); 
 
 // 3. Remove single image — DB + Cloudinary
-router.delete('/admin/products/:id/images/:imageId', authorize('super_admin', 'admin'), validateProductIdAndImageId, removeProductImage); //using
+router.delete('/admin/products/:id/images/:imageId', authorize('super_admin', 'admin'), validateProductIdAndImageId, removeProductImage); 
 
 // 4. Reorder / set primary — pure JSON
-router.patch('/admin/products/:id/images/reorder', authorize('super_admin', 'admin'), validateProductId, reorderProductImages); //using
+router.patch('/admin/products/:id/images/reorder', authorize('super_admin', 'admin'), validateProductId, reorderProductImages); 
 
 export default router;
