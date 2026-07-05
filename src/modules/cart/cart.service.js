@@ -5,7 +5,7 @@ import { setSessionCookie } from '../../middlewares/session.middleware.js';
 
 // using
 export const getCart = async (sessionId) => {
-    console.log("Service Layer - getCart called with sessionId:", sessionId);
+    // console.log("Service Layer - getCart called with sessionId:", sessionId);
     const cart = await cartRepository.findCartBySession(sessionId);
 
     if (!cart) {
