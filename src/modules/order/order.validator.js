@@ -1,363 +1,274 @@
-import joi from 'joi';
+import Joi from 'joi';
 
-const orderStatusValues = ['pending_payment','pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'];
-const ORDER_STATUS = ["pending_payment","pending","paid","processing","shipped","delivered","cancelled",];
+const ORDER_STATUS = ["pending_payment", "pending", "paid", "processing", "shipped", "delivered", "cancelled"];
 const ORDER_TYPES = ["direct", "cart"];
 
-const directOrderSchema = joi.object({
-	customer_email: joi.string()
-		.trim()
-		.email()
-		.required()
-		.messages({
-			'string.email': 'Customer email must be a valid email address',
-			'any.required': 'Customer email is required'
-		}),
-	phone_number: joi.string()
-		.trim()
-		.min(7)
-		.max(20)
-		.required()
-		.messages({
-			'string.empty': 'Phone number is required',
-			'string.min': 'Phone number must be at least 7 characters',
-			'string.max': 'Phone number must not exceed 20 characters'
-		}),
-	shipping_address: joi.string()
-		.trim()
-		.min(5)
-		.max(255)
-		.required()
-		.messages({
-			'string.empty': 'Shipping address is required'
-		}),
-	city: joi.string()
-		.trim()
-		.min(2)
-		.max(100)
-		.required()
-		.messages({
-			'string.empty': 'City is required'
-		}),
-	postal_code: joi.string()
-		.trim()
-		.min(3)
-		.max(20)
-		.required()
-		.messages({
-			'string.empty': 'Postal code is required'
-		}),
-	product_id: joi.number()
-		.integer()
-		.positive()
-		.required()
-		.messages({
-			'number.base': 'Product ID must be a number',
-			'number.integer': 'Product ID must be an integer',
-			'number.positive': 'Product ID must be positive',
-			'any.required': 'Product ID is required'
-		}),
-	quantity: joi.number()
-		.integer()
-		.positive()
-		.required()
-		.messages({
-			'number.base': 'Quantity must be a number',
-			'number.integer': 'Quantity must be an integer',
-			'number.positive': 'Quantity must be positive',
-			'any.required': 'Quantity is required'
-		})
+export const CreateOrder = Joi.object({
+    order_type: Joi.string()
+        .valid(...ORDER_TYPES)
+        .required()
+        .messages({
+            "any.only": "Order type must be either 'direct' or 'cart'",
+            "string.empty": "Order type is required"
+        }),
+
+    full_name: Joi.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .required()
+        .messages({
+            "string.empty": "Full name is required",
+            "string.min": "Full name must be at least 2 characters long"
+        }),
+
+    customer_email: Joi.string()
+        .trim()
+        .email()
+        .required()
+        .messages({
+            "string.email": "Customer email must be a valid email address",
+            "string.empty": "Customer email is required"
+        }),
+
+    phone_number: Joi.string()
+        .trim()
+        .min(7)
+        .max(20)
+        .required()
+        .messages({
+            "string.empty": "Phone number is required",
+            "string.min": "Phone number must be at least 7 characters long",
+            "string.max": "Phone number cannot exceed 20 characters"
+        }),
+
+    shipping_address: Joi.string()
+        .trim()
+        .min(5)
+        .max(255)
+        .required()
+        .messages({
+            "string.empty": "Shipping address is required",
+            "string.min": "Shipping address must be at least 5 characters long"
+        }),
+
+    city: Joi.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .required()
+        .messages({
+            "string.empty": "City is required",
+            "string.min": "City must be at least 2 characters long"
+        }),
+
+    postal_code: Joi.string()
+        .trim()
+        .min(3)
+        .max(20)
+        .required()
+        .messages({
+            "string.empty": "Postal code is required",
+            "string.min": "Postal code must be at least 3 characters long"
+        }),
+
+    order_status: Joi.string()
+        .valid(...ORDER_STATUS)
+        .default('pending_payment')
+        .messages({
+            "any.only": `Order status must be one of: ${ORDER_STATUS.join(', ')}`
+        }),
+
+    product_id: Joi.when('order_type', {
+        is: 'direct',
+        then: Joi.number()
+            .integer()
+            .positive()
+            .required()
+            .messages({
+                "number.base": "Product ID must be a number",
+                "number.integer": "Product ID must be an integer",
+                "number.positive": "Product ID must be a positive number",
+                "any.required": "Product ID is required for direct orders"
+            }),
+        otherwise: Joi.forbidden()
+    }),
+
+    quantity: Joi.when('order_type', {
+        is: 'direct',
+        then: Joi.number()
+            .integer()
+            .positive()
+            .required()
+            .messages({
+                "number.base": "Quantity must be a number",
+                "number.integer": "Quantity must be an integer",
+                "number.positive": "Quantity must be a positive number",
+                "any.required": "Quantity is required for direct orders"
+            }),
+        otherwise: Joi.forbidden()
+    })
 });
 
-const cartOrderSchema = joi.object({
-	customer_email: joi.string()
-		.trim()
-		.email()
-		.required()
-		.messages({
-			'string.email': 'Customer email must be a valid email address',
-			'any.required': 'Customer email is required'
-		}),
-	phone_number: joi.string()
-		.trim()
-		.min(7)
-		.max(20)
-		.required()
-		.messages({
-			'string.empty': 'Phone number is required',
-			'string.min': 'Phone number must be at least 7 characters',
-			'string.max': 'Phone number must not exceed 20 characters'
-		}),
-	shipping_address: joi.string()
-		.trim()
-		.min(5)
-		.max(255)
-		.required()
-		.messages({
-			'string.empty': 'Shipping address is required'
-		}),
-	city: joi.string()
-		.trim()
-		.min(2)
-		.max(100)
-		.required()
-		.messages({
-			'string.empty': 'City is required'
-		}),
-	postal_code: joi.string()
-		.trim()
-		.min(3)
-		.max(20)
-		.required()
-		.messages({
-			'string.empty': 'Postal code is required'
-		}),
-	order_status: joi.string()
-		.trim()
-		.lowercase()
-		.valid(...orderStatusValues)
-		.optional()
-		.messages({
-			'any.only': `Order status must be one of: ${orderStatusValues.join(', ')}`
-		})
+const TrackingLookup = Joi.object({
+    email: Joi.string()
+        .trim()
+        .email()
+        .required()
+        .messages({
+            "string.email": "Email must be a valid email address",
+            "string.empty": "Email is required"
+        }),
+
+    trackingCode: Joi.string()
+        .trim()
+        .min(6)
+        .max(100)
+        .required()
+        .messages({
+            "string.empty": "Tracking code is required",
+            "string.min": "Tracking code must be at least 6 characters long"
+        })
 });
 
-const customerSchema = {
-  customer_email: joi.string()
-    .trim()
-    .email()
-    .required()
-    .messages({
-      "string.email": "Customer email must be valid",
-      "any.required": "Customer email is required",
-    }),
-
-  phone_number: joi.string()
-    .trim()
-    .min(7)
-    .max(20)
-    .required()
-    .messages({
-      "string.empty": "Phone number is required",
-      "string.min": "Phone number must be at least 7 characters",
-      "string.max": "Phone number cannot exceed 20 characters",
-    }),
-
-  shipping_address: joi.string()
-    .trim()
-    .min(5)
-    .max(255)
-    .required()
-    .messages({
-      "string.empty": "Shipping address is required",
-    }),
-
-  city: joi.string()
-    .trim()
-    .min(2)
-    .max(100)
-    .required()
-    .messages({
-      "string.empty": "City is required",
-    }),
-
-  postal_code: joi.string()
-    .trim()
-    .min(3)
-    .max(20)
-    .required()
-    .messages({
-      "string.empty": "Postal code is required",
-    }),
-};
-
-const createOrderSchema = joi.object({
-  ...customerSchema,
-
-  order_type: joi.string()
-    .valid(...ORDER_TYPES)
-    .required()
-    .messages({
-      "any.only": `Order type must be one of: ${ORDER_TYPES.join(", ")}`,
-      "any.required": "Order type is required",
-    }),
-
-  order_status: joi.string()
-    .valid(...ORDER_STATUS)
-    .default("pending")
-    .messages({
-      "any.only": `Order status must be one of: ${ORDER_STATUS.join(", ")}`,
-    }),
-
-  product_id: joi.when("order_type", {
-    is: "direct",
-    then: joi.number()
-      .integer()
-      .positive()
-      .required()
-      .messages({
-        "number.base": "Product ID must be a number",
-        "number.integer": "Product ID must be an integer",
-        "number.positive": "Product ID must be positive",
-        "any.required": "Product ID is required for direct orders",
-      }),
-    otherwise: joi.forbidden(),
-  }),
-
-  quantity: joi.when("order_type", {
-    is: "direct",
-    then: joi.number()
-      .integer()
-      .positive()
-      .required()
-      .messages({
-        "number.base": "Quantity must be a number",
-        "number.integer": "Quantity must be an integer",
-        "number.positive": "Quantity must be positive",
-        "any.required": "Quantity is required for direct orders",
-      }),
-    otherwise: joi.forbidden(),
-  }),
+const OrderId = Joi.object({
+    id: Joi.number()
+        .integer()
+        .positive()
+        .required()
+        .messages({
+            "number.base": "Order ID must be a number",
+            "number.integer": "Order ID must be an integer",
+            "number.positive": "Order ID must be a positive number",
+            "any.required": "Order ID is required"
+        })
 });
 
-const trackingSchema = joi.object({
-	email: joi.string()
-		.trim()
-		.email()
-		.required()
-		.messages({
-			'string.email': 'Email must be a valid email address',
-			'any.required': 'Email is required'
-		}),
-	trackingCode: joi.string()
-		.trim()
-		.min(6)
-		.max(100)
-		.required()
-		.messages({
-			'string.empty': 'Tracking code is required',
-			'any.required': 'Tracking code is required'
-		})
+const UpdateOrderStatus = Joi.object({
+    newStatus: Joi.string()
+        .trim()
+        .lowercase()
+        .valid(...ORDER_STATUS)
+        .required()
+        .messages({
+            "any.only": `Order status must be one of: ${ORDER_STATUS.join(', ')}`,
+            "string.empty": "Order status is required"
+        })
 });
 
-const orderIdParamSchema = joi.object({
-	id: joi.number()
-		.integer()
-		.positive()
-		.required()
-		.messages({
-			'number.base': 'Order ID must be a number',
-			'number.integer': 'Order ID must be an integer',
-			'number.positive': 'Order ID must be positive',
-			'any.required': 'Order ID is required'
-		})
-});
-
-const updateOrderStatusSchema = joi.object({
-	newStatus: joi.string()
-		.trim()
-		.lowercase()
-		.valid(...orderStatusValues)
-		.required()
-		.messages({
-			'any.only': `newStatus must be one of: ${orderStatusValues.join(', ')}`,
-			'any.required': 'newStatus is required'
-		})
+const UploadPaymentSlip = Joi.object({
+    params: Joi.object({
+        id: Joi.number()
+            .integer()
+            .positive()
+            .required()
+            .messages({
+                "number.base": "Order ID must be a number",
+                "number.integer": "Order ID must be an integer",
+                "number.positive": "Order ID must be a positive number",
+                "any.required": "Order ID is required"
+            })
+    })
 });
 
 const buildValidationError = (error) => {
-	return error.details.map((err) => ({
-		field: err.path.join('.'),
-		message: err.message
-	}));
-};
-
-export const validateCreateDirectOrder = (req, res, next) => {
-	const { error, value } = directOrderSchema.validate(req.body, { abortEarly: false, stripUnknown: true });
-	if (error) {
-		return res.status(400).json({
-			success: false,
-			message: 'Invalid direct order payload',
-			errors: buildValidationError(error)
-		});
-	}
-
-	req.body = value;
-	next();
-};
-
-export const validateCreateCartOrder = (req, res, next) => {
-	const { error, value } = cartOrderSchema.validate(req.body, { abortEarly: false, stripUnknown: true });
-	if (error) {
-		return res.status(400).json({
-			success: false,
-			message: 'Invalid cart order payload',
-			errors: buildValidationError(error)
-		});
-	}
-
-	req.body = value;
-	next();
-};
-
-export const validateTrackingLookup = (req, res, next) => {
-	const { email, trackingCode } = req.body;
-
-	const { error, value } = trackingSchema.validate({ email, trackingCode }, { abortEarly: false, stripUnknown: true });
-	if (error) {
-		return res.status(400).json({
-			success: false,
-			message: 'Invalid tracking lookup input',
-			errors: buildValidationError(error)
-		});
-	}
-
-	req.query = value;
-	req.body = value;
-	next();
-};
-
-export const validateOrderIdParam = (req, res, next) => {
-	const { error, value } = orderIdParamSchema.validate(req.params, { abortEarly: false, stripUnknown: true });
-	if (error) {
-		return res.status(400).json({
-			success: false,
-			message: 'Invalid order ID parameter',
-			errors: buildValidationError(error)
-		});
-	}
-
-	req.params = value;
-	next();
-};
-
-export const validateUpdateOrderStatus = (req, res, next) => {
-	const { error, value } = updateOrderStatusSchema.validate(req.body, { abortEarly: false, stripUnknown: true });
-	if (error) {
-		return res.status(400).json({
-			success: false,
-			message: 'Invalid order status payload',
-			errors: buildValidationError(error)
-		});
-	}
-
-	req.body = value;
-	next();
+    return error.details.map((err) => ({
+        field: err.path.join('.'),
+        message: err.message
+    }));
 };
 
 export const validateCreateOrder = (req, res, next) => {
-  const { error, value } = createOrderSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true,
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid order payload",
+    const { error, value } = CreateOrder.validate(req.body , {
+        abortEarly: false,
+        stripUnknown: true
     });
-  }
 
-  req.body = value;
-  next();
+    if (error) {
+		console.error('Validation error:', error); // Debug log to check validation error
+        return res.status(400).json({
+            success: false,
+            errors: buildValidationError(error)
+        });
+    }
+
+    req.body = value;
+    next();
+};
+
+export const validateTrackingLookup = (req, res, next) => {
+    const { error, value } = TrackingLookup.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true
+    });
+
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            errors: buildValidationError(error)
+        });
+    }
+
+    req.body = value;
+    next();
+};
+
+export const validateOrderIdParam = (req, res, next) => {
+    const { error, value } = OrderId.validate(req.params, {
+        abortEarly: false
+    });
+
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            errors: buildValidationError(error)
+        });
+    }
+
+    req.params = value;
+    next();
+};
+
+export const validateUpdateOrderStatus = (req, res, next) => {
+    const { error, value } = UpdateOrderStatus.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true
+    });
+
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            errors: buildValidationError(error)
+        });
+    }
+
+    req.body = value;
+    next();
+};
+
+export const validateUploadPaymentSlip = (req, res, next) => {
+    const { error, value } = UploadPaymentSlip.validate({
+        params: req.params
+    }, {
+        abortEarly: false
+    });
+
+    const errors = error ? buildValidationError(error) : [];
+
+    if (!req.file) {
+        errors.push({
+            field: "media",
+            message: "Payment receipt is required"
+        });
+    }
+
+    if (errors.length) {
+        return res.status(400).json({
+            success: false,
+            errors
+        });
+    }
+
+    req.params = value.params;
+    next();
 };

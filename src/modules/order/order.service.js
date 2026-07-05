@@ -18,7 +18,7 @@ export const createOrder = async (orderData, sessionId) => {
         await client.query('BEGIN');
 
         // ── DIRECT ORDER ──────────────────────────────────────────
-        if (orderData.type === 'direct') {
+        if (orderData.order_type === 'direct') {
             const product = await productRepository.findProductById(orderData.product_id, client);
             if (!product) throw new AppError('Product not found', 404);
 
@@ -41,7 +41,7 @@ export const createOrder = async (orderData, sessionId) => {
         }
 
         // ── CART ORDER ────────────────────────────────────────────
-        else if (orderData.type === 'cart') {
+        else if (orderData.order_type === 'cart') {
             if (!sessionId) throw new AppError('Session not found', 401);
 
             const cart = await cartRepository.findCartBySession(sessionId, client);

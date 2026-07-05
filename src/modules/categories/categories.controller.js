@@ -3,7 +3,6 @@ import * as categoryService from './categories.service.js';
 // Create category
 //using
 export const createCategory = async (req, res, next) => {
-    console.log('req.body:', req.body);
     try {
         const newCategory = await categoryService.createCategory(req.body, req.file);
 
