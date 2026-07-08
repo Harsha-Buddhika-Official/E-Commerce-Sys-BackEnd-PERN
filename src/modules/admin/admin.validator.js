@@ -195,7 +195,7 @@ export const validateUpdatePassword = (req, res, next) => {
 }
 
 export const validateDeleteAdmin = (req, res, next) => {
-    console.log('req.params:', req.params);
+    // console.log('req.params:', req.params);
     const { error, value } = deleteAdminSchema.validate(req.params, { abortEarly: false });
 
     if (error) {
