@@ -6,11 +6,11 @@ dotenv.config();
 //     'PORT',
 //     'JWT_SECRET',
 
-//     // 'DB_USER',
-//     // 'DB_PASSWORD',
-//     // 'DB_HOST',
-//     // 'DB_NAME',
-//     // 'DB_PORT',
+//     'DB_USER',
+//     'DB_PASSWORD',
+//     'DB_HOST',
+//     'DB_NAME',
+//     'DB_PORT',
 
 //     'CLOUDINARY_CLOUD_NAME',
 //     'CLOUDINARY_API_KEY',
@@ -49,27 +49,3 @@ const config = {
 };
 
 export default config;
-
-// import dotenv from 'dotenv';
-
-// dotenv.config();
-
-// if (!process.env.JWT_SECRET) {
-//   throw new Error('JWT_SECRET is required');
-// }
-
-// if (!process.env.PORT) {
-//   throw new Error('PORT is required');
-// }
-
-// if (!process.env.DATABASE_URL) {
-//   throw new Error('DATABASE_URL is required');
-// }
-
-// const config = {
-//   port: process.env.PORT,
-//   jwtSecret: process.env.JWT_SECRET,
-//   databaseUrl: process.env.DATABASE_URL,
-// };
-
-// export default config;

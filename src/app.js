@@ -17,6 +17,7 @@ const app = express();
 app.use(express.json({
     limit:'1mb'
 }));
+app.set("trust proxy", 1);
 app.use(cors({
     origin: [
         "http://localhost:5173",
