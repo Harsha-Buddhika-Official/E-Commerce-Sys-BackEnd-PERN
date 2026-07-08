@@ -3,7 +3,8 @@ import * as orderService from './order.service.js';
 //using
 export const createOrder = async (req, res, next) => {
     const sessionId = req.cookies.sid
-    
+    // console.log('Received request body in controller:', req.body); // Debug log to check request body
+    // console.log('Received session ID in controller:', sessionId); // Debug log to check session ID
     try {
         const order = await orderService.createOrder(
             req.body,
@@ -16,6 +17,7 @@ export const createOrder = async (req, res, next) => {
             message: 'Order created successfully'
         });
     } catch (error) {
+        console.error(error);
         next(error);
     }
 };
@@ -23,6 +25,8 @@ export const createOrder = async (req, res, next) => {
 // using
 export const updatePaymentSlip = async (req, res, next) => {
     try {
+        console.log('Received file in controller:', req.file); // Debug log to check uploaded file
+        console.log('Received order ID in controller:', req.params.id); // Debug log to check order ID
         const orderId = req.params.id;
         const slipUrl = await orderService.updatePaymentSlip(orderId, req.file);
         res.status(200).json({
@@ -31,6 +35,7 @@ export const updatePaymentSlip = async (req, res, next) => {
             message: 'Payment slip URL retrieved successfully'
         });
     } catch (error) {
+        console.error(error);
         next(error);
     }
 }

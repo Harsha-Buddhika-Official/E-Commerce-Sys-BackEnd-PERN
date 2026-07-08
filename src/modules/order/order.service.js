@@ -49,6 +49,8 @@ export const createOrder = async (orderData, sessionId) => {
 
             const cartData = await cartRepository.getCartWithItems(cart.cart_id, client);
             if (!cartData.items.length) throw new AppError('Cart is empty', 400);
+            
+            // console.log('Cart data retrieved:', cartData); // Debug log to check cart data
 
             for (const item of cartData.items) {
                 const product = await productRepository.findProductById(item.product_id, client);
