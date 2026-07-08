@@ -26,8 +26,6 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    console.log("Rate limit triggered");
-
     const resetTime = req.rateLimit?.resetTime;
     const retryAfter = resetTime
       ? Math.max(0, Math.ceil((resetTime.getTime() - Date.now()) / 1000))
