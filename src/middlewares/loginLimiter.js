@@ -13,13 +13,17 @@
 import rateLimit from "express-rate-limit";
 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 10 * 60 * 1000,
   max: 5,
   handler: (req, res) => {
     console.log("Rate limit triggered");
+    const resetTime = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const retryAfter = Math.ceil((new Date(resetTime) - new Date()) / 1000); // in seconds
+    res.setHeader("Retry-After", retryAfter);
     res.status(429).json({
         success: false,
-        message: "Too many login attempts. Try again after 15 minutes."
+        message: "Too many login attempts. Try again shortly.",
+        retryAfter: retryAfter,
     });
   },
 });
