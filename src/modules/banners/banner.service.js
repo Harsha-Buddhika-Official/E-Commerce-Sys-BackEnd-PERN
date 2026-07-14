@@ -3,6 +3,34 @@ import * as repo from "./banner.repository.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/cloudinaryUpload.js";
 
 //using
+// export const createBanner = async (data, file) => {
+//   let media_type = null;
+
+//   if (file) {
+//     if (file.mimetype.startsWith("image/")) {
+//       media_type = "image";
+//     } else if (file.mimetype.startsWith("video/")) {
+//       media_type = "video";
+//     }
+
+//     const uploadResult = await uploadToCloudinary(
+//       file.buffer,
+//       `offer-banner-${Date.now()}`,
+//       "ecommerce/banners"
+//     );
+
+//     data.media_url = uploadResult.secure_url;
+//     data.media_public_id = uploadResult.public_id;
+//     data.media_type = media_type;
+//   }
+
+//   if (!data.title) {
+//     throw new AppError("Banner title is required",400);
+//   }
+
+//   return await repo.createBanner(data);
+// };
+
 export const createBanner = async (data, file) => {
   let media_type = null;
 
@@ -16,7 +44,9 @@ export const createBanner = async (data, file) => {
     const uploadResult = await uploadToCloudinary(
       file.buffer,
       `offer-banner-${Date.now()}`,
-      "ecommerce/banners"
+      "ecommerce/banners",
+      {},                 // options
+      file.mimetype       // ← new: lets uploadToCloudinary detect video and set resource_type correctly
     );
 
     data.media_url = uploadResult.secure_url;
@@ -25,7 +55,7 @@ export const createBanner = async (data, file) => {
   }
 
   if (!data.title) {
-    throw new AppError("Banner title is required",400);
+    throw new AppError("Banner title is required", 400);
   }
 
   return await repo.createBanner(data);
