@@ -4,7 +4,7 @@ import { validateOrderIdParam, validateTrackingLookup, validateUpdateOrderStatus
 import { attachSession } from '../../middlewares/session.middleware.js';
 import { authorize } from '../../middlewares/authorize.js';
 import { authMiddleware } from '../../middlewares/auth.js';
-import upload from '../../middlewares/multer.js';
+import receiptUpload from '../../middlewares/multer.js';
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.use(attachSession);
 // ==================== PUBLIC ROUTES - POST ====================
 router.post('/create',  validateCreateOrder, createOrder);
 router.post('/tracking', validateTrackingLookup, getOrdersByTrackingCode);  
-router.post('/upload-receipt/:id', upload.single('media'), updatePaymentSlip); 
+router.post('/upload-receipt/:id', receiptUpload.single('media'), updatePaymentSlip); 
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
