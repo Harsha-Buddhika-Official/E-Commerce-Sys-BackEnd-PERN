@@ -33,20 +33,22 @@ const EXPLICITLY_BLOCKED_MIME_TYPES = [
 // };
 
 const fileFilter = (req, file, cb) => {
+    console.log(`Received file: ${file.originalname} with mimetype ${file.mimetype}`);
     const ext = getExtension(file.originalname);
 
     // 1. Hard block known-dangerous types first, regardless of anything else
     if (EXPLICITLY_BLOCKED_MIME_TYPES.includes(file.mimetype)) {
+        console.log(`Blocked upload attempt: ${file.originalname} with mimetype ${file.mimetype}`);
         return cb(new MulterFileTypeError(
             `File type "${file.mimetype}" is not allowed.`
         ));
     }
 
     // 2. Allow-list check
-    const allowedExtensions = ALLOWED_TYPES[file.mimetype];
+    const allowedExtensions = ALLOWED_MIME_TYPES[file.mimetype];
     if (!allowedExtensions) {
         return cb(new MulterFileTypeError(
-            `Invalid file type "${file.mimetype}". Allowed: ${Object.keys(ALLOWED_TYPES).join(', ')}`
+            `Invalid file type "${file.mimetype}". Allowed: ${Object.keys(ALLOWED_MIME_TYPES).join(', ')}`
         ));
     }
 
