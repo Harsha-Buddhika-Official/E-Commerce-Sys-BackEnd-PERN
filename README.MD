@@ -1,122 +1,99 @@
 # E-Commerce System Backend (PERN)
 
-Backend service for an e-commerce platform built with Node.js, Express, and PostgreSQL.
-The codebase follows a layered module pattern (routes -> controller -> service -> repository) for maintainability and clear separation of concerns.
+Backend service for an e-commerce platform built with Node.js, Express, and PostgreSQL. The codebase uses a layered feature-module architecture so API concerns, business rules, and persistence stay separated and testable.
 
-## What This Project Includes
+## Architecture At A Glance
 
-- Product catalog management
-- Brand and category management
-- Attribute management for category-based product filtering
-- Session-based cart operations
-- Order creation (direct order and cart checkout)
-- Order tracking by email and tracking code
-- Admin authentication and role-based authorization
-- Soft-delete and restore flows for selected resources
-
-## Tech Stack
-
-- Runtime: Node.js (ES Modules)
-- Framework: Express
-- Database: PostgreSQL (pg Pool)
-- Validation: Joi
-- Auth: JWT (Bearer token)
-- Password Hashing: bcrypt
-- Utility Libraries: slugify, uuid, dotenv, cookie-parser, cors
-- Dev Tooling: nodemon
-
-## High-Level Architecture
+The application boots in [src/server.js](src/server.js), waits for the database connection to succeed, and then starts the Express app from [src/app.js](src/app.js). The app mounts all feature routers under `/api`, applies cross-cutting middleware once, and delegates error normalization to a single global handler.
 
 Request flow:
 
-1. Route receives request and applies validators/middleware.
-2. Controller handles HTTP concerns and forwards business logic to service.
-3. Service applies business rules and orchestration.
-4. Repository executes SQL queries.
-5. Errors are normalized by global error handler middleware.
+1. The router receives the request and runs request-specific validation and middleware.
+2. The controller handles HTTP concerns and response shaping.
+3. The service layer applies business rules and orchestration.
+4. The repository layer executes SQL against PostgreSQL.
+5. Errors bubble into [src/middlewares/errorHandler.js](src/middlewares/errorHandler.js) and are returned in a consistent JSON shape.
 
-Main entry points:
+This is a classic module-boundary design, not a shared-service monolith. Each feature owns its own route, controller, service, repository, and validator files, which keeps the public API surface easy to reason about and minimizes cross-module coupling.
 
-- Server bootstrap: src/server.js
-- Express app and route mounting: src/app.js
-- Database pool: src/config/db.js
-- Environment config loader: src/config/env.js
+## System Boundaries
 
-## Folder Structure
+### Runtime And Infrastructure
 
-```text
-src/
-	app.js
-	server.js
-	config/
-		db.js
-		env.js
-	middlewares/
-		auth.js
-		authorize.js
-		errorHandler.js
-	modules/
-		admin/
-		attributes/
-		brands/
-		cart/
-		categories/
-		order/
-		products/
-	utils/
-		AppError.js
-		generateTrackingCode.js
-		hash.js
-		jwt.js
-```
+- Runtime: Node.js with ES modules
+- Web framework: Express
+- Database: PostgreSQL via `pg`
+- Deployment database path: `DATABASE_URL` with SSL enabled in [src/config/db.js](src/config/db.js)
+- Environment loading: `dotenv` in [src/config/env.js](src/config/env.js)
 
-Each domain module generally contains:
+### Core Middleware Chain
 
-- <module>.routes.js
-- <module>.controller.js
-- <module>.service.js
-- <module>.repository.js
-- <module>.validator.js
+The app-level middleware stack in [src/app.js](src/app.js) does the following:
 
-## API Modules
+- Parses JSON bodies with a 1 MB limit
+- Sets `trust proxy` for reverse-proxy aware deployments
+- Enables CORS for the approved frontend origins
+- Parses cookies for session-aware flows
+- Initializes Cloudinary on startup
+- Mounts the feature routers
+- Handles uncaught application errors with the global error middleware
 
-Base path prefixes:
+### Authentication And Access Control
 
-- /api/admin
-- /api/attributes
-- /api/brands
-- /api/cart
-- /api/categories
-- /api/orders
-- /api/products
+- Admin protection uses JWT Bearer tokens in the `Authorization` header
+- `authMiddleware` decodes and attaches the token payload to `req.admin`
+- `authorize(...)` enforces role-based access for protected routes
+- Supported roles in code are `super_admin`, `admin`, and `manager`
 
-For full endpoint-level documentation, request/response payloads, and role access rules, see API_DOCUMENTATION.md.
+### Session And Cart Behavior
 
-## Authentication and Authorization
+Cart and order flows are intentionally session-backed for guest users. [src/middlewares/session.middleware.js](src/middlewares/session.middleware.js) assigns a cookie-backed session ID, and cart/order handlers reuse that identifier to resolve the active cart or checkout state without requiring a login session.
 
-- JWT token is required for protected endpoints.
-- Token is expected in Authorization header:
+### Media And External Services
 
-```http
-Authorization: Bearer <token>
-```
+- File uploads use `multer`
+- Product and brand images are stored in Cloudinary
+- Email support is scaffolded through the mail service and templates
+- A Resend config exists alongside the Nodemailer setup, but the active order-email path is still service-driven rather than fully centralized in a single provider abstraction
 
-- Role-based guards are enforced with middleware.
-- Supported roles in code:
-	- super_admin
-	- admin
-	- manager
+## Domain Modules
 
-## Cart and Session Behavior
+The main mounted API areas are:
 
-- Cart operations are session-oriented.
-- A session identifier is used to resolve a cart for non-authenticated flows.
-- Cart checkout uses the active session to transform cart items into an order.
+- `/api/admin`
+- `/api/attributes`
+- `/api/banners`
+- `/api/brands`
+- `/api/cart`
+- `/api/categories`
+- `/api/offers`
+- `/api/orders`
+- `/api/products`
 
-## Error Handling
+Each module generally contains:
 
-- Centralized handler: src/middlewares/errorHandler.js
-- Typical error response shape:
+- `*.routes.js` or `*.router.js`
+- `*.controller.js`
+- `*.service.js`
+- `*.repository.js`
+- `*.validator.js`
+
+Important domain patterns:
+
+- Products expose both public catalog routes and protected admin-only maintenance routes.
+- Orders support both guest checkout and admin order management.
+- Brands and products integrate multipart uploads with Cloudinary-backed image lifecycle handling.
+- Some modules intentionally expose lightweight public read endpoints while protecting write and management actions behind auth.
+
+## Data And Persistence
+
+Repositories are the only layer that should talk to PostgreSQL directly. Business logic should stay in services, and validation should stay close to the module boundary so malformed inputs are rejected before they hit the database.
+
+The codebase currently favors explicit SQL and domain-specific query methods over a generic ORM abstraction. That keeps the data access predictable and makes it easier to reason about query shape, performance, and edge cases.
+
+## Error Model
+
+Errors are normalized by [src/middlewares/errorHandler.js](src/middlewares/errorHandler.js). The expected response shape is:
 
 ```json
 {
@@ -125,11 +102,58 @@ Authorization: Bearer <token>
 }
 ```
 
-## Prerequisites
+Use `AppError` for predictable operational failures and keep low-level exceptions out of controller code unless they are immediately translated into a user-facing error.
 
-- Node.js 18+ recommended
-- PostgreSQL 13+ recommended
-- npm
+## Repository Layout
+
+```text
+src/
+	app.js
+	server.js
+	config/
+		cloudinary.js
+		connectDB.js
+		db.js
+		env.js
+		mailer.config.js
+		resend.config.js
+	middlewares/
+		auth.js
+		authorize.js
+		errorHandler.js
+		loginLimiter.js
+		multer.js
+		session.middleware.js
+	modules/
+		admin/
+		attributes/
+		banners/
+		brands/
+		cart/
+		categories/
+		notifications/
+		offers/
+		order/
+		products/
+	services/
+		mail.service.js
+	templates/
+		orderConfirmation.template.js
+		orderStatusUpdate.template.js
+	utils/
+		AppError.js
+		cloudinaryUpload.js
+		generateTrackingCode.js
+		hash.js
+		jwt.js
+		offerPricing.js
+```
+
+## Operational Notes
+
+- `src/config/env.js` currently loads environment variables but does not enforce a required-variable checklist at startup.
+- The project is deployed with a PostgreSQL connection string rather than the older local `DB_*` config path.
+- The module structure is intentionally consistent, but a few files use slightly different naming conventions, such as `banner.router.js`.
 
 ## Getting Started
 
@@ -139,23 +163,17 @@ Authorization: Bearer <token>
 npm install
 ```
 
-2. Create an environment file in project root:
+2. Create a `.env` file in the project root.
 
-```bash
-.env
-```
-
-3. Add required environment variables (placeholder values only):
+3. Add the required environment variables:
 
 ```env
 PORT=3000
 JWT_SECRET=your_jwt_secret_here
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=your_database_name
-DB_USER=your_database_user
-DB_PASSWORD=your_database_password
+DATABASE_URL=postgresql://user:password@host:5432/database
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 4. Start the server:
@@ -164,37 +182,24 @@ DB_PASSWORD=your_database_password
 npm run start
 ```
 
-If startup succeeds, the app listens on:
-
-- http://localhost:<PORT>
+If startup succeeds, the app listens on `http://localhost:<PORT>`.
 
 ## Available Scripts
 
-- npm run start: start development server with nodemon
-- npm test: placeholder script (not implemented)
+- `npm run start`: start the server
+- `npm run dev`: start the server with `nodemon`
+- `npm test`: placeholder script
 
-## Environment Variables Reference
+## Documentation
 
-- PORT: application port
-- JWT_SECRET: signing secret for JWT generation/verification
-- DB_HOST: PostgreSQL host
-- DB_PORT: PostgreSQL port
-- DB_NAME: PostgreSQL database name
-- DB_USER: PostgreSQL username
-- DB_PASSWORD: PostgreSQL password
+- API reference: [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
+- Senior-level API reference: [docs/API_DOCUMENTATION_SENIOR.md](docs/API_DOCUMENTATION_SENIOR.md)
+- Full documentation: [docs/FULL_DOCUMENTATION.md](docs/FULL_DOCUMENTATION.md)
 
-Important:
+## Notes For Contributors
 
-- Do not commit .env to version control.
-- Never expose production secrets in documentation.
-
-## Notes for Contributors
-
-- Keep validation rules in module validator files.
-- Keep SQL access in repository layer.
-- Keep business logic in service layer.
-- Reuse AppError for consistent error propagation.
-
-## Related Documentation
-
-- API reference: API_DOCUMENTATION.md
+- Keep validation in module validator files.
+- Keep SQL access in repository files.
+- Keep orchestration in service files.
+- Reuse `AppError` for consistent error propagation.
+- When adding routes, place specific routes before parameterized routes to avoid accidental shadowing.
