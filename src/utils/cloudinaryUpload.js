@@ -6,42 +6,10 @@ import AppError from './AppError.js';
  * @param {Buffer} fileBuffer - File buffer from multer
  * @param {String} fileName - Name for the file on Cloudinary
  * @param {String} folder - Folder path on Cloudinary (e.g., 'ecommerce/products')
+ * @param {Object} options - Extra Cloudinary upload options (overrides defaults)
+ * @param {String} mimetype - File's mimetype (from multer's req.file.mimetype), used to detect video
  * @returns {Promise<Object>} - Cloudinary response with public_id and secure_url
  */
-
-//using
-// export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommerce') => {
-//     try {
-//         return new Promise((resolve, reject) => {
-//             const uploadStream = cloudinary.uploader.upload_stream(
-//                 {
-//                     resource_type: 'auto',
-//                     public_id: fileName,
-//                     folder: folder,
-//                     overwrite: true,
-//                     quality: 'auto'
-//                 },
-//                 (error, result) => {
-//                     if (error) {
-//                         reject(new AppError(`Cloudinary upload failed: ${error.message}`, 500));
-//                     } else {
-//                         resolve({
-//                             public_id: result.public_id,
-//                             secure_url: result.secure_url,
-//                             url: result.url,
-//                             width: result.width,
-//                             height: result.height
-//                         });
-//                     }
-//                 }
-//             );
-
-//             uploadStream.end(fileBuffer);
-//         });
-//     } catch (error) {
-//         throw new AppError(`Failed to upload file to Cloudinary: ${error.message}`, 500);
-//     }
-// };
 
 const isPdfBuffer = (buffer) =>
     buffer?.length >= 4 &&
@@ -50,16 +18,12 @@ const isPdfBuffer = (buffer) =>
     buffer[2] === 0x44 &&
     buffer[3] === 0x46;
 
-export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommerce', options = {}) => {
-    const isPdf = isPdfBuffer(fileBuffer);
+// Video mimetypes accepted by the general-purpose multer instance
+const VIDEO_MIMETYPES = ['video/mp4', 'video/webm', 'video/ogg'];
 
-    // console.log('[Cloudinary Upload] Starting:', {
-    //     fileName,
-    //     folder,
-    //     isPdf,
-    //     bufferSize: fileBuffer?.length,
-    //     magicBytes: fileBuffer ? [...fileBuffer.slice(0, 4)].map(b => b.toString(16)).join(' ') : 'no buffer',
-    // });
+export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommerce', options = {}, mimetype = '') => {
+    const isPdf = isPdfBuffer(fileBuffer);
+    const isVideo = VIDEO_MIMETYPES.includes(mimetype);
 
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -67,7 +31,7 @@ export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommer
                 folder,
                 public_id:     fileName,
                 overwrite:     true,
-                resource_type: 'image',             // always image
+                resource_type: isVideo ? 'video' : 'image',   // branch based on detected video mimetype
                 ...(isPdf && {
                     format:  'jpg',                 // convert PDF → JPG on upload
                     pages:   1,                     // first page only
@@ -80,11 +44,6 @@ export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommer
                     console.error('[Cloudinary Upload] Failed:', error);
                     reject(new AppError(`Cloudinary upload failed: ${error.message}`, 500));
                 } else {
-                    // console.log('[Cloudinary Upload] Success:', {
-                    //     resource_type: result.resource_type,
-                    //     format:        result.format,
-                    //     secure_url:    result.secure_url,
-                    // });
                     resolve({
                         public_id:     result.public_id,
                         secure_url:    result.secure_url,
@@ -105,11 +64,12 @@ export const uploadToCloudinary = async (fileBuffer, fileName, folder = 'ecommer
 /**
  * Delete file from Cloudinary
  * @param {String} publicId - Public ID of the file on Cloudinary
+ * @param {String} resourceType - 'image' (default) or 'video' — must match the type used at upload time
  * @returns {Promise<Object>} - Cloudinary response
  */
-export const deleteFromCloudinary = async (publicId) => {
+export const deleteFromCloudinary = async (publicId, resourceType = 'image') => {
     try {
-        const result = await cloudinary.uploader.destroy(publicId);
+        const result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
         return result;
     } catch (error) {
         throw new AppError(`Failed to delete file from Cloudinary: ${error.message}`, 500);
@@ -133,7 +93,6 @@ export const getCloudinaryUrl = (publicId, options = {}) => {
     }
 };
 
-// utils/cloudinaryUpload.js — add this
 export const getDownloadUrl = (publicId, resourceType = 'raw', filename = 'receipt') => {
     return cloudinary.url(publicId, {
         secure:        true,
