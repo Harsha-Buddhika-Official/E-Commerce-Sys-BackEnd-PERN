@@ -3,7 +3,6 @@ import * as offersRepository from './offers.repository.js';
 import * as productRepository from '../products/product.repository.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-//using
 export const createOffer = async (offerData, file) => {
     if (!offerData.title?.trim()) {
         throw new AppError('Offer title is required', 400);
@@ -53,12 +52,10 @@ export const createOffer = async (offerData, file) => {
     return await offersRepository.createOffer({ ...payload, banner_image_url, banner_image_id });
 };
 
-//using
 export const getAllOffers = async () => {
     return offersRepository.getAllOffers();
 };
 
-//using
 export const getOffers = async (status) => {
     const validStatuses = ['active', 'upcoming', undefined];
 
@@ -70,17 +67,14 @@ export const getOffers = async (status) => {
     return offers;
 };
 
-//using
 export const getActiveOffers = async () => {
     return offersRepository.getActiveOffers();
 };
 
-//using
 export const getUpcomingOffers = async () => {
     return offersRepository.getUpcomingOffers();
 };
 
-//using
 export const getOfferByIdAdmin = async (id) => {
     const offer = await offersRepository.findOfferByIdAdmin(id);
     if (!offer) {
@@ -118,7 +112,6 @@ export const getOfferByIdAdmin = async (id) => {
     return offer;
 };
 
-//using
 export const getOfferByIdUser = async (id) => {
     const offer = await offersRepository.findOfferByIdUser(id);
     if (!offer) {
@@ -156,7 +149,6 @@ export const getOfferByIdUser = async (id) => {
     return offer;
 };
 
-//using
 export const updateOffer = async (id, offerData, file) => {
     const existing =
         await offersRepository.findOfferByIdBasic(id);
@@ -203,8 +195,6 @@ export const updateOffer = async (id, offerData, file) => {
     return await offersRepository.updateOffer(id, updated);
 };
 
-
-//using
 export const toggleOffer = async (id, isActive) => {
     if (!id) throw new AppError("Offer ID is required", 400);
 
@@ -215,7 +205,6 @@ export const toggleOffer = async (id, isActive) => {
     return offersRepository.toggleOffer(id, isActive);
 };
 
-//using
 export const deleteOffer = async (id) => {
     const existing = await offersRepository.findOfferByIdBasic(id);
     if (!existing) {
@@ -225,7 +214,6 @@ export const deleteOffer = async (id) => {
     return offersRepository.deleteOffer(id);
 };
 
-//using
 export const addOfferProduct = async (offerId, productId) => {
     const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {
@@ -244,7 +232,6 @@ export const addOfferProduct = async (offerId, productId) => {
     return offersRepository.addOfferProduct(offerId, productId);
 };
 
-//using
 export const getOfferProducts = async (offerId) => {
     const offer = await offersRepository.findOfferByIdBasic(offerId);
     if (!offer) {

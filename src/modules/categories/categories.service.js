@@ -3,8 +3,6 @@ import * as categoryRepository from './categories.repository.js';
 import AppError from '../../utils/AppError.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-// Create category
-//using
 export const createCategory = async (categoryData, file) => {
     const { name, category_type } = categoryData;
 
@@ -46,8 +44,6 @@ export const createCategory = async (categoryData, file) => {
     return await categoryRepository.createCategory(payload);
 };
 
-// Get categories by type or all
-//using
 export const getCategories = async (type) => {
     if (type) {
         return await categoryRepository.getCategoriesByType(type);
@@ -56,8 +52,6 @@ export const getCategories = async (type) => {
     return await categoryRepository.getAllCategories();
 };
 
-// Get category names and ids
-//using
 export const getCategoryNames = async () => {
     const categories = await categoryRepository.getCategoryNames();
 
@@ -68,8 +62,6 @@ export const getCategoryNames = async () => {
     return categories;
 };
 
-// Delete category
-//using
 export const deleteCategory = async (id) => {
     const existingCategory = await categoryRepository.findCategoryById(id);
       await deleteFromCloudinary(

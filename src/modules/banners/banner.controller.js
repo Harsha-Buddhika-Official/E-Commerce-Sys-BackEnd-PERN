@@ -1,6 +1,5 @@
 import * as service from "./banner.service.js";
 
-//using
 export const createBanner = async (req, res, next) => {
     try {
         const banner = await service.createBanner(req.body, req.file);
@@ -15,7 +14,6 @@ export const createBanner = async (req, res, next) => {
     }
 };
 
-//using
 export const getBannerImages = async (req, res, next) => {
     try {
         const banners = await service.getBannerImages();
@@ -30,7 +28,6 @@ export const getBannerImages = async (req, res, next) => {
     }
 };
 
-//using
 export const getBannerVideo = async (req, res, next) => {
     try {
         const banners = await service.getBannerVideo();
@@ -45,7 +42,6 @@ export const getBannerVideo = async (req, res, next) => {
     }
 };
 
-//using
 export const getAllBanners = async (req, res, next) => {
     try {
         const banners = await service.getAllBanners();
@@ -60,7 +56,6 @@ export const getAllBanners = async (req, res, next) => {
     }
 };
 
-//using
 export const getBannerById = async (req, res, next) => {
     try {
         const banner = await service.getBannerById(req.params.id);
@@ -75,7 +70,6 @@ export const getBannerById = async (req, res, next) => {
     }
 };
 
-//using
 export const deleteBanner = async (req, res, next) => {
     try {
         const deleted = await service.deleteBanner(req.params.id);

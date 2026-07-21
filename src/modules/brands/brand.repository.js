@@ -1,6 +1,5 @@
 import pool from "../../config/db.js";
 
-//using
 export const createBrand = async ({ name, slug, logo_url, logo_public_id }) => {
     const query = `
         INSERT INTO brands (name, slug, logo_url, logo_public_id)
@@ -12,35 +11,30 @@ export const createBrand = async ({ name, slug, logo_url, logo_public_id }) => {
     return rows[0];
 };
 
-//using
 export const getAllBrands = async () => {
     const query = `SELECT brand_id,name,slug,logo_url,is_active,updated_at,created_at FROM brands`;
     const { rows } = await pool.query(query);
     return rows;
 };
 
-//using
 export const getAllBrandNames = async () => {
     const query = `SELECT brand_id, name FROM brands WHERE is_active = true`;
     const { rows } = await pool.query(query);
     return rows;
 };
 
-//using
 export const findBrandByName = async (name) => {
     const query = `SELECT * FROM brands WHERE name = $1`;
     const { rows } = await pool.query(query, [name]);
     return rows[0];
 };
 
-//using
 export const findBrandById = async (id) => {
     const query = `SELECT * FROM brands WHERE brand_id = $1`;
     const { rows } = await pool.query(query, [id]);
     return rows[0];
 };
 
-//using
 export const deleteBrand = async (id) => {
     const query = `DELETE FROM brands WHERE brand_id =$1 RETURNING *`;
     const { rows } = await pool.query(query, [id]);

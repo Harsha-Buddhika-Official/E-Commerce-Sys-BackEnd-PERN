@@ -1,6 +1,5 @@
 import pool from "../../config/db.js";
 
-//using
 export const createCategory = async ({ name, slug, category_type, img_url, media_public_id }) => {
     const query = `
         INSERT INTO categories (
@@ -26,7 +25,6 @@ export const createCategory = async ({ name, slug, category_type, img_url, media
     return rows[0];
 };
 
-//using
 export const getAllCategories = async () => {
     const query = `
         SELECT *
@@ -39,7 +37,6 @@ export const getAllCategories = async () => {
     return rows;
 };
 
-//using
 export const getCategoriesByType = async (type) => {
     const query = `
         SELECT *
@@ -53,7 +50,6 @@ export const getCategoriesByType = async (type) => {
     return rows;
 };
 
-//using
 export const getCategoryNames = async () => {
     const query = `
         SELECT
@@ -68,7 +64,6 @@ export const getCategoryNames = async () => {
     return rows;
 };
 
-//using
 export const findCategoryById = async (id) => {
     const query = `
         SELECT *
@@ -82,7 +77,6 @@ export const findCategoryById = async (id) => {
     return rows[0];
 };
 
-//using
 export const findCategoryByName = async (name) => {
     const query = `
         SELECT *
@@ -96,7 +90,6 @@ export const findCategoryByName = async (name) => {
     return rows[0];
 };
 
-//using
 export const deleteCategory = async (id) => {
     const query = `
         DELETE FROM categories

@@ -1,6 +1,5 @@
 import * as attributeService from './attribute.service.js';
 
-//using
 export const createAttribute = async (req, res, next) => {
     try {
         const attributeData = await attributeService.createAttribute(req.body);
@@ -14,7 +13,6 @@ export const createAttribute = async (req, res, next) => {
     }
 };
 
-//using
 export const createProductAttribute = async (req, res, next) => {
     try {
         const { productId } = req.params;
@@ -29,7 +27,6 @@ export const createProductAttribute = async (req, res, next) => {
     }
 };
 
-//using
 export const createAttributeValue = async (req, res, next) => { 
     try {
         const attributeValueData = await attributeService.createAttributeValue ({
@@ -47,7 +44,6 @@ export const createAttributeValue = async (req, res, next) => {
 };
 
 
-//using
 export const getAttributes = async (req, res, next) => {
     try {
         const catalog = await attributeService.getAttributeCatalog();
@@ -61,7 +57,6 @@ export const getAttributes = async (req, res, next) => {
     }
 };
 
-//using
 export const getAttributeById = async (req, res, next) => {
     try {
         const attribute = await attributeService.getAttributeById(req.params.id);
@@ -75,7 +70,6 @@ export const getAttributeById = async (req, res, next) => {
     }
 };
 
-//using
 export const getAttributesGroupedByCategory = async (req, res, next) => {
     try {
         const categoryId = req.params.categoryId || req.query.category_id || req.query.categoryId || (req.body && req.body.category_id) || null;
@@ -90,7 +84,6 @@ export const getAttributesGroupedByCategory = async (req, res, next) => {
     }
 };
 
-//using
 export const deleteAttribute = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -105,7 +98,6 @@ export const deleteAttribute = async (req, res, next) => {
     }
 };
 
-//using
 export const deleteAttributeValue = async (req, res, next) => {
     try {
         const { attributeId, valueId } = req.params;

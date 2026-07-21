@@ -1,6 +1,5 @@
 import * as orderService from './order.service.js';
 
-//using
 export const createOrder = async (req, res, next) => {
     const sessionId = req.cookies.sid
     // console.log('Received request body in controller:', req.body); // Debug log to check request body
@@ -22,7 +21,6 @@ export const createOrder = async (req, res, next) => {
     }
 };
 
-// using
 export const updatePaymentSlip = async (req, res, next) => {
     try {
         // console.log('Received file in controller:', req.file); // Debug log to check uploaded file
@@ -40,8 +38,6 @@ export const updatePaymentSlip = async (req, res, next) => {
     }
 }
 
-//status data for admin dashboard
-//using
 export const getStatusData = async (req, res, next) => {
     try {
         const statusData = await orderService.getStatusData();
@@ -55,8 +51,6 @@ export const getStatusData = async (req, res, next) => {
     }
 };
 
-//low stock alert for admin dashboard
-//using
 export const lowStockAlert = async (req, res, next) => {
     try {
         const lowStockProducts = await orderService.lowStockAlert();
@@ -70,8 +64,6 @@ export const lowStockAlert = async (req, res, next) => {
     }
 };
 
-//recent orders for admin dashboard
-//using
 export const getRecentOrders = async (req, res, next) => {
     try {
         const orders = await orderService.getRecentOrders();
@@ -87,8 +79,6 @@ export const getRecentOrders = async (req, res, next) => {
     }
 };
 
-//order status count for order page
-//using
 export const OrderStatusCount = async (req, res, next) => {
     try {
         const OrderStatus = await orderService.getOrderStatusCount();
@@ -102,8 +92,6 @@ export const OrderStatusCount = async (req, res, next) => {
     }
 };
 
-//orders for order page
-//using
 export const getAllOrders = async (req, res, next) => {
     try {
         const orders = await orderService.getAllOrders();
@@ -117,7 +105,6 @@ export const getAllOrders = async (req, res, next) => {
     }
 };
 
-//using
 export const getOrderById = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -132,7 +119,6 @@ export const getOrderById = async (req, res, next) => {
     }
 };
 
-//using
 export const getOrdersByTrackingCode = async (req, res, next) => {
     try {
         // console.log('Received request body in controller:', req.body); // Debug log to check request body
@@ -148,7 +134,6 @@ export const getOrdersByTrackingCode = async (req, res, next) => {
     }
 };
 
-//using
 export const updateOrderStatus = async (req, res, next) => {
     try {
         const orderId = req.params.id;
@@ -180,7 +165,6 @@ export const updateOrderStatus = async (req, res, next) => {
 //     }
 // };
 
-//using
 export const findOrderImageById = async (req, res, next) => {
     try {
         const orderId = req.params.id;

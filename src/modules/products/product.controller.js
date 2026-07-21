@@ -1,6 +1,5 @@
 import * as productService from './product.service.js';
 
-//using
 export const createProductWithoutAttributes = async (req, res, next) => {
   try {
     const product = await productService.createProductWithoutAttributes({
@@ -35,7 +34,6 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
-//using
 export const getAllProductsDetailsSimple = async (req, res, next) => {
   try {
     const products = await productService.getAllProductsDetailsSimple();
@@ -49,7 +47,6 @@ export const getAllProductsDetailsSimple = async (req, res, next) => {
   }
 };
 
-//using
 export const getAllProducts = async (req, res, next) => {
   try {
     const products = await productService.getAllProducts();
@@ -63,7 +60,6 @@ export const getAllProducts = async (req, res, next) => {
   }
 };
 
-//using
 export const getAllProductLimitedDetilas = async (req, res, next) => {
   try {
     const products = await productService.getAllProductLimitedDetilas();
@@ -77,7 +73,6 @@ export const getAllProductLimitedDetilas = async (req, res, next) => {
   }
 };
 
-//using
 export const getAllDetialsProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -93,7 +88,6 @@ export const getAllDetialsProductById = async (req, res, next) => {
   }
 };
 
-//using
 export const getProductsByCategory = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
@@ -109,7 +103,6 @@ export const getProductsByCategory = async (req, res, next) => {
   }
 };
 
-//using
 export const getBestSellingProducts = async (req, res, next) => {
   try {
     const products = await productService.getBestSellingProducts();
@@ -124,7 +117,6 @@ export const getBestSellingProducts = async (req, res, next) => {
   }
 };
 
-//using
 export const getLatestProducts = async (req, res, next) => {
   try {
     const products = await productService.getLatestProducts();
@@ -139,7 +131,6 @@ export const getLatestProducts = async (req, res, next) => {
   }
 };
 
-//using
 export const getProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -155,7 +146,6 @@ export const getProductById = async (req, res, next) => {
   }
 };
 
-//using
 export const getProductByName = async (req, res, next) => {
   try {
     const { name } = req.params;
@@ -179,7 +169,6 @@ export const getProductByName = async (req, res, next) => {
   }
 };
 
-// ✅ FIXED: now calls updateProductDetails
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -195,7 +184,6 @@ export const updateProduct = async (req, res, next) => {
   }
 };
 
-//using
 export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -210,7 +198,6 @@ export const deleteProduct = async (req, res, next) => {
   }
 };
 
-//using
 export const getFilterOptions = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
@@ -222,7 +209,6 @@ export const getFilterOptions = async (req, res, next) => {
   }
 };
 
-//using
 export const getFilteredProducts = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
@@ -234,7 +220,6 @@ export const getFilteredProducts = async (req, res, next) => {
   }
 };
 
-//using
 export const updateProductDetails = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -250,7 +235,6 @@ export const updateProductDetails = async (req, res, next) => {
   }
 };
 
-//using
 export const addProductImage = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -268,7 +252,6 @@ export const addProductImage = async (req, res, next) => {
   }
 };
 
-//using
 export const removeProductImage = async (req, res, next) => {
   try {
     const { id, imageId } = req.params;
@@ -284,7 +267,6 @@ export const removeProductImage = async (req, res, next) => {
   }
 };
 
-// using 
 export const reorderProductImages = async (req, res, next) => {
   try {
     const { id } = req.params;

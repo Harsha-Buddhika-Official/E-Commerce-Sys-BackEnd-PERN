@@ -7,7 +7,6 @@ import { uploadToCloudinary, deleteFromCloudinary, getDownloadUrl } from "../../
 import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '../../services/mail.service.js';
 import pool from '../../config/db.js';
 
-//using
 export const createOrder = async (orderData, sessionId) => {
     const client = await pool.connect();
 
@@ -122,7 +121,6 @@ export const createOrder = async (orderData, sessionId) => {
     return order;
 };
 
-//using
 export const updatePaymentSlip = async (orderId, file) => {
     try{
         let media_url, media_public_id;
@@ -141,8 +139,6 @@ export const updatePaymentSlip = async (orderId, file) => {
     }
 }
 
-//status bar data for admin dashboard
-//using
 export const getStatusData = async (client) => {
     const {
         totalRevenueThisMonth,
@@ -175,74 +171,32 @@ export const getStatusData = async (client) => {
     };
 };
 
-//low stock alert for admin dashboard
-//using
 export const lowStockAlert = async (client) => {
     const lowStockProducts = await orderRepository.lowStockAlert(client);
     return lowStockProducts;
 }
 
-//recent orders for admin dashboard
-//using
 export const getRecentOrders = async (client) => {
     return await orderRepository.findRecentOrders(client);
 }
 
-//order status count for order page
-//using
 export const getOrderStatusCount = async (client) =>{
     const OrderStatus = await orderRepository.getOrderStatusCount(client);
     return OrderStatus;
 }
 
-//orders for order page
-//using
 export const getAllOrders = async (client) => {
     return await orderRepository.findAllOrders(client);
 };
 
-//using
 export const getOrderById = async (orderId, client) => {
     return await orderRepository.getOrderById(orderId, client);
 };
 
-//using
 export const findOrderImageById = async (orderId, client) => {
     return await orderRepository.findOrderImageById(orderId, client);
 }
 
-// export const findOrderImageById = async (orderId, client) => {
-//     const result = await orderRepository.findOrderImageById(orderId, client);
-//     if (!result) return null;
-
-//     return {
-//         ...result,
-//         media_url: result.media_url?.endsWith('.pdf') && result.media_url?.includes('/image/upload/')
-//             ? result.media_url.replace('/image/upload/', '/raw/upload/')
-//             : result.media_url,
-//     };
-// };
-
-// export const findOrderImageById = async (orderId, client) => {
-//     const result = await orderRepository.findOrderImageById(orderId, client);
-//     if (!result) return null;
-
-//     const isPdf = result.media_url?.endsWith('.pdf');
-
-//     return {
-//         ...result,
-//         // corrected view URL
-//         media_url: isPdf
-//             ? result.media_url.replace('/image/upload/', '/raw/upload/')
-//             : result.media_url,
-//         // direct download URL built from public_id — bypasses the broken stored URL entirely
-//         download_url: isPdf
-//             ? `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/fl_attachment/${result.media_public_id}.pdf`
-//             : null,
-//     };
-// };
-
-//using
 export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     const emailCheck = await orderRepository.getOrdersByEmail(email, client);
     if (!emailCheck || emailCheck.length === 0) {
@@ -261,7 +215,6 @@ export const getOrdersByTrackingCode = async (trackingCode, email, client) => {
     return TrackingCodeCheck;
 };
 
-//using
 export const updateOrderStatus = async (orderId, newStatus, client) => {
     const order = await orderRepository.getOrderById(orderId, client);
     if (!order) throw new AppError('Order not found', 404);

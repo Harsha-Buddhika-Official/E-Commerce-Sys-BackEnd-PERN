@@ -1,6 +1,5 @@
  import pool from "../../config/db.js";
 
-//using
 export const createProduct = async (productData, client = pool) => {
 
   const {
@@ -42,7 +41,6 @@ export const createProduct = async (productData, client = pool) => {
   return rows[0];
 };
 
-//using
 export const getAttributeValueById = async (attributeValueId, client = pool) => {
   const query = `
     SELECT
@@ -58,14 +56,12 @@ export const getAttributeValueById = async (attributeValueId, client = pool) => 
   return rows[0];
 };
 
-//using
 export const deleteProductAttributes = async (productId, client = pool) => {
   const query = `DELETE FROM product_attributes WHERE product_id = $1`;
   const values = [productId];
   await client.query(query, values);
 };
 
-//using
 export const insertProductAttributes = async (productId, attributes, client = pool) => {
   if (!attributes || attributes.length === 0) return;
 
@@ -93,7 +89,6 @@ export const insertProductAttributes = async (productId, attributes, client = po
   await client.query(query, values);
 };
 
-//using
 export const getAllProductsDetailsSimple = async () => {
   const query = `
     SELECT p.product_id,p.name,p.discounted_price,p.is_active,c.name AS category_name FROM products p
@@ -103,7 +98,6 @@ export const getAllProductsDetailsSimple = async () => {
   return rows;
 };
 
-//using
 export const getAllProducts = async () => {
   const query = `
     SELECT
@@ -167,7 +161,6 @@ export const getAllProducts = async () => {
   return rows;
 };
 
-//using
 export const getAllProductLimitedDetilas = async () => {
   const query = `
     SELECT
@@ -214,87 +207,6 @@ export const getAllProductLimitedDetilas = async () => {
   const { rows } = await pool.query(query);
   return rows;
 };
-
-//using
-// export const getAllDetialsProductById = async (id) => {
-//   const query = `SELECT
-//     p.product_id,
-//     p.name,
-//     p.slug,
-//     p.description,
-//     p.base_price,
-//     p.selling_price,
-//     p.discounted_price,
-//     p.stock_quantity,
-//     CASE
-//       WHEN p.stock_quantity <= 0 THEN 'OUT_OF_STOCK'
-//       WHEN p.stock_quantity <= 3 THEN 'LOW_STOCK'
-//       ELSE 'IN_STOCK'
-//     END AS stock_status,
-//     p.warranty_months,
-//     p.product_tag,
-//     p.is_active,
-//     p.created_at,
-//     p.updated_at,
-//     c.category_id,
-//     c.name AS category_name,
-//     c.slug AS category_slug,
-//     c.category_type,
-//     c.img_url AS category_image,
-//     c.is_active AS category_active,
-//     b.brand_id,
-//     b.name AS brand_name,
-//     b.slug AS brand_slug,
-//     b.logo_url,
-//     b.is_active AS brand_active,
-//     COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
-//     COALESCE(img_agg.images, '[]'::json) AS images
-//   FROM products p
-//   LEFT JOIN categories c
-//         ON c.category_id = p.category_id
-//   LEFT JOIN brands b
-//         ON b.brand_id = p.brand_id
-//   LEFT JOIN (
-//         SELECT
-//               pa.product_id,
-//               JSON_AGG(
-//                     JSON_BUILD_OBJECT(
-//                           'product_attribute_id', pa.product_attribute_id,
-//                           'attribute_id', pa.attribute_id,
-//                           'attribute_name', a.name,
-//                           'attribute_value_id', pa.attribute_value_id,
-//                           'value', pa.value
-//                     )
-//                     ORDER BY pa.product_attribute_id
-//               ) AS attributes
-//         FROM product_attributes pa
-//         LEFT JOIN attributes a
-//               ON a.attribute_id = pa.attribute_id
-//         GROUP BY pa.product_id
-//   ) attr_agg
-//         ON attr_agg.product_id = p.product_id
-//   LEFT JOIN (
-//         SELECT
-//               pi.product_id,
-//               JSON_AGG(
-//                     JSON_BUILD_OBJECT(
-//                           'image_id', pi.image_id,
-//                           'image_url', pi.image_url,
-//                           'is_primary', pi.is_primary,
-//                           'alt_text', pi.alt_text,
-//                           'sort_order', pi.sort_order
-//                     )
-//                     ORDER BY pi.sort_order
-//               ) AS images
-//         FROM product_images pi
-//         GROUP BY pi.product_id
-//   ) img_agg
-//         ON img_agg.product_id = p.product_id
-//   WHERE p.product_id = $1
-//     `;
-//   const { rows } = await pool.query(query, [id]);
-//   return rows[0];
-// };
 
 export const getAllDetialsProductById = async (id) => {
   const query = `
@@ -365,56 +277,6 @@ export const getAllDetialsProductById = async (id) => {
   const { rows } = await pool.query(query, [id]);
   return rows[0];
 };
-
-//using
-// export const getProductsByCategory = async (categoryId) => {
-//   const query = `SELECT
-//         p.*,
-//         c.name AS category_name,
-//         b.name AS brand_name,
-//         p.discounted_price,
-//         COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
-//         COALESCE(img_agg.images, '[]'::json) AS images
-//   FROM products p
-//   LEFT JOIN categories c ON c.category_id = p.category_id
-//   LEFT JOIN brands b ON b.brand_id = p.brand_id
-//   LEFT JOIN (
-//         SELECT
-//               pa.product_id,
-//               JSON_AGG(
-//                     JSON_BUILD_OBJECT(
-//                           'product_attribute_id', pa.product_attribute_id,
-//                           'attribute_id', pa.attribute_id,
-//                           'attribute_name', a.name,
-//                           'value', pa.value
-//                     )
-//               ) AS attributes
-//         FROM product_attributes pa
-//         LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
-//         GROUP BY pa.product_id
-//   ) attr_agg ON attr_agg.product_id = p.product_id
-//   LEFT JOIN (
-//         SELECT
-//               pi.product_id,
-//               JSON_AGG(
-//                     JSON_BUILD_OBJECT(
-//                           'image_id', pi.image_id,
-//                           'image_url', pi.image_url,
-//                           'is_primary', pi.is_primary,
-//                           'alt_text', pi.alt_text,
-//                           'sort_order', pi.sort_order
-//                     ) ORDER BY pi.sort_order
-//               ) AS images
-//         FROM product_images pi
-//         GROUP BY pi.product_id
-//   ) img_agg ON img_agg.product_id = p.product_id
-//   WHERE p.is_active = true
-//   AND p.category_id = $1
-//   ORDER BY p.product_id ASC
-//   `;
-//   const { rows } = await pool.query(query, [categoryId]);
-//   return rows;
-// };
 
 export const getProductsByCategory = async (categoryId) => {
   const query = `
@@ -562,55 +424,6 @@ export const getBestSellingProducts = async () => {
   return rows;
 };
 
-//using
-// export const getLatestProducts = async () => {
-//   const query = `SELECT
-//         p.*,
-//         c.name AS category_name,
-//         b.name AS brand_name,
-//         COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
-//         COALESCE(img_agg.images, '[]'::json) AS images
-//       FROM products p
-//       LEFT JOIN categories c ON c.category_id = p.category_id
-//       LEFT JOIN brands b ON b.brand_id = p.brand_id
-//       LEFT JOIN (
-//         SELECT
-//           pa.product_id,
-//           JSON_AGG(
-//             JSON_BUILD_OBJECT(
-//               'product_attribute_id', pa.product_attribute_id,
-//               'attribute_id', pa.attribute_id,
-//               'attribute_name', a.name,
-//               'value', pa.value
-//             )
-//           ) AS attributes
-//         FROM product_attributes pa
-//         LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
-//         GROUP BY pa.product_id
-//       ) attr_agg ON attr_agg.product_id = p.product_id
-//       LEFT JOIN (
-//         SELECT
-//           pi.product_id,
-//           JSON_AGG(
-//             JSON_BUILD_OBJECT(
-//               'image_id', pi.image_id,
-//               'image_url', pi.image_url,
-//               'is_primary', pi.is_primary,
-//               'alt_text', pi.alt_text,
-//               'sort_order', pi.sort_order
-//             ) ORDER BY pi.sort_order
-//           ) AS images
-//         FROM product_images pi
-//         GROUP BY pi.product_id
-//       ) img_agg ON img_agg.product_id = p.product_id
-//       WHERE p.is_active = true
-//       ORDER BY p.created_at DESC
-//       LIMIT 8;
-//   `;
-//   const { rows } = await pool.query(query);
-//   return rows;
-// };
-
 export const getLatestProducts = async () => {
   const query = `
     SELECT
@@ -690,54 +503,6 @@ export const getLatestProducts = async () => {
   return rows;
 };
 
-//using
-// export const findProductById = async (id, client = pool) => {
-//   const query = `SELECT
-//         p.*,
-//         c.name AS category_name,
-//         b.name AS brand_name,
-//         p.discounted_price,
-//         COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
-//         COALESCE(img_agg.images, '[]'::json) AS images
-//   FROM products p
-//   LEFT JOIN categories c ON c.category_id = p.category_id
-//   LEFT JOIN brands b ON b.brand_id = p.brand_id
-//   LEFT JOIN (
-//         SELECT
-//               pa.product_id,
-//               JSON_AGG(
-//                     JSON_BUILD_OBJECT(
-//                           'product_attribute_id', pa.product_attribute_id,
-//                           'attribute_id', pa.attribute_id,
-//                           'attribute_name', a.name,
-//                           'value', pa.value
-//                     )
-//               ) AS attributes
-//         FROM product_attributes pa
-//         LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
-//         GROUP BY pa.product_id
-//   ) attr_agg ON attr_agg.product_id = p.product_id
-//   LEFT JOIN (
-//         SELECT
-//               pi.product_id,
-//               JSON_AGG(
-//                     JSON_BUILD_OBJECT(
-//                           'image_id', pi.image_id,
-//                           'image_url', pi.image_url,
-//                           'is_primary', pi.is_primary,
-//                           'alt_text', pi.alt_text,
-//                           'sort_order', pi.sort_order
-//                     ) ORDER BY pi.sort_order
-//               ) AS images
-//         FROM product_images pi
-//         GROUP BY pi.product_id
-//   ) img_agg ON img_agg.product_id = p.product_id
-//   WHERE p.product_id = $1`;
-//   const values = [id];
-//   const { rows } = await client.query(query, values);
-//   return rows[0];
-// };
-
 export const findProductById = async (id, client = pool) => {
   const query = `
     SELECT
@@ -793,7 +558,6 @@ export const findProductById = async (id, client = pool) => {
   return rows[0];
 };
 
-//using
 export const findProductByIdBasic = async (productId) => {
   const query = `
         SELECT product_id, name, selling_price, stock_quantity, is_active
@@ -804,7 +568,6 @@ export const findProductByIdBasic = async (productId) => {
   return rows[0];
 };
 
-//using
 export const findProductByName = async (name, client = pool) => {
   const query = `
     SELECT * FROM products WHERE name = $1 AND is_active = true
@@ -814,7 +577,6 @@ export const findProductByName = async (name, client = pool) => {
   return rows[0];
 }
 
-//using
 export const findProductByNameForSearch = async (name, client = pool) => {
   const query = `SELECT
       p.*,
@@ -867,7 +629,6 @@ export const findProductByNameForSearch = async (name, client = pool) => {
 //   return rows;
 // };
 
-//using
 export const deleteProduct = async (id) => {
   const query = `DELETE FROM products WHERE product_id = $1 RETURNING *`;
   const values = [id];
@@ -875,7 +636,6 @@ export const deleteProduct = async (id) => {
   return rows[0];
 };
 
-//using
 export const getAttributesByCategory = async (categoryId) => {
   const query = `
             SELECT
@@ -895,97 +655,6 @@ export const getAttributesByCategory = async (categoryId) => {
   const { rows } = await pool.query(query, values);
   return rows;
 };
-
-//using
-// export const getFilteredProducts = async ({ categoryId, attributeFilters = [], priceMin, priceMax }) => {
-//   const conditions = [`p.category_id = $1`, `p.is_active = true`];
-//   const params = [categoryId];
-//   let idx = 2;
-
-//   if (priceMin !== undefined) {
-//     conditions.push(`p.selling_price >= $${idx++}`);
-//     params.push(priceMin);
-//   }
-
-//   if (priceMax !== undefined) {
-//     conditions.push(`p.selling_price <= $${idx++}`);
-//     params.push(priceMax);
-//   }
-
-//   for (const { attributeId, values } of attributeFilters) {
-//     conditions.push(`
-//       EXISTS (
-//         SELECT 1 FROM product_attributes pa2
-//         WHERE pa2.product_id   = p.product_id
-//           AND pa2.attribute_id = $${idx++}
-//           AND pa2.value        = ANY($${idx++}::text[])
-//       )
-//     `);
-//     params.push(Number(attributeId), values); // values is already a JS array — pg handles it
-//   }
-
-//   const query = `
-//     SELECT
-//       p.*,
-//       c.name AS category_name,
-//       b.name AS brand_name,
-//       CASE
-//         WHEN active_offer.id IS NULL THEN p.discounted_price
-//         WHEN active_offer.discount_type = 'percentage' THEN GREATEST(0, p.selling_price - (p.selling_price * active_offer.discount_value / 100))
-//         ELSE GREATEST(0, p.selling_price - active_offer.discount_value)
-//       END AS discounted_price,
-//       COALESCE(attr_agg.attributes, '[]'::json) AS attributes,
-//       COALESCE(img_agg.images,      '[]'::json) AS images
-//     FROM products p
-//     LEFT JOIN categories c ON c.category_id = p.category_id
-//     LEFT JOIN brands b     ON b.brand_id    = p.brand_id
-//     LEFT JOIN LATERAL (
-//       SELECT o.id, o.discount_type, o.discount_value
-//       FROM offer_products op
-//       JOIN offers o ON o.id = op.offer_id
-//       WHERE op.product_id = p.product_id
-//         AND o.is_active = true
-//         AND NOW() BETWEEN o.start_date AND o.end_date
-//       ORDER BY o.start_date DESC
-//       LIMIT 1
-//     ) active_offer ON true
-//     LEFT JOIN (
-//       SELECT
-//         pa.product_id,
-//         JSON_AGG(
-//           JSON_BUILD_OBJECT(
-//             'product_attribute_id', pa.product_attribute_id,
-//             'attribute_id',         pa.attribute_id,
-//             'attribute_name',       a.name,
-//             'value',                pa.value
-//           )
-//         ) AS attributes
-//       FROM product_attributes pa
-//       LEFT JOIN attributes a ON a.attribute_id = pa.attribute_id
-//       GROUP BY pa.product_id
-//     ) attr_agg ON attr_agg.product_id = p.product_id
-//     LEFT JOIN (
-//       SELECT
-//         pi.product_id,
-//         JSON_AGG(
-//           JSON_BUILD_OBJECT(
-//             'image_id',   pi.image_id,
-//             'image_url',  pi.image_url,
-//             'is_primary', pi.is_primary,
-//             'alt_text',   pi.alt_text,
-//             'sort_order', pi.sort_order
-//           ) ORDER BY pi.sort_order
-//         ) AS images
-//       FROM product_images pi
-//       GROUP BY pi.product_id
-//     ) img_agg ON img_agg.product_id = p.product_id
-//     WHERE ${conditions.join(' AND ')}
-//     ORDER BY p.created_at DESC
-//   `;
-
-//   const { rows } = await pool.query(query, params);
-//   return rows;
-// };
 
 export const getFilteredProducts = async ({ categoryId, attributeFilters = [], priceMin, priceMax }) => {
   const conditions = [`p.category_id = $1`, `p.is_active = true`];
@@ -1083,14 +752,12 @@ export const getFilteredProducts = async ({ categoryId, attributeFilters = [], p
   return rows;
 };
 
-//using
 export const getImagesById = async (id) => {
-  const quary = `SELECT * FROM product_images WHERE product_id = $1`;
-  const { rows } = await pool.query(quary, [id]);
+  const query = `SELECT * FROM product_images WHERE product_id = $1`;
+  const { rows } = await pool.query(query, [id]);
   return rows;
 }
 
-//using
 export const updateProductFieldsOnly = async (id, productData, client = pool) => {
   const {
     name,
@@ -1147,7 +814,6 @@ export const updateProductFieldsOnly = async (id, productData, client = pool) =>
   return rows[0];
 };
 
-//using
 export const insertSingleImage = async (productId, image, client = pool) => {
   const query = `
     INSERT INTO product_images
@@ -1167,21 +833,18 @@ export const insertSingleImage = async (productId, image, client = pool) => {
   return rows[0];
 };
 
-//using
 export const getImageById = async (imageId, client = pool) => {
   const query = `SELECT * FROM product_images WHERE image_id = $1`;
   const { rows } = await client.query(query, [imageId]);
   return rows[0];
 };
 
-// using 
 export const deleteImageById = async (imageId, client = pool) => {
   const query = `DELETE FROM product_images WHERE image_id = $1 RETURNING *`;
   const { rows } = await client.query(query, [imageId]);
   return rows[0];
 };
 
-//using
 export const updateImagesOrder = async (productId, orderedImageIds, primaryImageId, client = pool) => {
   for (const [index, imageId] of orderedImageIds.entries()) {
     await client.query(

@@ -1,6 +1,5 @@
 import pool from '../../config/db.js';
 
-//using
 export const createAttribute = async ({ name, category_id }) => {
 
     const query = `
@@ -13,7 +12,6 @@ export const createAttribute = async ({ name, category_id }) => {
     return rows[0];
 }
 
-//using
 export const createProductAttribute = async (productId, attributeData) => {
     const query = `
         INSERT INTO product_attributes (
@@ -37,7 +35,6 @@ export const createProductAttribute = async (productId, attributeData) => {
     return rows[0];
 };
 
-//using
 export const getAttributeValueById = async (attributeValueId) => {
     const query = `
         SELECT
@@ -52,7 +49,6 @@ export const getAttributeValueById = async (attributeValueId) => {
     return rows[0];
 };
 
-//using
 export const insertAttributeValue = async ({ attribute_id, value }) => {
     const query = `
         INSERT INTO attribute_values (attribute_id, value)
@@ -63,7 +59,6 @@ export const insertAttributeValue = async ({ attribute_id, value }) => {
     return rows[0];
 }
 
-//using
 export const getAttributeCatalog = async () => {
     const categoriesQuery = `
         SELECT category_id, name
@@ -103,7 +98,6 @@ export const getAttributeCatalog = async () => {
     };
 }
 
-//using
 export const getAttributesByCategory = async (categoryId) => {
     const query = `
         SELECT
@@ -131,14 +125,12 @@ export const getAttributesByCategory = async (categoryId) => {
     return rows;
 };
 
-//using
 export const deleteAttributeById = async (id) => {
     const query = `DELETE FROM attributes WHERE attribute_id = $1 RETURNING *`;
     const { rows } = await pool.query(query, [id]);
     return rows[0];
 }
 
-//using
 export const deleteAttributeValueById = async (attributeId, valueId) => {
     const query = `
         DELETE FROM attribute_values

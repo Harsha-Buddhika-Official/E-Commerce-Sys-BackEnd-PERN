@@ -2,12 +2,10 @@ import * as attributeRepository from './attribute.repository.js';
 import * as productRepository from '../products/product.repository.js';
 import AppError from '../../utils/AppError.js';
 
-//using
 export const createAttribute = async (attribute) => {
     return await attributeRepository.createAttribute(attribute);
 }
 
-//using
 export const createProductAttribute = async (productId, attributeData) => {
     const product = await productRepository.findProductById(productId);
     if (!product) {
@@ -29,7 +27,6 @@ export const createProductAttribute = async (productId, attributeData) => {
     });
 }
 
-//using
 export const createAttributeValue = async (attributeValue) => {
     if(!attributeValue.attribute_id || !attributeValue.value){
         const error = new Error("Attribute ID and value are required to create an attribute value");
@@ -39,12 +36,10 @@ export const createAttributeValue = async (attributeValue) => {
     return await attributeRepository.insertAttributeValue (attributeValue);
 }
 
-//using
 export const getAttributeCatalog = async () => {
     return await attributeRepository.getAttributeCatalog();
 }
 
-//using
 export const getAttributesGroupedByCategory = async (categoryId = null) => {
     return await attributeRepository.getAttributesByCategory(categoryId);
 }
@@ -78,7 +73,6 @@ export const updateAttribute = async (id, payload) => {
     return updated;
 };
 
-//using
 export const deleteAttribute = async (id) => {
     const deleted = await attributeRepository.deleteAttributeById (id);
 
@@ -91,7 +85,6 @@ export const deleteAttribute = async (id) => {
     return deleted;
 }
 
-//using
 export const deleteAttributeValue = async (attributeId, valueId) => {
     const deleted = await attributeRepository.deleteAttributeValueById(attributeId, valueId);
 

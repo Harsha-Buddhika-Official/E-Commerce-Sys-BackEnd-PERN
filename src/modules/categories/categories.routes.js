@@ -8,21 +8,21 @@ import upload from '../../middlewares/multer.js';
 const router = express.Router();
 
 // ==================== PUBLIC ROUTES - GET ====================
-router.get('/products', validateGetCategory, getProductCategories); //using
-router.get('/accessories', validateGetCategory, getAccessoryCategories); //using
+router.get('/products', validateGetCategory, getProductCategories); 
+router.get('/accessories', validateGetCategory, getAccessoryCategories); 
 // router.get('/:id', validateCategoryIdParam, getCategoryById);
 
 // ==================== PROTECTED ROUTES ====================
 router.use(authMiddleware);
 
 // ==================== PROTECTED ROUTES - GET ====================
-router.get('/admin', authorize('super_admin', 'admin'), getCategories); //using
-router.get('/admin/names', authorize('super_admin', 'admin'), getCategoryNames); //using
+router.get('/admin', authorize('super_admin', 'admin'), getCategories); 
+router.get('/admin/names', authorize('super_admin', 'admin'), getCategoryNames); 
 
 // ==================== PROTECTED ROUTES - POST ====================
-router.post('/', authorize('super_admin', 'admin'), upload.single('media'), validateCreateCategory, createCategory); //using
+router.post('/', authorize('super_admin', 'admin'), upload.single('media'), validateCreateCategory, createCategory); 
 
 // ==================== PROTECTED ROUTES - DELETE ====================
-router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); //using
+router.delete('/:id', authorize('super_admin', 'admin'), validateCategoryIdParam, deleteCategory); 
 
 export default router;

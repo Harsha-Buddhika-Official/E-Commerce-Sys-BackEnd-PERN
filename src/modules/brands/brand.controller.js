@@ -1,8 +1,6 @@
 import * as brandService from './brand.service.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-//create brand
-//using
 export const createBrand = async (req, res, next) => {
     try {
         const newBrand = await brandService.createBrand(req.body, req.file);
@@ -23,8 +21,6 @@ export const createBrand = async (req, res, next) => {
     }
 };
 
-//get all brands
-//using
 export const getAllBrands = async (req, res, next) => {
     try {
         const brands = await brandService.getAllBrands();
@@ -38,8 +34,6 @@ export const getAllBrands = async (req, res, next) => {
     }
 }
 
-//get all brand names and ids
-//using
 export const getAllBrandnames = async (req, res, next) => {
     try {
         const brandNames = await brandService.getAllBrandNames();
@@ -53,7 +47,6 @@ export const getAllBrandnames = async (req, res, next) => {
     }
 }
 
-//get brand by id
 export const getBrandById = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -68,7 +61,6 @@ export const getBrandById = async (req, res, next) => {
     }
 };
 
-//using
 export const deleteBrand = async (req, res, next) => {
     try {
         const { id } = req.params;

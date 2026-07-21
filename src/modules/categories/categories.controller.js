@@ -1,7 +1,5 @@
 import * as categoryService from './categories.service.js';
 
-// Create category
-//using
 export const createCategory = async (req, res, next) => {
     try {
         const newCategory = await categoryService.createCategory(req.body, req.file);
@@ -16,8 +14,6 @@ export const createCategory = async (req, res, next) => {
     }
 };
 
-// Get product categories
-//using
 export const getProductCategories = async (req, res, next) => {
     try {
         const categories = await categoryService.getCategories('product');
@@ -32,8 +28,6 @@ export const getProductCategories = async (req, res, next) => {
     }
 };
 
-// Get accessory categories
-//using
 export const getAccessoryCategories = async (req, res, next) => {
     try {
         const categories = await categoryService.getCategories('accessory');
@@ -48,8 +42,6 @@ export const getAccessoryCategories = async (req, res, next) => {
     }
 };
 
-// Get categories by type or all categories
-//using
 export const getCategories = async (req, res, next) => {
     try {
         const { type } = req.query;
@@ -66,8 +58,6 @@ export const getCategories = async (req, res, next) => {
     }
 };
 
-// Get category names and ids only
-//using
 export const getCategoryNames = async (req, res, next) => {
     try {
         const categories = await categoryService.getCategoryNames();
@@ -82,8 +72,6 @@ export const getCategoryNames = async (req, res, next) => {
     }
 };
 
-// Delete category
-//using
 export const deleteCategory = async (req, res, next) => {
     try {
         const { id } = req.params;

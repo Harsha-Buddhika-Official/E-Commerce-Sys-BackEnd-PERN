@@ -7,11 +7,6 @@ import pool from '../../config/db.js';
 import AppError from '../../utils/AppError.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-/* =========================================================
-   CLOUDINARY HELPERS
-========================================================= */
-
-//using
 const uploadProductImages = async (files = []) => {
   const uploadedImages = [];
   const uploadedCloudinaryIds = [];
@@ -35,10 +30,6 @@ const uploadProductImages = async (files = []) => {
 
   return { uploadedImages, uploadedCloudinaryIds };
 };
-
-/* =========================================================
-   CREATE PRODUCT (WITH ATTRIBUTES)
-========================================================= */
 
 export const createProduct = async ({ body, files }) => {
   const client = await pool.connect();
@@ -101,11 +92,6 @@ export const createProduct = async ({ body, files }) => {
   }
 };
 
-/* =========================================================
-   CREATE PRODUCT (WITHOUT ATTRIBUTES)
-========================================================= */
-
-//using
 export const createProductWithoutAttributes = async ({ body, files }) => {
   const client = await pool.connect();
   let uploadedCloudinaryIds = [];
@@ -159,46 +145,36 @@ export const createProductWithoutAttributes = async ({ body, files }) => {
   }
 };
 
-/* =========================================================
-   GET PRODUCTS
-========================================================= */
-
-//using
 export const getAllProducts = async () => {
   const products = await productRepository.getAllProducts();
   if (!products.length) throw new AppError('No products found', 404);
   return products;
 };
 
-//using
 export const getAllProductsDetailsSimple = async () => {
   const products = await productRepository.getAllProductsDetailsSimple();
   if (!products.length) throw new AppError('No products found', 404);
   return products;
 };
 
-//using
 export const getAllProductLimitedDetilas = async () => {
   const products = await productRepository.getAllProductLimitedDetilas();
   if (!products.length) throw new AppError('No products found', 404);
   return products;
 };
 
-//using
 export const getAllDetialsProductById = async (id) => {
   const product = await productRepository.getAllDetialsProductById(id);
   if (!product) throw new AppError('Product not found', 404);
   return applyOfferToProduct(product);
 };
 
-//using
 export const getProductById = async (id) => {
   const product = await productRepository.findProductById(id);
   if (!product) throw new AppError('Product not found', 404);
   return applyOfferToProduct(product);
 };
 
-//using
 export const getProductByName = async (name) => {
   if (!name) throw new AppError('Product name is required', 400);
 
@@ -210,11 +186,6 @@ export const getProductByName = async (name) => {
   return product;
 };
 
-/* =========================================================
-   FILTER / CATEGORY / SPECIAL LISTS
-========================================================= */
-
-//using
 export const getProductsByCategory = async (categoryId) => {
   const products = await productRepository.getProductsByCategory(categoryId);
   if (!products.length) throw new AppError('No products found', 404);
@@ -222,7 +193,6 @@ export const getProductsByCategory = async (categoryId) => {
   return applyOffersToProducts(products);
 };
 
-//using
 export const getBestSellingProducts = async () => {
   const products = await productRepository.getBestSellingProducts();
   if (!products.length) throw new AppError('No products found', 404);
@@ -230,7 +200,6 @@ export const getBestSellingProducts = async () => {
   return applyOffersToProducts(products);
 };
 
-//using
 export const getLatestProducts = async () => {
   const products = await productRepository.getLatestProducts();
   if (!products.length) throw new AppError('No products found', 404);
@@ -238,21 +207,12 @@ export const getLatestProducts = async () => {
   return applyOffersToProducts(products);
 };
 
-/* =========================================================
-   PRODUCT DELETE / RESTORE
-========================================================= */
-
-//using
 export const deleteProduct = async (id) => {
   const existing = await productRepository.findProductById(id);
   if (!existing) throw new AppError('Product not found', 404);
 
   return productRepository.deleteProduct(id);
 };
-
-/* =========================================================
-   ATTRIBUTES
-========================================================= */
 
 export const removeProductAttribute = async (productId, attributeId) => {
   const existing = await productRepository.findProductById(productId);
@@ -277,7 +237,6 @@ export const getAttributesByCategory = async (categoryId) => {
   return rows;
 };
 
-//using
 export const getFilterOptions = async (categoryId) => {
   const rows =
     await productRepository.getAttributesByCategory(categoryId);
@@ -305,7 +264,6 @@ export const getFilterOptions = async (categoryId) => {
   return Array.from(map.values());
 };
 
-//using
 export const filterProducts = async (categoryId, body) => {
   const priceMin = body.priceMin ? parseFloat(body.priceMin) : undefined;
   const priceMax = body.priceMax ? parseFloat(body.priceMax) : undefined;
@@ -331,11 +289,6 @@ export const filterProducts = async (categoryId, body) => {
   return products;
 };
 
-/* =========================================================
-   UPDATE PRODUCT (CORE FIXED VERSION)
-========================================================= */
-
-//using
 export const updateProductDetails = async (id, productData) => {
   const client = await pool.connect();
 
@@ -431,10 +384,6 @@ export const updateProductDetails = async (id, productData) => {
   }
 };
 
-/* =========================================================
-   IMAGE MANAGEMENT
-========================================================= */
-//using
 export const addProductImage = async (productId, files) => {
   const client = await pool.connect();
   const uploaded = [];
@@ -498,7 +447,6 @@ export const addProductImage = async (productId, files) => {
   }
 };
 
-// using 
 export const removeProductImage = async (productId, imageId) => {
   const client = await pool.connect();
 
@@ -542,7 +490,6 @@ export const removeProductImage = async (productId, imageId) => {
   }
 };
 
-// using 
 export const reorderProductImages = async (
   productId,
   primaryImageId,

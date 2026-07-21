@@ -1,6 +1,5 @@
 import pool from '../../config/db.js';
 
-//using
 export const createOffer = async (offerData) => {
     const {
         title,
@@ -37,7 +36,6 @@ export const createOffer = async (offerData) => {
     return rows[0];
 };
 
-//using
 export const addOfferProduct = async (offerId, productId) => {
     const query = `
         INSERT INTO offer_products (offer_id, product_id)
@@ -48,7 +46,6 @@ export const addOfferProduct = async (offerId, productId) => {
     return rows[0];
 };
 
-//using
 export const getAllOffers = async () => {
     const query = `
         SELECT
@@ -98,7 +95,6 @@ export const getAllOffers = async () => {
     return rows;
 };
 
-//using
 export const getAllOfferProducts = async () => {
     const query = `
         SELECT
@@ -122,8 +118,6 @@ export const getAllOfferProducts = async () => {
     return rows;
 }
 
-// Get offers with optional status filter
-//using
 export const getOffers = async ({ status }) => {
     let query = `
     SELECT 
@@ -172,7 +166,6 @@ export const getOffers = async ({ status }) => {
     return rows;
 };
 
-// using
 export const getActiveOffers = async () => {
     const query = `
         SELECT
@@ -198,7 +191,6 @@ export const getActiveOffers = async () => {
     return rows;
 };
 
-//using
 export const getUpcomingOffers = async () => {
     const query = `
         SELECT
@@ -224,7 +216,6 @@ export const getUpcomingOffers = async () => {
     return rows;
 };
 
-//using
 export const findOfferByIdBasic = async (id) => {
     const query = `
         SELECT * FROM offers
@@ -234,7 +225,6 @@ export const findOfferByIdBasic = async (id) => {
     return rows[0];
 }
 
-//using
 export const findOfferByIdUser = async (id) => {
     const query = `SELECT
         o.id,
@@ -306,7 +296,6 @@ export const findOfferByIdUser = async (id) => {
     return rows[0];
 };
 
-//using
 export const findOfferByIdAdmin = async (id) => {
     const query = `SELECT
     o.id,
@@ -390,8 +379,6 @@ GROUP BY
     return rows[0];
 };
 
-//for cart service to check if the product have offer or not
-//using
 export const findOfferByProductId = async (id) => {
     const query = `
         SELECT *
@@ -402,7 +389,6 @@ export const findOfferByProductId = async (id) => {
     return rows[0];
 };
 
-//using
 export const findOfferByIdWhenItsActive = async (id) => {
     const query = `
         SELECT *
@@ -415,7 +401,6 @@ export const findOfferByIdWhenItsActive = async (id) => {
     return rows[0];
 };
 
-//using
 export const updateOffer = async (id, Payload) => {
     const {
         title,
@@ -462,7 +447,6 @@ export const updateOffer = async (id, Payload) => {
     return rows[0];
 };
 
-//using
 export const toggleOffer = async (id, isActive) => {
     const query = `
         UPDATE offers
@@ -476,14 +460,12 @@ export const toggleOffer = async (id, isActive) => {
     return rows[0];
 };
 
-//using
 export const deleteOffer = async (id) => {
     const query = `DELETE FROM offers WHERE id = $1 RETURNING *`;
     const { rows } = await pool.query(query, [id]);
     return rows[0];
 };
 
-//using
 export const findOfferProduct = async (offerId, productId) => {
     const query = `
         SELECT *
@@ -494,7 +476,6 @@ export const findOfferProduct = async (offerId, productId) => {
     return rows[0];
 };
 
-//using
 export const getOfferProducts = async (offerId) => {
     const query = `
         SELECT
@@ -515,7 +496,6 @@ export const getOfferProducts = async (offerId) => {
     return rows;
 };
 
-//using
 export const findOfferByProductIdFullOfferData = async (productId) => {
     const query = `
         SELECT o.discount_type, o.discount_value, o.start_date, o.end_date 

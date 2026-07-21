@@ -1,6 +1,5 @@
 import * as adminService from './admin.service.js';
 
-//using
 export const createAdmin = async (req, res, next) => {
     try {
         const newAdmin = await adminService.createAdmin(req.body);
@@ -14,7 +13,6 @@ export const createAdmin = async (req, res, next) => {
     }
 };
 
-//using
 export const loginAdmin = async (req, res, next) => {
     try {
         const result = await adminService.loginAdmin(req.body);
@@ -28,7 +26,6 @@ export const loginAdmin = async (req, res, next) => {
     }
 };
 
-//using
 export const getAllAdmins = async (req, res, next) => {
     try {
         const admins = await adminService.getAllAdmins();
@@ -43,7 +40,6 @@ export const getAllAdmins = async (req, res, next) => {
     }
 };
 
-//using
 export const updateAdminRole = async (req, res, next) => {
     try {
         const updated = await adminService.updateAdminRole(
@@ -61,7 +57,6 @@ export const updateAdminRole = async (req, res, next) => {
     }
 };
 
-//using
 export const deleteAdmin = async (req, res, next) => {
     try {
         // console.log('req.body.id:', req.params);
@@ -77,7 +72,6 @@ export const deleteAdmin = async (req, res, next) => {
     }
 };
 
-//using
 export const updateAdminPassword = async (req, res, next) => {
     try {
         const updated = await adminService.updateAdminPassword(

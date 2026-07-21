@@ -1,6 +1,5 @@
 import pool from '../../config/db.js';
 
-//using
 export const createOrder = async (orderData, client = pool) => {
 
     const { tracking_code, customer_email, phone_number, total_amount, order_status, shipping_address, city, postal_code, items, full_name } = orderData;
@@ -61,7 +60,6 @@ export const createOrder = async (orderData, client = pool) => {
     return order;
 };
 
-//using
 export const importPaymentSlipData = async (data) => {
     const query = `INSERT INTO order_receipts (
         order_id,
@@ -82,7 +80,6 @@ export const importPaymentSlipData = async (data) => {
     return rows[0];
 }
 
-//using
 export const getDashboardMetrics = async (client = pool) => {
     const query = `
         SELECT
@@ -140,7 +137,6 @@ export const getDashboardMetrics = async (client = pool) => {
     return rows[0];
 };
 
-//using
 export const lowStockAlert = async (threshold = 5, client = pool) => {
     const query = `
         SELECT product_id, name, stock_quantity
@@ -158,7 +154,6 @@ export const lowStockAlert = async (threshold = 5, client = pool) => {
     }
 };
 
-//using
 export const getOrderStatusCount = async (client = pool) => {
     const query = `
         SELECT
@@ -186,7 +181,6 @@ export const getOrderStatusCount = async (client = pool) => {
     }
 }
 
-//using
 export const findRecentOrders = async (client = pool) => {
     const query = `SELECT
         o.order_id,
@@ -214,7 +208,6 @@ export const findRecentOrders = async (client = pool) => {
     }
 }
 
-//using
 export const findAllOrders = async (client = pool) => {
     const query = `SELECT
         o.order_id,
@@ -369,7 +362,6 @@ export const findAllOrders = async (client = pool) => {
 //     }
 // };
 
-//using
 export const getOrderById = async (orderId, client = pool) => {
     const query = `SELECT 
         o.order_id,
@@ -431,7 +423,6 @@ export const getOrderById = async (orderId, client = pool) => {
     }
 };
 
-//using
 export const findOrderImageById = async (orderId, client = pool) => {
     const query = `SELECT media_url, media_public_id FROM order_receipts WHERE order_id = $1`;
     try {
@@ -444,7 +435,6 @@ export const findOrderImageById = async (orderId, client = pool) => {
     }
 };
 
-//using
 export const getOrdersByEmail = async (email, client = pool) => {
     const query = `SELECT 
     o.order_id, 
@@ -474,7 +464,6 @@ export const getOrdersByEmail = async (email, client = pool) => {
     }
 };
 
-// using
 export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
     const query = `
         SELECT 
@@ -520,7 +509,6 @@ export const getOrderByTrackingCode = async (trackingCode, client = pool) => {
     }
 };
 
-//using
 export const updateOrderStatus = async (orderId, newStatus, client = pool) => {
     const query = `UPDATE orders
     SET 

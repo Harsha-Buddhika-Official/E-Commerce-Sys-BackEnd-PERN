@@ -1,7 +1,6 @@
 import * as offersService from './offers.service.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinaryUpload.js';
 
-//using
 export const createOffer = async (req, res, next) => {
     try {
         const offer = await offersService.createOffer(req.body, req.file);
@@ -16,7 +15,6 @@ export const createOffer = async (req, res, next) => {
     }
 };
 
-//using
 export const getAllOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getAllOffers();
@@ -29,7 +27,6 @@ export const getAllOffers = async (req, res, next) => {
     }
 };
 
-//using
 export const getOffers = async (req, res, next) => {
   try {
     const { status } = req.query;
@@ -44,7 +41,6 @@ export const getOffers = async (req, res, next) => {
   }
 };
 
-//using
 export const getActiveOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getActiveOffers();
@@ -57,7 +53,6 @@ export const getActiveOffers = async (req, res, next) => {
     }
 };
 
-//using
 export const getUpcomingOffers = async (req, res, next) => {
     try {
         const offers = await offersService.getUpcomingOffers();
@@ -70,7 +65,6 @@ export const getUpcomingOffers = async (req, res, next) => {
     }
 };
 
-//using
 export const getOfferByIdAdmin = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -86,7 +80,6 @@ export const getOfferByIdAdmin = async (req, res, next) => {
     }
 };
 
-//using
 export const getOfferByIdUser = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -100,7 +93,6 @@ export const getOfferByIdUser = async (req, res, next) => {
     }
 };
 
-//using
 export const updateOffer = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -117,7 +109,6 @@ export const updateOffer = async (req, res, next) => {
     }
 };
 
-//using
 export const updateOfferStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -135,7 +126,6 @@ export const updateOfferStatus = async (req, res, next) => {
     }
 };
 
-//using
 export const deleteOffer = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -151,7 +141,6 @@ export const deleteOffer = async (req, res, next) => {
     }
 };
 
-//using
 export const addOfferProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -167,7 +156,6 @@ export const addOfferProduct = async (req, res, next) => {
     }
 };
 
-//using
 export const getOfferProducts = async (req, res, next) => {
     try {
         const { id } = req.params;

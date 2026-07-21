@@ -3,7 +3,6 @@ import { hashPassword, comparePasswords } from '../../utils/hash.js';
 import { generateToken } from '../../utils/jwt.js';
 import AppError from '../../utils/AppError.js';
 
-//using
 export const createAdmin = async (adminData) => {
     if (!adminData.fullname || !adminData.email || !adminData.password) {
         throw new AppError('All fields are required', 400);
@@ -25,7 +24,6 @@ export const createAdmin = async (adminData) => {
     return safe;
 };
 
-//using
 export const loginAdmin = async (adminData) => {
     const { email, password } = adminData;
 
@@ -55,14 +53,12 @@ export const loginAdmin = async (adminData) => {
     return { token, admin: safeAdmin };
 };
 
-//using
 export const getAllAdmins = async () => {
     const admins = await adminRepository.getAllAdmins();
 
     return admins.map(({ password_hash, ...rest }) => rest);
 };
 
-//using
 export const updateAdminRole = async (adminId, adminData) => {
     if (!adminId || !adminData.newRole) {
         throw new AppError('Admin ID and new role are required', 400);
@@ -76,7 +72,6 @@ export const updateAdminRole = async (adminId, adminData) => {
     return safe;
 };
 
-//using
 export const deleteAdmin = async (adminId) => {
     if (!adminId) {
         throw new AppError('Admin ID is required', 400);
@@ -93,7 +88,6 @@ export const deleteAdmin = async (adminId) => {
     return safe;
 };
 
-//using
 export const updateAdminPassword = async (adminId, adminData) => {
     if (!adminId) throw new AppError('Admin ID is required', 400);
 

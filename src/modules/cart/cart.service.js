@@ -3,7 +3,6 @@ import { findOfferByProductId, findOfferByIdWhenItsActive } from '../offers/offe
 import AppError from '../../utils/AppError.js';
 import { setSessionCookie } from '../../middlewares/session.middleware.js';
 
-// using
 export const getCart = async (sessionId) => {
     // console.log("Service Layer - getCart called with sessionId:", sessionId);
     const cart = await cartRepository.findCartBySession(sessionId);
@@ -15,7 +14,6 @@ export const getCart = async (sessionId) => {
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-//using
 export const addItem = async ({ sessionId, productId, quantity }) => {
     const product = await cartRepository.findProduct(productId);
 
@@ -83,7 +81,6 @@ export const addItem = async ({ sessionId, productId, quantity }) => {
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-//using
 export const updateQuantity = async ({ sessionId, itemId, quantity }) => {
     const cart = await cartRepository.findCartBySession(sessionId);
 
@@ -111,7 +108,6 @@ export const updateQuantity = async ({ sessionId, itemId, quantity }) => {
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-//using
 export const removeItem = async ({ sessionId, itemId }) => {
     const cart = await cartRepository.findCartBySession(sessionId);
 
@@ -130,7 +126,6 @@ export const removeItem = async ({ sessionId, itemId }) => {
     return cartRepository.getCartWithItems(cart.cart_id);
 };
 
-//using
 export const clearCart = async (sessionId) => {
     const cart = await cartRepository.findCartBySession(sessionId);
     if (!cart) {

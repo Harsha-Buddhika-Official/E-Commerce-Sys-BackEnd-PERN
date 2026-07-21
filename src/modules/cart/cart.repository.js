@@ -1,6 +1,5 @@
 import pool from '../../config/db.js';
 
-// using
 export const findCartBySession = async (sessionId) => {
     const query = `
         SELECT *
@@ -13,7 +12,6 @@ export const findCartBySession = async (sessionId) => {
     return rows[0] ?? null;
 };
 
-// using
 export const createCart = async (sessionId) => {
     const query = `
         INSERT INTO carts (session_id)
@@ -25,7 +23,6 @@ export const createCart = async (sessionId) => {
     return rows[0];
 };
 
-// using
 export const findCartItem = async (cartId, productId) => {
     const query = `
         SELECT *
@@ -38,7 +35,6 @@ export const findCartItem = async (cartId, productId) => {
     return rows[0] ?? null;
 };
 
-// using
 export const findCartItemById = async (itemId) => {
     const query = `
         SELECT *
@@ -50,7 +46,6 @@ export const findCartItemById = async (itemId) => {
     return rows[0] ?? null;
 };
 
-// using
 export const createCartItem = async ({ cart_id, product_id, quantity, price_at_add }) => {
     const query = `
         INSERT INTO cart_items (
@@ -65,7 +60,6 @@ export const createCartItem = async ({ cart_id, product_id, quantity, price_at_a
     await pool.query(query, [cart_id, product_id, quantity, price_at_add]);
 };
 
-// using
 export const updateItemQuantity = async (itemId, quantity) => {
     const query = `
         UPDATE cart_items
@@ -77,7 +71,6 @@ export const updateItemQuantity = async (itemId, quantity) => {
     await pool.query(query, [quantity, itemId]);
 };
 
-// using
 export const deleteCartItem = async (itemId) => {
     const query = `
         DELETE FROM cart_items
@@ -87,7 +80,6 @@ export const deleteCartItem = async (itemId) => {
     await pool.query(query, [itemId]);
 };
 
-// using
 export const deleteAllCartItems = async (cartId) => {
     const query = `
         DELETE FROM cart_items
@@ -97,7 +89,6 @@ export const deleteAllCartItems = async (cartId) => {
     await pool.query(query, [cartId]);
 };
 
-// using
 export const findProduct = async (productId) => {
     const query = `
         SELECT product_id,
@@ -113,7 +104,6 @@ export const findProduct = async (productId) => {
     return rows[0] ?? null;
 };
 
-// using
 export const getCartWithItems = async (cartId) => {
     const query = `
         SELECT
