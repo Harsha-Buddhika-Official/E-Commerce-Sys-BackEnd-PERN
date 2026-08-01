@@ -18,7 +18,8 @@ const allowedOrigins = [
     "http://localhost:3000",
     "https://e-commerce-sys-front-end-pern.vercel.app",
     "https://e-commerce-sys-front-end-pern-harshabuddika75-8373s-projects.vercel.app/",
-    "https://e-commerce-sys-front-end-pern-olzsfhmsa.vercel.app"
+    "https://e-commerce-sys-front-end-pern-olzsfhmsa.vercel.app",
+    "https://e-commerce-sys-front-end-pern-eta.vercel.app"
 ];
 
 const app = express();
@@ -27,13 +28,6 @@ app.use(express.json({
 }));
 app.set("trust proxy", 1);
 app.use(cors({
-    // origin: [
-    //     "http://localhost:5173",
-    //     "http://localhost:3000",
-    //     "https://e-commerce-sys-front-end-pern.vercel.app",
-    //     "https://e-commerce-sys-front-end-pern-harshabuddika75-8373s-projects.vercel.app/",
-    //     "https://e-commerce-sys-front-end-pern-olzsfhmsa.vercel.app"
-    // ],
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
