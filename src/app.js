@@ -24,6 +24,7 @@ app.use(cors({
         "http://localhost:3000",
         "https://e-commerce-sys-frontend-pern-production.up.railway.app",
         "https://e-commerce-sys-backend-pern-production.up.railway.app/api",
+        "https://e-commerce-sys-front-end-pern-mbkixvvnk.vercel.app/"
     ],
     credentials: true,
 }));
