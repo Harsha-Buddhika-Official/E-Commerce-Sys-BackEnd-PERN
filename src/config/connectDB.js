@@ -9,7 +9,7 @@ const connectDB = async () => {
     while (true) {
         try {
             await pool.query('SELECT 1');
-            await pool.query('SET search_path TO public'); //this is only for neon database because tables name change like table_name -> public.table_name
+            // await pool.query('SET search_path TO public'); //this is only for neon database because tables name change like table_name -> public.table_name
             console.log('✅ Database connection successful');
             return;
         } catch (err) {
