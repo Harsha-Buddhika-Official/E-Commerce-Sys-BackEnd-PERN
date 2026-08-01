@@ -13,29 +13,44 @@ import attributeRoutes from './modules/attributes/attribute.routes.js';
 import offerRoutes from './modules/offers/offers.routes.js';
 import bannerRoutes from './modules/banners/banner.router.js';
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://e-commerce-sys-front-end-pern.vercel.app",
+    "https://e-commerce-sys-front-end-pern-harshabuddika75-8373s-projects.vercel.app/",
+    "https://e-commerce-sys-front-end-pern-olzsfhmsa.vercel.app"
+];
+
 const app = express();
 app.use(express.json({
-    limit:'1mb'
+    limit: '1mb'
 }));
 app.set("trust proxy", 1);
 app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://e-commerce-sys-front-end-pern.vercel.app",
-        "https://e-commerce-sys-front-end-pern-harshabuddika75-8373s-projects.vercel.app/",
-        "e-commerce-sys-front-end-pern-olzsfhmsa.vercel.app"
-    ],
+    // origin: [
+    //     "http://localhost:5173",
+    //     "http://localhost:3000",
+    //     "https://e-commerce-sys-front-end-pern.vercel.app",
+    //     "https://e-commerce-sys-front-end-pern-harshabuddika75-8373s-projects.vercel.app/",
+    //     "https://e-commerce-sys-front-end-pern-olzsfhmsa.vercel.app"
+    // ],
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
 app.use(cookieParser());
 
-app.use('/api/categories', categoryRoutes); 
-app.use('/api/brands', brandRoutes); 
-app.use('/api/products', productRoutes); 
-app.use('/api/cart', cartRoutes);  
-app.use('/api/orders', orderRoutes); 
-app.use('/api/admin', adminRoutes); 
+app.use('/api/categories', categoryRoutes);
+app.use('/api/brands', brandRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/offers', offerRoutes);
 app.use("/api/banners", bannerRoutes);
