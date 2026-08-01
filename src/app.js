@@ -22,7 +22,7 @@ app.use(cors({
     origin: [
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://e-commerce-sys-front-end-pern-mbkixvvnk.vercel.app/"
+        "https://e-commerce-sys-front-end-pern.vercel.app"
     ],
     credentials: true,
 }));
