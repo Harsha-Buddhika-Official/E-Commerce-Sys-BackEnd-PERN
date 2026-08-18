@@ -12,6 +12,7 @@ import adminRoutes from './modules/admin/admin.routes.js';
 import attributeRoutes from './modules/attributes/attribute.routes.js';
 import offerRoutes from './modules/offers/offers.routes.js';
 import bannerRoutes from './modules/banners/banner.router.js';
+import comparisonRoutes from './modules/comparison/comparison.route.js';
 
 const allowedOrigins = [
     "http://localhost:5173",
@@ -46,6 +47,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/offers', offerRoutes);
 app.use("/api/banners", bannerRoutes);
+app.use("/api/ai", comparisonRoutes);
 
 app.use(errorHandler);
 
