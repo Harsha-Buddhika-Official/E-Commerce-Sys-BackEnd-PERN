@@ -1,18 +1,19 @@
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "poolside/laguna-s-2.1:free";
+const OPENROUTER_MODEL = process.env.AI_MODEL || "poolside/laguna-s-2.1:free";
 
-/**
- * Sends a single comparison prompt to OpenRouter and returns the AI's response.
- * @param {string} prompt - The formatted comparison prompt (built from product data)
- * @param {boolean} useReasoning - Enable step-by-step reasoning for complex comparisons
- */
-
+// Used by comparison.service.js (unchanged, still works the same)
 export async function askAI(prompt, useReasoning = false) {
+  return askAIWithHistory([{ role: "user", content: prompt }], useReasoning);
+}
+
+// NEW - used by chat.service.js (accepts full message history)
+// src/services/ai/openRouterClient.js
+export async function askAIWithHistory(messages, useReasoning = false) {
   const body = {
     model: OPENROUTER_MODEL,
-    messages: [
-      { role: "user", content: prompt }
-    ],
+    messages,
+    max_tokens: 1500,
+    temperature: 0.3,
   };
 
   if (useReasoning) {
@@ -34,5 +35,11 @@ export async function askAI(prompt, useReasoning = false) {
   }
 
   const result = await response.json();
-  return result.choices[0].message.content;
+  const choice = result.choices[0];
+
+  if (choice.finish_reason === "length") {
+    console.warn("⚠️ AI response was truncated due to max_tokens limit. Consider increasing max_tokens.");
+  }
+
+  return choice.message.content;
 }

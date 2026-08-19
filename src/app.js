@@ -13,6 +13,7 @@ import attributeRoutes from './modules/attributes/attribute.routes.js';
 import offerRoutes from './modules/offers/offers.routes.js';
 import bannerRoutes from './modules/banners/banner.router.js';
 import comparisonRoutes from './modules/comparison/comparison.route.js';
+import chatRoutes from './modules/chat/chat.route.js';
 
 const allowedOrigins = [
     "http://localhost:5173",
@@ -48,6 +49,7 @@ app.use('/api/attributes', attributeRoutes);
 app.use('/api/offers', offerRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/ai", comparisonRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use(errorHandler);
 

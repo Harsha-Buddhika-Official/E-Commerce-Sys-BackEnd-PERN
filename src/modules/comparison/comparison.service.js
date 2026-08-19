@@ -47,6 +47,13 @@ function safeParseAIJson(rawText) {
   } catch (err) {
     console.error("Failed to parse AI JSON response:", err.message);
     console.error("Raw AI response was:", rawText);
+
+    // If the response looks cut off mid-JSON, it's almost always a max_tokens issue
+    const looksLikeTruncation = !cleaned.trim().endsWith("}");
+    if (looksLikeTruncation) {
+      throw new Error("AI response was cut off before completing. Try comparing fewer products, or increase max_tokens.");
+    }
+
     throw new Error("AI returned an invalid response format.");
   }
 
@@ -56,7 +63,7 @@ function safeParseAIJson(rawText) {
 export async function compareProducts(productIds) {
   const products = await getProductsByIds(productIds);
 
-  console.log("Retrieved Products:", products);
+  // console.log("Retrieved Products:", products);
 
   if (!products || products.length < 2) {
     throw new Error("At least 2 valid products are required for comparison.");

@@ -1,5 +1,3 @@
-// src/services/ai/utils/formatAIResponse.js
-
 /**
  * Cleans raw AI markdown response into plain, human-readable text.
  * Removes markdown symbols and normalizes spacing.
