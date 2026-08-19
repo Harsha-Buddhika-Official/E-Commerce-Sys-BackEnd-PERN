@@ -12,7 +12,7 @@ export async function askAIWithHistory(messages, useReasoning = false) {
   const body = {
     model: OPENROUTER_MODEL,
     messages,
-    max_tokens: 1500,
+    max_tokens: 2000,
     temperature: 0.3,
   };
 
