@@ -24,7 +24,7 @@ export async function chat(history = [], newMessage, comparisonResult = null) {
   ];
 
   const aiReply = await askAIWithHistory(messages);
-  console.log("AI Reply:", aiReply);
+  // console.log("AI Reply:", aiReply);
   
   return { reply: aiReply };
 }

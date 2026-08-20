@@ -62,7 +62,7 @@ export async function compareProducts(productIds) {
 
   const cached = getFromCache(cacheKey);
   if (cached) {
-    console.log("Serving comparison from cache:", cacheKey);
+    // console.log("Serving comparison from cache:", cacheKey);
     return cached;
   }
 
