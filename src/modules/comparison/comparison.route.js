@@ -1,8 +1,10 @@
+// src/modules/comparison/comparison.route.js
 import express from 'express';
-import { responseHandler } from './comparison.controller.js';
+import { startComparison, getComparisonResult } from './comparison.controller.js';
 
 const router = express.Router();
 
-router.post('/', responseHandler);
+router.post('/', startComparison);
+router.get('/:jobId', getComparisonResult);
 
 export default router;
